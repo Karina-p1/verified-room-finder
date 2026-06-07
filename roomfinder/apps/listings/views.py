@@ -114,6 +114,21 @@ def create_listing(request):
         messages.error(request, 'Only landlords can create listings.')
         return redirect('listings:homepage')
 
+    # Check if landlord has uploaded and approved documents
+    doc = getattr(request.user, 'documents', None)
+    if not doc:
+        messages.warning(
+            request,
+            'You must upload your verification documents before creating a listing.'
+        )
+        return redirect('documents:upload')
+    if doc.verification_status == 'pending':
+        messages.warning(request, 'Your documents are still under review. Please wait.')
+        return redirect('documents:status')
+    if doc.verification_status == 'rejected':
+        messages.error(request, 'Your documents were rejected. Please re-upload.')
+        return redirect('documents:upload')
+
     if request.method == 'POST':
         listing_form = ListingForm(request.POST)
         facilities_form = FacilitiesForm(request.POST)

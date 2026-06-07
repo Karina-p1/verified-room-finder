@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Upload Verification Documents — RoomFinder{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+
+    <div class="mb-4">
+        <h3 class="fw-bold">Landlord Verification</h3>
+        <p class="text-muted">
+            Upload the required documents to verify your identity and property ownership.
+            All documents are reviewed manually by our admin team within 24 hours.
+        </p>
+    </div>
+
+    <!-- Status banner if already submitted -->
+    {% if existing %}
+        {% if existing.verification_status == 'pending' %}
+            <div class="alert alert-warning">
+                <i class="bi bi-hourglass-split"></i>
+                <strong>Under Review.</strong> Your documents are currently being reviewed.
+                You can re-upload to replace them.
+            </div>
+        {% elif existing.verification_status == 'rejected' %}
+            <div class="alert alert-danger">
+                <i class="bi bi-x-circle"></i>
+                <strong>Rejected.</strong> {{ existing.rejection_reason }}
+                Please re-upload corrected documents.
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Required documents info -->
+    <div class="card border-0 bg-light p-4 mb-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-info-circle"></i> Required Documents</h6>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <i class="bi bi-card-image text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">Citizenship Front</div>
+                        <small class="text-muted">Front side of your citizenship card</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <i class="bi bi-card-image text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">Citizenship Back</div>
+                        <small class="text-muted">Back side of your citizenship card</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <i class="bi bi-file-earmark-text text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">Lalpurja</div>
+                        <small class="text-muted">Property ownership document</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <i class="bi bi-person-badge text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">Selfie with Citizenship</div>
+                        <small class="text-muted">Hold your citizenship next to your face</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <small class="text-muted mt-3 d-block">
+            <i class="bi bi-exclamation-triangle"></i>
+            All files must be JPG or PNG format, maximum 5MB each.
+        </small>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="card border-0 shadow-sm p-4">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        {{ field.label }}
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <!-- Show existing image if already uploaded -->
+                    {% if existing %}
+                        {% if field.name == 'citizenship_front' and existing.citizenship_front %}
+                            <div class="mb-2">
+                                <img src="{{ existing.citizenship_front.url }}"
+                                     class="img-thumbnail" style="max-height:100px;">
+                                <small class="text-muted d-block">Current file</small>
+                            </div>
+                        {% elif field.name == 'citizenship_back' and existing.citizenship_back %}
+                            <div class="mb-2">
+                                <img src="{{ existing.citizenship_back.url }}"
+                                     class="img-thumbnail" style="max-height:100px;">
+                                <small class="text-muted d-block">Current file</small>
+                            </div>
+                        {% elif field.name == 'lalpurja' and existing.lalpurja %}
+                            <div class="mb-2">
+                                <img src="{{ existing.lalpurja.url }}"
+                                     class="img-thumbnail" style="max-height:100px;">
+                                <small class="text-muted d-block">Current file</small>
+                            </div>
+                        {% elif field.name == 'selfie_image' and existing.selfie_image %}
+                            <div class="mb-2">
+                                <img src="{{ existing.selfie_image.url }}"
+                                     class="img-thumbnail" style="max-height:100px;">
+                                <small class="text-muted d-block">Current file</small>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
+                <i class="bi bi-cloud-upload"></i>
+                {% if existing %}Re-submit Documents{% else %}Submit Documents{% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

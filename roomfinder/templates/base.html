@@ -30,16 +30,22 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 {% if user.is_authenticated %}
-                    {% if user.role == 'landlord' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'listings:create_listing' %}">
-                                <i class="bi bi-plus-circle"></i> Post Room
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'listings:my_listings' %}">My Listings</a>
-                        </li>
-                    {% endif %}
+                   {% if user.role == 'landlord' %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'listings:create_listing' %}">
+            <i class="bi bi-plus-circle"></i> Post Room
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'listings:my_listings' %}">My Listings</a>
+    </li>
+    <!-- ADD THIS -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'documents:status' %}">
+            <i class="bi bi-patch-check"></i> Verification
+        </a>
+    </li>
+{% endif %}
                     {% if user.role == 'tenant' %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'listings:saved_listings' %}">
