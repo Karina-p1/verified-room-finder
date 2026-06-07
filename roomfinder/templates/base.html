@@ -53,11 +53,14 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if user.is_staff %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin_panel:dashboard' %}">Admin Panel</a>
-                        </li>
-                    {% endif %}
+                  {% if user.is_staff %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_panel:dashboard' %}">Admin Panel</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_panel:manage_ads' %}">Ads</a>
+    </li>
+{% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> {{ user.first_name }}

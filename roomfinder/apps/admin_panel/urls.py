@@ -26,4 +26,6 @@ urlpatterns = [
 
     path('reports/', views.reports_queue, name='reports_queue'),
     path('reports/<int:pk>/resolve/', views.resolve_report, name='resolve_report'),
+    path('ads/', views.manage_ads, name='manage_ads'),
+    path('ads/<int:pk>/toggle/', views.toggle_ad, name='toggle_ad'),
 ]

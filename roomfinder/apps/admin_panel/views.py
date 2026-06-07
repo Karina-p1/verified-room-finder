@@ -8,7 +8,7 @@ from django.db.models import Count
 from apps.listings.models import Listing, ListingReport
 from apps.documents.models import LandlordDocument
 from apps.accounts.models import CustomUser
-
+from apps.advertisements.models import Advertisement
 
 @staff_member_required
 def dashboard(request):
@@ -180,3 +180,17 @@ def resolve_report(request, pk):
         report.save()
         messages.success(request, 'Report resolved.')
     return redirect('admin_panel:reports_queue')
+
+@staff_member_required
+def manage_ads(request):
+    ads = Advertisement.objects.all().order_by('-created_at')
+    return render(request, 'admin_panel/ads.html', {'ads': ads})
+
+@staff_member_required
+def toggle_ad(request, pk):
+    if request.method == 'POST':
+        ad = get_object_or_404(Advertisement, pk=pk)
+        ad.is_active = not ad.is_active
+        ad.save()
+        messages.success(request, f'Ad "{ad.title}" {"activated" if ad.is_active else "deactivated"}.')
+    return redirect('admin_panel:manage_ads')

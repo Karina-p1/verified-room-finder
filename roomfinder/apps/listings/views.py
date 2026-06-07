@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Listing, ListingImage, SavedListing, ListingReport
 from .forms import ListingForm, FacilitiesForm, ListingReportForm
-
+from apps.advertisements.models import Advertisement
 DISTRICTS = {
     'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
               'Khotang', 'Bhojpur', 'Dhankuta', 'Terhathum', 'Panchthar',
@@ -81,9 +81,19 @@ def homepage(request):
         if (i + 1) % 5 == 0:
             with_ads.append({'type': 'ad'})
 
+    top_banner = Advertisement.objects.filter(
+        position='homepage_top', is_active=True
+    ).order_by('?').first()
+
+    between_ad = Advertisement.objects.filter(
+        position='homepage_between', is_active=True
+    ).order_by('?').first()
+    
     context = {
         'listings': with_ads,
         'districts': DISTRICTS,
+        'top_banner': top_banner,
+        'between_ad': between_ad,
         'current_filters': {
             'q': q, 'province': province, 'district': district,
             'property_type': property_type, 'min_price': min_price,

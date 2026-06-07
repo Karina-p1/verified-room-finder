@@ -85,7 +85,20 @@
     </form>
   </div>
 </div>
-
+<!-- Top Banner Ad -->
+{% if top_banner %}
+<div class="container mt-3">
+    <div class="text-center">
+        <a href="{{ top_banner.link_url }}" target="_blank">
+            <img src="{{ top_banner.image.url }}"
+                 class="img-fluid rounded shadow-sm w-100"
+                 style="max-height:120px;object-fit:cover;"
+                 alt="{{ top_banner.title }}">
+        </a>
+        <small class="text-muted">Advertisement</small>
+    </div>
+</div>
+{% endif %}
 <!-- Listings Grid -->
 <div class="container my-5">
   <div class="row g-4">

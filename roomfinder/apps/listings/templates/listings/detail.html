@@ -129,14 +129,7 @@
                         <span id="phoneDisplay">98XXXXXXXX</span>
                     </p>
                     {% if user.is_authenticated %}
-                        <!-- In detail.html, replace line 132 with this -->
-<button class="btn btn-primary w-100" 
-        id="revealBtn" 
-        data-listing-id="{{ listing.pk }}"
-        onclick="revealPhone(this.dataset.listingId)">
-    <i class="bi bi-bi-eye"></i> Reveal Phone Number
-    <small class="d-block opacity-75">Watch a short ad to reveal</small>
-</button>
+                        <button class="btn btn-primary w-100" id="revealBtn" onclick="revealPhone()">
                             <i class="bi bi-eye"></i> Reveal Phone Number
                             <small class="d-block opacity-75">Watch a short ad to reveal</small>
                         </button>
@@ -165,32 +158,115 @@
         </div>
     </div>
 </div>
+
+<!-- Ad Modal (outside columns, inside content block) -->
+<div class="modal fade" id="adModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h6 class="modal-title fw-bold">Watch this short ad to reveal the phone number</h6>
+                <span class="badge bg-warning text-dark ms-2">
+                    <span id="adCountdown">10</span>s
+                </span>
+            </div>
+            <div class="modal-body text-center p-0">
+                <a href="#" target="_blank" id="adLink">
+                    <img id="adImage" src="" class="img-fluid w-100"
+                         style="max-height:300px;object-fit:cover;" alt="Advertisement">
+                </a>
+            </div>
+            <div class="modal-footer border-0">
+                <button id="watchCompleteBtn" class="btn btn-secondary w-100" onclick="adWatched()" disabled>
+                    Please watch the ad...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function revealPhone(listingId) {
-    // Simulated ad — in production wire this to your ads app
+const revealUrl = "{% url 'advertisements:reveal_phone' listing.pk %}";
+const confirmUrl = "{% url 'advertisements:confirm_ad_watched' listing.pk %}";
+const csrfToken = "{{ csrf_token }}";
+
+function revealPhone() {
     const btn = document.getElementById('revealBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Watching ad... <span id="countdown">10</span>s';
-    let seconds = 10;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+
+    fetch(revealUrl, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.already_revealed) {
+            showPhone(data.phone);
+        } else if (data.show_ad) {
+            showAdModal(data);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-eye"></i> Reveal Phone Number';
+    });
+}
+
+function showAdModal(adData) {
+    document.getElementById('adImage').src = adData.ad_image;
+    if (adData.ad_link) {
+        document.getElementById('adLink').href = adData.ad_link;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('adModal'));
+    modal.show();
+
+    let seconds = adData.ad_duration;
+    const countdownEl = document.getElementById('adCountdown');
+    const watchBtn = document.getElementById('watchCompleteBtn');
+
+    countdownEl.textContent = seconds;
+    watchBtn.disabled = true;
+
     const timer = setInterval(() => {
         seconds--;
-        document.getElementById('countdown').textContent = seconds;
+        countdownEl.textContent = seconds;
         if (seconds <= 0) {
             clearInterval(timer);
-            fetch(`/ads/confirm-ad/${listingId}/`, {
-                method: 'POST',
-                headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
-            })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('phoneDisplay').textContent = data.phone;
-                btn.style.display = 'none';
-            });
+            watchBtn.disabled = false;
+            watchBtn.innerHTML = '<i class="bi bi-check-circle"></i> Done — Reveal Number';
+            watchBtn.classList.replace('btn-secondary', 'btn-success');
         }
     }, 1000);
+}
+
+function adWatched() {
+    fetch(confirmUrl, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        bootstrap.Modal.getInstance(document.getElementById('adModal')).hide();
+        showPhone(data.phone);
+    });
+}
+
+function showPhone(phone) {
+    document.getElementById('phoneDisplay').textContent = phone;
+    document.getElementById('phoneDisplay').classList.add('text-success', 'fw-bold');
+    const btn = document.getElementById('revealBtn');
+    if (btn) btn.style.display = 'none';
+
+    const callBtn = document.createElement('a');
+    callBtn.href = `tel:${phone}`;
+    callBtn.className = 'btn btn-success w-100 mt-2';
+    callBtn.innerHTML = '<i class="bi bi-telephone-fill"></i> Call Now';
+    document.getElementById('phoneSection').appendChild(callBtn);
 }
 </script>
 {% endblock %}
