@@ -36,12 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',
-    'listings',
-    'advertisements',
-    'admin_panel',
-    'listings',
-    'reports',
+    
+    'apps.accounts.apps.AccountsConfig',
+    'apps.listings.apps.ListingsConfig',
+    'apps.documents.apps.DocumentsConfig',
+    'apps.admin_panel.apps.AdminPanelConfig',
+    'apps.advertisements.apps.AdvertisementsConfig',
+    'apps.reports.apps.ReportsConfig',
 ]
 
 MIDDLEWARE = [
@@ -56,11 +57,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'roomfinder.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  
+        'APP_DIRS': True,                  
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

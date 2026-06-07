@@ -1,3 +1,244 @@
-from django.shortcuts import render
+# apps/listings/views.py
 
-# Create your views here.
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from .models import Listing, ListingImage, SavedListing, ListingReport
+from .forms import ListingForm, FacilitiesForm, ListingReportForm
+
+DISTRICTS = {
+    'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
+              'Khotang', 'Bhojpur', 'Dhankuta', 'Terhathum', 'Panchthar',
+              'Ilam', 'Jhapa', 'Morang', 'Sunsari', 'Udayapur'],
+    'Madhesh': ['Saptari', 'Siraha', 'Dhanusha', 'Mahottari',
+                'Sarlahi', 'Rautahat', 'Bara', 'Parsa'],
+    'Bagmati': ['Kathmandu', 'Lalitpur', 'Bhaktapur', 'Kavrepalanchok',
+                'Sindhupalchok', 'Rasuwa', 'Nuwakot', 'Dhading',
+                'Makwanpur', 'Chitwan', 'Sindhuli', 'Ramechhap', 'Dolakha'],
+    'Gandaki': ['Kaski', 'Syangja', 'Parbat', 'Baglung', 'Myagdi',
+                'Mustang', 'Manang', 'Lamjung', 'Tanahu', 'Gorkha',
+                'Nawalpur', 'Palpa'],
+    'Lumbini': ['Rupandehi', 'Kapilvastu', 'Nawalparasi', 'Arghakhanchi',
+                'Gulmi', 'Palpa', 'Dang', 'Pyuthan', 'Rolpa',
+                'Eastern Rukum', 'Banke', 'Bardiya'],
+    'Karnali': ['Surkhet', 'Dailekh', 'Jajarkot', 'Western Rukum',
+                'Salyan', 'Dolpa', 'Humla', 'Jumla', 'Kalikot', 'Mugu'],
+    'Sudurpashchim': ['Kailali', 'Kanchanpur', 'Dadeldhura', 'Baitadi',
+                      'Darchula', 'Bajhang', 'Bajura', 'Achham', 'Doti'],
+}
+
+
+def homepage(request):
+    listings = Listing.objects.filter(status='approved').prefetch_related('images', 'facilities')
+
+    # Search
+    q = request.GET.get('q', '')
+    province = request.GET.get('province', '')
+    district = request.GET.get('district', '')
+    property_type = request.GET.get('property_type', '')
+    min_price = request.GET.get('min_price', '')
+    max_price = request.GET.get('max_price', '')
+    wifi = request.GET.get('wifi', '')
+    attached_bathroom = request.GET.get('attached_bathroom', '')
+    pet_allowed = request.GET.get('pet_allowed', '')
+    sort = request.GET.get('sort', 'latest')
+
+    if q:
+        listings = listings.filter(
+            Q(title__icontains=q) | Q(description__icontains=q) |
+            Q(city__icontains=q) | Q(district__icontains=q)
+        )
+    if province:
+        listings = listings.filter(province=province)
+    if district:
+        listings = listings.filter(district=district)
+    if property_type:
+        listings = listings.filter(property_type=property_type)
+    if min_price:
+        listings = listings.filter(monthly_rent__gte=min_price)
+    if max_price:
+        listings = listings.filter(monthly_rent__lte=max_price)
+    if wifi:
+        listings = listings.filter(facilities__wifi=True)
+    if attached_bathroom:
+        listings = listings.filter(facilities__attached_bathroom=True)
+    if pet_allowed:
+        listings = listings.filter(facilities__pet_allowed=True)
+
+    if sort == 'price_low':
+        listings = listings.order_by('monthly_rent')
+    elif sort == 'price_high':
+        listings = listings.order_by('-monthly_rent')
+    else:
+        listings = listings.order_by('-created_at')
+
+    # Insert ads every 5 cards
+    listing_list = list(listings)
+    with_ads = []
+    for i, listing in enumerate(listing_list):
+        with_ads.append({'type': 'listing', 'obj': listing})
+        if (i + 1) % 5 == 0:
+            with_ads.append({'type': 'ad'})
+
+    context = {
+        'listings': with_ads,
+        'districts': DISTRICTS,
+        'current_filters': {
+            'q': q, 'province': province, 'district': district,
+            'property_type': property_type, 'min_price': min_price,
+            'max_price': max_price, 'sort': sort,
+        }
+    }
+    return render(request, 'listings/homepage.html', context)
+
+
+def listing_detail(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, status='approved')
+    is_saved = False
+    if request.user.is_authenticated:
+        is_saved = SavedListing.objects.filter(
+            user=request.user, listing=listing
+        ).exists()
+    report_form = ListingReportForm()
+    return render(request, 'listings/detail.html', {
+        'listing': listing,
+        'is_saved': is_saved,
+        'report_form': report_form,
+    })
+
+
+@login_required
+def create_listing(request):
+    if request.user.role != 'landlord':
+        messages.error(request, 'Only landlords can create listings.')
+        return redirect('listings:homepage')
+
+    if request.method == 'POST':
+        listing_form = ListingForm(request.POST)
+        facilities_form = FacilitiesForm(request.POST)
+        images = request.FILES.getlist('images')
+
+        if listing_form.is_valid() and facilities_form.is_valid():
+            # Validate image count
+            if len(images) < 3:
+                messages.error(request, 'Please upload at least 3 images.')
+            elif len(images) > 15:
+                messages.error(request, 'Maximum 15 images allowed.')
+            else:
+                listing = listing_form.save(commit=False)
+                listing.owner = request.user
+                listing.status = 'pending'
+                listing.save()
+
+                # Save facilities
+                facilities = facilities_form.save(commit=False)
+                facilities.listing = listing
+                facilities.save()
+
+                # Save images
+                for i, img in enumerate(images):
+                    ListingImage.objects.create(
+                        listing=listing,
+                        image=img,
+                        is_primary=(i == 0)  # first image is primary
+                    )
+
+                messages.success(
+                    request,
+                    'Listing submitted successfully! It will be visible after admin approval.'
+                )
+                return redirect('listings:my_listings')
+    else:
+        listing_form = ListingForm()
+        facilities_form = FacilitiesForm()
+
+    return render(request, 'listings/create_listing.html', {
+        'listing_form': listing_form,
+        'facilities_form': facilities_form,
+        'districts': DISTRICTS,
+    })
+
+
+@login_required
+def my_listings(request):
+    listings = Listing.objects.filter(owner=request.user).prefetch_related('images')
+    return render(request, 'listings/my_listings.html', {'listings': listings})
+
+
+@login_required
+def edit_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, owner=request.user)
+    facilities, _ = listing.facilities if hasattr(listing, 'facilities') else (None, None)
+
+    if request.method == 'POST':
+        listing_form = ListingForm(request.POST, instance=listing)
+        facilities_form = FacilitiesForm(request.POST, instance=listing.facilities)
+        if listing_form.is_valid() and facilities_form.is_valid():
+            listing = listing_form.save(commit=False)
+            listing.status = 'pending'  # re-submit for approval after edit
+            listing.save()
+            facilities_form.save()
+            messages.success(request, 'Listing updated and resubmitted for approval.')
+            return redirect('listings:my_listings')
+    else:
+        listing_form = ListingForm(instance=listing)
+        facilities_form = FacilitiesForm(instance=listing.facilities)
+
+    return render(request, 'listings/edit_listing.html', {
+        'listing_form': listing_form,
+        'facilities_form': facilities_form,
+        'listing': listing,
+        'districts': DISTRICTS,
+    })
+
+
+@login_required
+def delete_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        listing.delete()
+        messages.success(request, 'Listing deleted.')
+    return redirect('listings:my_listings')
+
+
+@login_required
+def save_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk)
+    saved, created = SavedListing.objects.get_or_create(
+        user=request.user, listing=listing
+    )
+    if not created:
+        saved.delete()
+        messages.info(request, 'Listing removed from saved.')
+    else:
+        messages.success(request, 'Listing saved!')
+    return redirect('listings:detail', pk=pk)
+
+
+@login_required
+def saved_listings(request):
+    saved = SavedListing.objects.filter(user=request.user).select_related('listing')
+    return render(request, 'listings/saved_listings.html', {'saved': saved})
+
+
+@login_required
+def report_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk)
+    if request.method == 'POST':
+        form = ListingReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.listing = listing
+            report.reported_by = request.user
+            report.save()
+            messages.success(request, 'Report submitted. Thank you.')
+    return redirect('listings:detail', pk=pk)
+
+
+def get_districts(request):
+    """AJAX endpoint — returns districts for a selected province."""
+    from django.http import JsonResponse
+    province = request.GET.get('province', '')
+    districts = DISTRICTS.get(province, [])
+    return JsonResponse({'districts': districts})

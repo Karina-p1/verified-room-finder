@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Verify Email — RoomFinder{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width:400px;">
+    <h3 class="fw-bold mb-2">Verify Your Email</h3>
+    <p class="text-muted mb-4">Enter the 6-digit code sent to your email.</p>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100">Verify</button>
+    </form>
+</div>
+{% endblock %}

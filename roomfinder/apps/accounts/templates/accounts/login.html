@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Login — RoomFinder{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width:400px;">
+    <h3 class="fw-bold mb-4">Login</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <p class="mt-3 text-center">Don't have an account? <a href="{% url 'accounts:register' %}">Register</a></p>
+</div>
+{% endblock %}
