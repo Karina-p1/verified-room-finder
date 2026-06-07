@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Approved Listings — Admin{% endblock %}
+{% block content %}
+<div class="container-fluid my-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="bi bi-check-circle text-success"></i> Approved Listings</h3>
+        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Title</th><th>Landlord</th><th>Location</th><th>Rent</th><th>Date</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    {% for listing in listings %}
+                    <tr>
+                        <td>{{ listing.title|truncatechars:30 }}</td>
+                        <td>{{ listing.owner.email }}</td>
+                        <td>{{ listing.district }}, {{ listing.province }}</td>
+                        <td>NPR {{ listing.monthly_rent }}</td>
+                        <td>{{ listing.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'admin_panel:remove_listing' listing.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this listing?')">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No approved listings yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

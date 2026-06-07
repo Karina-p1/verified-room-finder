@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Review Document — Admin{% endblock %}
+{% block content %}
+<div class="container my-4" style="max-width:800px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Review Documents</h3>
+        <a href="{% url 'admin_panel:pending_documents' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+    </div>
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <h6 class="fw-bold mb-1">{{ doc.user.get_full_name }}</h6>
+        <p class="text-muted small mb-3">{{ doc.user.email }} | Submitted: {{ doc.submitted_at|date:"M d, Y H:i" }}</p>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <p class="fw-semibold mb-1">Citizenship Front</p>
+                <a href="{{ doc.citizenship_front.url }}" target="_blank">
+                    <img src="{{ doc.citizenship_front.url }}" class="img-fluid rounded border">
+                </a>
+            </div>
+            <div class="col-md-6">
+                <p class="fw-semibold mb-1">Citizenship Back</p>
+                <a href="{{ doc.citizenship_back.url }}" target="_blank">
+                    <img src="{{ doc.citizenship_back.url }}" class="img-fluid rounded border">
+                </a>
+            </div>
+            <div class="col-md-6">
+                <p class="fw-semibold mb-1">Lalpurja</p>
+                <a href="{{ doc.lalpurja.url }}" target="_blank">
+                    <img src="{{ doc.lalpurja.url }}" class="img-fluid rounded border">
+                </a>
+            </div>
+            <div class="col-md-6">
+                <p class="fw-semibold mb-1">Selfie with Citizenship</p>
+                <a href="{{ doc.selfie_image.url }}" target="_blank">
+                    <img src="{{ doc.selfie_image.url }}" class="img-fluid rounded border">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'admin_panel:approve_document' doc.pk %}" class="mb-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success w-100 py-2" onclick="return confirm('Approve these documents?')">
+            <i class="bi bi-patch-check"></i> Approve Documents
+        </button>
+    </form>
+
+    <div class="card border-0 shadow-sm p-3">
+        <h6 class="fw-bold text-danger mb-2">Reject Documents</h6>
+        <form method="POST" action="{% url 'admin_panel:reject_document' doc.pk %}">
+            {% csrf_token %}
+            <textarea name="reason" class="form-control mb-2" rows="3" placeholder="Reason for rejection..." required></textarea>
+            <button type="submit" class="btn btn-danger w-100">Reject</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

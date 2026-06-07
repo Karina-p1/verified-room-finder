@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Review Listing — Admin{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Review Listing</h3>
+        <a href="{% url 'admin_panel:pending_listings' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h5 class="fw-bold mb-3">{{ listing.title }}</h5>
+                {% if listing.images.all %}
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    {% for img in listing.images.all %}
+                    <img src="{{ img.image.url }}" class="img-thumbnail" style="height:80px;width:80px;object-fit:cover;">
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <table class="table table-sm">
+                    <tr><th>Type</th><td>{{ listing.get_property_type_display }}</td></tr>
+                    <tr><th>Location</th><td>{{ listing.province }} → {{ listing.district }} → {{ listing.city }}</td></tr>
+                    <tr><th>Monthly Rent</th><td>NPR {{ listing.monthly_rent }}</td></tr>
+                    <tr><th>Security Deposit</th><td>NPR {{ listing.security_deposit }}</td></tr>
+                    <tr><th>Furnished</th><td>{{ listing.get_furnished_status_display }}</td></tr>
+                    <tr><th>Available</th><td>{{ listing.available_date|default:"Not specified" }}</td></tr>
+                    <tr><th>Submitted</th><td>{{ listing.created_at|date:"M d, Y H:i" }}</td></tr>
+                </table>
+                <h6 class="fw-bold mt-3">Description</h6>
+                <p>{{ listing.description }}</p>
+                {% if listing.house_rules %}
+                <h6 class="fw-bold">House Rules</h6>
+                <p>{{ listing.house_rules }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-person-circle"></i> Landlord</h6>
+                <p class="mb-1"><strong>Name:</strong> {{ listing.owner.get_full_name }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ listing.owner.email }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ listing.owner.phone }}</p>
+                <p class="mb-0"><strong>Joined:</strong> {{ listing.owner.date_joined|date:"M d, Y" }}</p>
+            </div>
+
+            {% if doc %}
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-text"></i> Documents</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <p class="small text-muted mb-1">Citizenship Front</p>
+                        <a href="{{ doc.citizenship_front.url }}" target="_blank">
+                            <img src="{{ doc.citizenship_front.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <p class="small text-muted mb-1">Citizenship Back</p>
+                        <a href="{{ doc.citizenship_back.url }}" target="_blank">
+                            <img src="{{ doc.citizenship_back.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <p class="small text-muted mb-1">Lalpurja</p>
+                        <a href="{{ doc.lalpurja.url }}" target="_blank">
+                            <img src="{{ doc.lalpurja.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <p class="small text-muted mb-1">Selfie</p>
+                        <a href="{{ doc.selfie_image.url }}" target="_blank">
+                            <img src="{{ doc.selfie_image.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No documents submitted.</div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'admin_panel:approve_listing' listing.pk %}" class="mb-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success w-100 py-2" onclick="return confirm('Approve this listing?')">
+                    <i class="bi bi-check-circle"></i> Approve Listing
+                </button>
+            </form>
+
+            <div class="card border-0 shadow-sm p-3">
+                <h6 class="fw-bold text-danger mb-2"><i class="bi bi-x-circle"></i> Reject Listing</h6>
+                <form method="POST" action="{% url 'admin_panel:reject_listing' listing.pk %}">
+                    {% csrf_token %}
+                    <textarea name="reason" class="form-control mb-2" rows="3" placeholder="Reason for rejection..." required></textarea>
+                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Reject this listing?')">Reject</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
