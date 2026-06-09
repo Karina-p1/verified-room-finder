@@ -2,13 +2,16 @@
 {% block title %}Find Rooms in Nepal — RoomFinder{% endblock %}
 
 {% block content %}
-<!-- Hero + Search -->
-<div class="hero-section">
-  <div class="container">
+
+<!-- Hero + Search — full width -->
+<div class="hero-section w-100">
+  <div class="container py-5">
     <h1 class="fw-bold mb-2">Find Your Perfect Room in Nepal</h1>
     <p class="mb-4">Verified listings. Trusted landlords. Easy search.</p>
+
     <form method="GET" action="{% url 'listings:homepage' %}">
-      <div class="row g-2">
+      <!-- Main search row -->
+      <div class="row g-2 mb-2">
         <div class="col-md-5">
           <input type="text" name="q" class="form-control form-control-lg"
                  placeholder="Search by title, city, area..."
@@ -38,8 +41,8 @@
         </div>
       </div>
 
-      <!-- Advanced Filters -->
-      <div class="row g-2 mt-2">
+      <!-- Advanced filters row -->
+      <div class="row g-2">
         <div class="col-md-2">
           <select name="property_type" class="form-select">
             <option value="">Property Type</option>
@@ -69,15 +72,18 @@
         </div>
         <div class="col-md-4 d-flex align-items-center gap-3 text-white">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="wifi" id="wifi" {% if request.GET.wifi %}checked{% endif %}>
+            <input class="form-check-input" type="checkbox" name="wifi" id="wifi"
+                   {% if request.GET.wifi %}checked{% endif %}>
             <label class="form-check-label" for="wifi">WiFi</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="attached_bathroom" id="bathroom" {% if request.GET.attached_bathroom %}checked{% endif %}>
+            <input class="form-check-input" type="checkbox" name="attached_bathroom" id="bathroom"
+                   {% if request.GET.attached_bathroom %}checked{% endif %}>
             <label class="form-check-label" for="bathroom">Attached Bath</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="pet_allowed" id="pet" {% if request.GET.pet_allowed %}checked{% endif %}>
+            <input class="form-check-input" type="checkbox" name="pet_allowed" id="pet"
+                   {% if request.GET.pet_allowed %}checked{% endif %}>
             <label class="form-check-label" for="pet">Pet Allowed</label>
           </div>
         </div>
@@ -85,74 +91,107 @@
     </form>
   </div>
 </div>
+
 <!-- Top Banner Ad -->
 {% if top_banner %}
 <div class="container mt-3">
-    <div class="text-center">
-        <a href="{{ top_banner.link_url }}" target="_blank">
-            <img src="{{ top_banner.image.url }}"
-                 class="img-fluid rounded shadow-sm w-100"
-                 style="max-height:120px;object-fit:cover;"
-                 alt="{{ top_banner.title }}">
-        </a>
-        <small class="text-muted">Advertisement</small>
-    </div>
+  <a href="{{ top_banner.link_url }}" target="_blank">
+    <img src="{{ top_banner.image.url }}" class="img-fluid rounded w-100"
+         style="max-height:120px;object-fit:cover;" alt="Advertisement">
+  </a>
+  <small class="text-muted d-block text-end">Advertisement</small>
 </div>
 {% endif %}
+
 <!-- Listings Grid -->
 <div class="container my-5">
+
+  {% if listings %}
+  <!-- Results count -->
+  <p class="text-muted mb-3">
+    Showing approved listings
+    {% if current_filters.province %}in <strong>{{ current_filters.province }}</strong>{% endif %}
+    {% if current_filters.q %}for "<strong>{{ current_filters.q }}</strong>"{% endif %}
+  </p>
+  {% endif %}
+
   <div class="row g-4">
     {% for item in listings %}
       {% if item.type == 'ad' %}
+        <!-- Between-cards ad -->
         <div class="col-12">
-          <div class="ad-banner rounded">
+          <div class="ad-banner rounded text-center py-3">
             <i class="bi bi-megaphone"></i> Advertisement
           </div>
         </div>
       {% else %}
         {% with listing=item.obj %}
-        <div class="col-md-4">
+        <div class="col-sm-6 col-md-4 col-lg-3">
           <div class="card listing-card h-100 border-0 shadow-sm">
+
+            <!-- Image -->
             {% with listing.primary_image as img %}
               {% if img %}
                 <img src="{{ img.image.url }}" class="card-img-top"
                      style="height:200px;object-fit:cover;" alt="{{ listing.title }}">
               {% else %}
-                <div class="bg-secondary d-flex align-items-center justify-content-center"
+                <div class="bg-light d-flex align-items-center justify-content-center"
                      style="height:200px;">
-                  <i class="bi bi-image text-white" style="font-size:3rem;"></i>
+                  <i class="bi bi-image text-muted" style="font-size:3rem;"></i>
                 </div>
               {% endif %}
             {% endwith %}
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start">
-                <h6 class="card-title fw-bold mb-1">{{ listing.title }}</h6>
-                <span class="badge bg-success verified-badge">
+
+            <div class="card-body d-flex flex-column">
+              <!-- Title + badge -->
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="card-title fw-bold mb-0 me-2" style="font-size:0.9rem;">
+                  {{ listing.title|truncatechars:40 }}
+                </h6>
+                <span class="badge bg-success flex-shrink-0" style="font-size:0.65rem;">
                   <i class="bi bi-patch-check-fill"></i> Verified
                 </span>
               </div>
+
+              <!-- Price -->
               <p class="text-primary fw-bold mb-1">
                 NPR {{ listing.monthly_rent|floatformat:0 }}/month
               </p>
+
+              <!-- Location -->
               <p class="text-muted small mb-1">
                 <i class="bi bi-geo-alt"></i> {{ listing.district }}, {{ listing.province }}
               </p>
-              <p class="text-muted small mb-2">
-                {{ listing.description|truncatechars:100 }}
+
+              <!-- Description -->
+              <p class="text-muted small mb-2 flex-grow-1">
+                {{ listing.description|truncatechars:80 }}
               </p>
+
+              <!-- Facility badges -->
               <div class="d-flex gap-1 flex-wrap mb-3">
-                <span class="badge bg-light text-dark">{{ listing.get_property_type_display }}</span>
+                <span class="badge bg-light text-dark border" style="font-size:0.7rem;">
+                  {{ listing.get_property_type_display }}
+                </span>
                 {% if listing.facilities.wifi %}
-                  <span class="badge bg-light text-dark"><i class="bi bi-wifi"></i> WiFi</span>
+                  <span class="badge bg-light text-dark border" style="font-size:0.7rem;">
+                    <i class="bi bi-wifi"></i> WiFi
+                  </span>
                 {% endif %}
                 {% if listing.facilities.attached_bathroom %}
-                  <span class="badge bg-light text-dark"><i class="bi bi-droplet"></i> Bathroom</span>
+                  <span class="badge bg-light text-dark border" style="font-size:0.7rem;">
+                    <i class="bi bi-droplet"></i> Bath
+                  </span>
                 {% endif %}
                 {% if listing.facilities.car_parking %}
-                  <span class="badge bg-light text-dark"><i class="bi bi-car-front"></i> Parking</span>
+                  <span class="badge bg-light text-dark border" style="font-size:0.7rem;">
+                    <i class="bi bi-car-front"></i> Parking
+                  </span>
                 {% endif %}
               </div>
-              <a href="{% url 'listings:detail' listing.pk %}" class="btn btn-primary btn-sm w-100">
+
+              <a href="{% url 'listings:detail' listing.pk %}"
+                 class="btn btn-primary btn-sm w-100 mt-auto">
                 View Details
               </a>
             </div>
@@ -165,10 +204,12 @@
         <i class="bi bi-house-slash" style="font-size:4rem;color:#ccc;"></i>
         <h4 class="mt-3 text-muted">No listings found</h4>
         <p class="text-muted">Try adjusting your search filters.</p>
+        <a href="{% url 'listings:homepage' %}" class="btn btn-outline-primary">Clear Filters</a>
       </div>
     {% endfor %}
   </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}

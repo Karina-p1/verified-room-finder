@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% block title %}Create Listing — RoomFinder{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width:800px;">
+    <h3 class="fw-bold mb-4"><i class="bi bi-plus-circle"></i> Post a Room</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Basic Info -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3">Basic Information</h5>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Property Title <span class="text-danger">*</span></label>
+                {{ listing_form.title }}
+                {% if listing_form.title.errors %}<div class="text-danger small">{{ listing_form.title.errors }}</div>{% endif %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                {{ listing_form.description }}
+                <small class="text-muted">Minimum 100 characters</small>
+                {% if listing_form.description.errors %}<div class="text-danger small">{{ listing_form.description.errors }}</div>{% endif %}
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Property Type <span class="text-danger">*</span></label>
+                    {{ listing_form.property_type }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Furnished Status</label>
+                    {{ listing_form.furnished_status }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt"></i> Location</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Province <span class="text-danger">*</span></label>
+                    {{ listing_form.province }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">District <span class="text-danger">*</span></label>
+                    <select name="district" id="districtSelect" class="form-select">
+                        <option value="{{ listing_form.district.value|default:'' }}">
+                            {{ listing_form.district.value|default:'Select district' }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">City / VDC <span class="text-danger">*</span></label>
+                    {{ listing_form.city }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Area / Tole</label>
+                    {{ listing_form.area }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Ward Number</label>
+                    {{ listing_form.ward_number }}
+                </div>
+            </div>
+            {{ listing_form.latitude }}
+            {{ listing_form.longitude }}
+        </div>
+
+        <!-- Pricing -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-cash"></i> Pricing</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Monthly Rent (NPR) <span class="text-danger">*</span></label>
+                    {{ listing_form.monthly_rent }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Security Deposit (NPR)</label>
+                    {{ listing_form.security_deposit }}
+                </div>
+            </div>
+            <div class="mt-3">
+                <label class="form-label fw-semibold">Bills Included</label>
+                <div class="d-flex gap-4">
+                    <div class="form-check">
+                        {{ listing_form.bills_water }}
+                        <label class="form-check-label" for="{{ listing_form.bills_water.id_for_label }}">Water</label>
+                    </div>
+                    <div class="form-check">
+                        {{ listing_form.bills_electricity }}
+                        <label class="form-check-label" for="{{ listing_form.bills_electricity.id_for_label }}">Electricity</label>
+                    </div>
+                    <div class="form-check">
+                        {{ listing_form.bills_internet }}
+                        <label class="form-check-label" for="{{ listing_form.bills_internet.id_for_label }}">Internet</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facilities -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-grid"></i> Facilities</h5>
+            <div class="row g-3">
+                {% for field in facilities_form %}
+                <div class="col-md-4">
+                    <div class="form-check">
+                        {{ field }}
+                        <label class="form-check-label" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Images -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-images"></i> Property Images</h5>
+<input type="file" name="images" id="imageInput" class="form-control" multiple accept="image/*" required>
+<div id="imagePreview" class="d-flex flex-wrap gap-2 mt-3"></div>
+<small class="text-muted mt-1 d-block">
+    <i class="bi bi-info-circle"></i> Hold <kbd>Cmd</kbd> (Mac) or <kbd>Ctrl</kbd> (Windows) to select multiple files.
+    Minimum 3, maximum 15. First image is the cover photo.
+</small>
+        </div>
+
+        <!-- Extra Details -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3">Additional Details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Available From</label>
+                    {{ listing_form.available_date }}
+                </div>
+            </div>
+            <div class="mt-3">
+                <label class="form-label fw-semibold">House Rules</label>
+                {{ listing_form.house_rules }}
+            </div>
+        </div>
+
+        {% if listing_form.errors %}
+        <div class="alert alert-danger">
+            Please fix the errors above before submitting.
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5">
+            <i class="bi bi-send"></i> Submit Listing for Review
+        </button>
+        <p class="text-muted text-center mt-2 small">
+            Your listing will be visible after admin approval.
+        </p>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ districts|json_script:"districts-data" }}
+<script>
+    // Image preview and validation
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+
+imageInput.addEventListener('change', function() {
+    imagePreview.innerHTML = '';
+    const files = Array.from(this.files);
+
+    if (files.length < 3) {
+        imagePreview.innerHTML = '<div class="text-danger w-100"><i class="bi bi-exclamation-circle"></i> Please select at least 3 images.</div>';
+        return;
+    }
+    if (files.length > 15) {
+        imagePreview.innerHTML = '<div class="text-danger w-100"><i class="bi bi-exclamation-circle"></i> Maximum 15 images allowed.</div>';
+        return;
+    }
+
+    // Show count badge
+    imagePreview.innerHTML = `<div class="w-100 mb-2"><span class="badge bg-success">${files.length} images selected</span> <small class="text-muted">First image = cover photo</small></div>`;
+
+    // Show previews
+    files.forEach(function(file, index) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.style.cssText = 'position:relative;';
+            div.innerHTML = `
+                <img src="${e.target.result}"
+                     style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid ${index === 0 ? '#0d6efd' : '#dee2e6'};">
+                ${index === 0 ? '<span style="position:absolute;bottom:2px;left:2px;background:#0d6efd;color:white;font-size:9px;padding:1px 4px;border-radius:4px;">COVER</span>' : ''}
+            `;
+            imagePreview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+// Validate on form submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const files = imageInput.files;
+    if (files.length < 3) {
+        e.preventDefault();
+        imagePreview.innerHTML = '<div class="text-danger w-100"><i class="bi bi-exclamation-circle"></i> Please select at least 3 images before submitting.</div>';
+        imageInput.scrollIntoView({behavior: 'smooth'});
+    }
+});
+const districts = JSON.parse(document.getElementById("districts-data").textContent);
+const provinceSelect = document.querySelector('select[name="province"]');
+const districtSelect = document.getElementById('districtSelect');
+const currentDistrict = "{{ listing_form.district.value|default:'' }}";
+
+function loadDistricts(province) {
+    districtSelect.innerHTML = '<option value="">Select district</option>';
+    if (districts[province]) {
+        districts[province].forEach(function(d) {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.text = d;
+            if (d === currentDistrict) opt.selected = true;
+            districtSelect.appendChild(opt);
+        });
+    }
+}
+
+if (provinceSelect) {
+    if (provinceSelect.value) loadDistricts(provinceSelect.value);
+    provinceSelect.addEventListener('change', function() {
+        loadDistricts(provinceSelect.value);
+    });
+}
+</script>
+{% endblock %}

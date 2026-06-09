@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Saved Listings — RoomFinder{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <h3 class="fw-bold mb-4"><i class="bi bi-bookmark-heart"></i> Saved Listings</h3>
+    {% if saved %}
+    <div class="row g-4">
+        {% for item in saved %}
+        {% with listing=item.listing %}
+        <div class="col-md-4">
+            <div class="card listing-card h-100 border-0 shadow-sm">
+                {% with listing.primary_image as img %}
+                    {% if img %}
+                        <img src="{{ img.image.url }}" class="card-img-top"
+                             style="height:200px;object-fit:cover;" alt="{{ listing.title }}">
+                    {% else %}
+                        <div class="bg-secondary d-flex align-items-center justify-content-center"
+                             style="height:200px;">
+                            <i class="bi bi-image text-white" style="font-size:3rem;"></i>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1">{{ listing.title }}</h6>
+                    <p class="text-primary fw-bold mb-1">NPR {{ listing.monthly_rent }}/month</p>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-geo-alt"></i> {{ listing.district }}, {{ listing.province }}
+                    </p>
+                    <p class="text-muted small mb-3">{{ listing.description|truncatechars:80 }}</p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'listings:detail' listing.pk %}" class="btn btn-primary btn-sm flex-grow-1">
+                            View Details
+                        </a>
+                        <a href="{% url 'listings:save_listing' listing.pk %}"
+                           class="btn btn-outline-warning btn-sm"
+                           onclick="return confirm('Remove from saved?')">
+                            <i class="bi bi-bookmark-x"></i>
+                        </a>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        Saved on {{ item.saved_at|date:"M d, Y" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-bookmark text-muted" style="font-size:4rem;"></i>
+        <h5 class="mt-3 text-muted">No saved listings yet.</h5>
+        <a href="{% url 'listings:homepage' %}" class="btn btn-primary mt-2">Browse Listings</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

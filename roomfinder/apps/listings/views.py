@@ -4,9 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from urllib3 import request
 from .models import Listing, ListingImage, SavedListing, ListingReport
 from .forms import ListingForm, FacilitiesForm, ListingReportForm
 from apps.advertisements.models import Advertisement
+from apps.listings.models import ListingReport
+
 DISTRICTS = {
     'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
               'Khotang', 'Bhojpur', 'Dhankuta', 'Terhathum', 'Panchthar',
@@ -28,6 +31,13 @@ DISTRICTS = {
                       'Darchula', 'Bajhang', 'Bajura', 'Achham', 'Doti'],
 }
 
+
+@login_required
+def my_reports(request):
+    reports = ListingReport.objects.filter(
+        reported_by=request.user
+    ).select_related('listing').order_by('-created_at')
+    return render(request, 'reports/my_reports.html', {'reports': reports})
 
 def homepage(request):
     listings = Listing.objects.filter(status='approved').prefetch_related('images', 'facilities')
@@ -145,7 +155,6 @@ def create_listing(request):
         images = request.FILES.getlist('images')
 
         if listing_form.is_valid() and facilities_form.is_valid():
-            # Validate image count
             if len(images) < 3:
                 messages.error(request, 'Please upload at least 3 images.')
             elif len(images) > 15:
@@ -155,24 +164,16 @@ def create_listing(request):
                 listing.owner = request.user
                 listing.status = 'pending'
                 listing.save()
-
-                # Save facilities
                 facilities = facilities_form.save(commit=False)
                 facilities.listing = listing
                 facilities.save()
-
-                # Save images
                 for i, img in enumerate(images):
                     ListingImage.objects.create(
                         listing=listing,
                         image=img,
-                        is_primary=(i == 0)  # first image is primary
+                        is_primary=(i == 0)
                     )
-
-                messages.success(
-                    request,
-                    'Listing submitted successfully! It will be visible after admin approval.'
-                )
+                messages.success(request, 'Listing submitted! Pending admin approval.')
                 return redirect('listings:my_listings')
     else:
         listing_form = ListingForm()
@@ -184,7 +185,6 @@ def create_listing(request):
         'districts': DISTRICTS,
     })
 
-
 @login_required
 def my_listings(request):
     listings = Listing.objects.filter(owner=request.user).prefetch_related('images')
@@ -194,21 +194,28 @@ def my_listings(request):
 @login_required
 def edit_listing(request, pk):
     listing = get_object_or_404(Listing, pk=pk, owner=request.user)
-    facilities, _ = listing.facilities if hasattr(listing, 'facilities') else (None, None)
+
+    # Get or create facilities
+    try:
+        facilities_instance = listing.facilities
+    except Exception:
+        facilities_instance = None
 
     if request.method == 'POST':
         listing_form = ListingForm(request.POST, instance=listing)
-        facilities_form = FacilitiesForm(request.POST, instance=listing.facilities)
+        facilities_form = FacilitiesForm(request.POST, instance=facilities_instance)
         if listing_form.is_valid() and facilities_form.is_valid():
-            listing = listing_form.save(commit=False)
-            listing.status = 'pending'  # re-submit for approval after edit
-            listing.save()
-            facilities_form.save()
+            updated = listing_form.save(commit=False)
+            updated.status = 'pending'
+            updated.save()
+            fac = facilities_form.save(commit=False)
+            fac.listing = updated
+            fac.save()
             messages.success(request, 'Listing updated and resubmitted for approval.')
             return redirect('listings:my_listings')
     else:
         listing_form = ListingForm(instance=listing)
-        facilities_form = FacilitiesForm(instance=listing.facilities)
+        facilities_form = FacilitiesForm(instance=facilities_instance)
 
     return render(request, 'listings/edit_listing.html', {
         'listing_form': listing_form,
@@ -216,7 +223,6 @@ def edit_listing(request, pk):
         'listing': listing,
         'districts': DISTRICTS,
     })
-
 
 @login_required
 def delete_listing(request, pk):
