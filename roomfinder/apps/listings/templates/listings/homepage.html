@@ -211,6 +211,67 @@
 </div>
 
 {% endblock %}
+<!-- Pagination -->
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+            of {{ total_count }} listings
+        </small>
+
+        <nav>
+            <ul class="pagination mb-0">
+
+                <!-- Previous -->
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.previous_page_number }}&q={{ current_filters.q }}&province={{ current_filters.province }}&district={{ current_filters.district }}&property_type={{ current_filters.property_type }}&min_price={{ current_filters.min_price }}&max_price={{ current_filters.max_price }}&sort={{ current_filters.sort }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                <!-- Page numbers -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?page={{ num }}&q={{ current_filters.q }}&province={{ current_filters.province }}&district={{ current_filters.district }}&property_type={{ current_filters.property_type }}&min_price={{ current_filters.min_price }}&max_price={{ current_filters.max_price }}&sort={{ current_filters.sort }}">
+                                {{ num }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next -->
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ page_obj.next_page_number }}&q={{ current_filters.q }}&province={{ current_filters.province }}&district={{ current_filters.district }}&property_type={{ current_filters.property_type }}&min_price={{ current_filters.min_price }}&max_price={{ current_filters.max_price }}&sort={{ current_filters.sort }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
 
 {% block extra_js %}
 {{ districts|json_script:"districts-data" }}

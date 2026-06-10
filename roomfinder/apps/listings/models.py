@@ -63,6 +63,8 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    is_rented = models.BooleanField(default=False)
+    rented_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         ordering = ['-created_at']
 

@@ -9,6 +9,8 @@ from .models import Listing, ListingImage, SavedListing, ListingReport
 from .forms import ListingForm, FacilitiesForm, ListingReportForm
 from apps.advertisements.models import Advertisement
 from apps.listings.models import ListingReport
+from django.utils import timezone
+from django.core.paginator import Paginator
 
 DISTRICTS = {
     'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
@@ -40,7 +42,7 @@ def my_reports(request):
     return render(request, 'reports/my_reports.html', {'reports': reports})
 
 def homepage(request):
-    listings = Listing.objects.filter(status='approved').prefetch_related('images', 'facilities')
+    listings = Listing.objects.filter(status='approved', is_rented=False).prefetch_related('images', 'facilities')
 
     # Search
     q = request.GET.get('q', '')
@@ -83,27 +85,31 @@ def homepage(request):
     else:
         listings = listings.order_by('-created_at')
 
-    # Insert ads every 5 cards
-    listing_list = list(listings)
+    # Paginate — 12 listings per page
+    paginator = Paginator(listings, 12)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Insert ads every 5 cards (paginated list only)
+    listing_list = list(page_obj)
     with_ads = []
     for i, listing in enumerate(listing_list):
         with_ads.append({'type': 'listing', 'obj': listing})
-        if (i + 1) % 5 == 0:
+        if (i + 1) % 5 == 0 and i + 1 < len(listing_list):
             with_ads.append({'type': 'ad'})
 
+    # Get banner ads
+    from apps.advertisements.models import Advertisement
     top_banner = Advertisement.objects.filter(
         position='homepage_top', is_active=True
     ).order_by('?').first()
 
-    between_ad = Advertisement.objects.filter(
-        position='homepage_between', is_active=True
-    ).order_by('?').first()
-    
     context = {
         'listings': with_ads,
+        'page_obj': page_obj,
         'districts': DISTRICTS,
         'top_banner': top_banner,
-        'between_ad': between_ad,
+        'total_count': paginator.count,
         'current_filters': {
             'q': q, 'province': province, 'district': district,
             'property_type': property_type, 'min_price': min_price,
@@ -111,7 +117,6 @@ def homepage(request):
         }
     }
     return render(request, 'listings/homepage.html', context)
-
 
 def listing_detail(request, pk):
     listing = get_object_or_404(Listing, pk=pk, status='approved')
@@ -266,6 +271,16 @@ def report_listing(request, pk):
             messages.success(request, 'Report submitted. Thank you.')
     return redirect('listings:detail', pk=pk)
 
+@login_required
+def mark_rented(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        listing.is_rented = not listing.is_rented
+        listing.rented_at = timezone.now() if listing.is_rented else None
+        listing.save()
+        status = 'marked as rented' if listing.is_rented else 'marked as available'
+        messages.success(request, f'Listing "{listing.title}" {status}.')
+    return redirect('listings:my_listings')
 
 def get_districts(request):
     """AJAX endpoint — returns districts for a selected province."""

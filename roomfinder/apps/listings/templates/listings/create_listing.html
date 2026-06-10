@@ -14,18 +14,25 @@
             <div class="mb-3">
                 <label class="form-label fw-semibold">Property Title <span class="text-danger">*</span></label>
                 {{ listing_form.title }}
-                {% if listing_form.title.errors %}<div class="text-danger small">{{ listing_form.title.errors }}</div>{% endif %}
+                {% if listing_form.title.errors %}
+                    <div class="text-danger small mt-1">{{ listing_form.title.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
                 {{ listing_form.description }}
                 <small class="text-muted">Minimum 100 characters</small>
-                {% if listing_form.description.errors %}<div class="text-danger small">{{ listing_form.description.errors }}</div>{% endif %}
+                {% if listing_form.description.errors %}
+                    <div class="text-danger small mt-1">{{ listing_form.description.errors.as_text }}</div>
+                {% endif %}
             </div>
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Property Type <span class="text-danger">*</span></label>
                     {{ listing_form.property_type }}
+                    {% if listing_form.property_type.errors %}
+                        <div class="text-danger small mt-1">{{ listing_form.property_type.errors.as_text }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Furnished Status</label>
@@ -40,19 +47,26 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Province <span class="text-danger">*</span></label>
+                    {# Province: rendered by form — value="Koshi", "Bagmati", etc. #}
                     {{ listing_form.province }}
+                    {% if listing_form.province.errors %}
+                        <div class="text-danger small mt-1">{{ listing_form.province.errors.as_text }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">District <span class="text-danger">*</span></label>
-                    <select name="district" id="districtSelect" class="form-select">
-                        <option value="{{ listing_form.district.value|default:'' }}">
-                            {{ listing_form.district.value|default:'Select district' }}
-                        </option>
-                    </select>
+                    {# District: rendered by form — it's now a ChoiceField select, JS just filters options #}
+                    {{ listing_form.district }}
+                    {% if listing_form.district.errors %}
+                        <div class="text-danger small mt-1">{{ listing_form.district.errors.as_text }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">City / VDC <span class="text-danger">*</span></label>
                     {{ listing_form.city }}
+                    {% if listing_form.city.errors %}
+                        <div class="text-danger small mt-1">{{ listing_form.city.errors.as_text }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Area / Tole</label>
@@ -63,8 +77,52 @@
                     {{ listing_form.ward_number }}
                 </div>
             </div>
-            {{ listing_form.latitude }}
-            {{ listing_form.longitude }}
+
+            <!-- Map Pin Picker -->
+            <div class="mt-4">
+                <label class="form-label fw-semibold">
+                    <i class="bi bi-pin-map"></i> Pin Exact Location on Map
+                </label>
+                <p class="text-muted small mb-2">
+                    Click on the map to drop a pin at the exact property location.
+                </p>
+                <div class="input-group mb-2">
+                    <input type="text" id="mapSearch" class="form-control"
+                           placeholder="Search for your location on map...">
+                    <button type="button" class="btn btn-outline-primary" onclick="searchMap()">
+                        <i class="bi bi-search"></i> Find
+                    </button>
+                </div>
+                <div id="mapPicker" class="rounded border"
+                     style="height:300px;background:#e9ecef;display:flex;align-items:center;justify-content:center;">
+                    <div class="text-center text-muted" id="mapPlaceholder">
+                        <i class="bi bi-map" style="font-size:3rem;"></i>
+                        <p class="mt-2">Map will load here</p>
+                        <small>Use the search box above or enter coordinates manually below</small>
+                    </div>
+                    <iframe id="mapFrame" width="100%" height="300"
+                            style="border:0;display:none;border-radius:8px;"
+                            loading="lazy" allowfullscreen></iframe>
+                </div>
+                <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted">Latitude</label>
+                        {{ listing_form.latitude }}
+                        <input type="number" step="any" id="latDisplay" class="form-control form-control-sm mt-1"
+                               placeholder="e.g. 27.7172" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted">Longitude</label>
+                        {{ listing_form.longitude }}
+                        <input type="number" step="any" id="lngDisplay" class="form-control form-control-sm mt-1"
+                               placeholder="e.g. 85.3240" readonly>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    <i class="bi bi-info-circle"></i>
+                    Kathmandu is approximately lat: 27.7172, lng: 85.3240
+                </small>
+            </div>
         </div>
 
         <!-- Pricing -->
@@ -74,6 +132,9 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Monthly Rent (NPR) <span class="text-danger">*</span></label>
                     {{ listing_form.monthly_rent }}
+                    {% if listing_form.monthly_rent.errors %}
+                        <div class="text-danger small mt-1">{{ listing_form.monthly_rent.errors.as_text }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Security Deposit (NPR)</label>
@@ -119,15 +180,15 @@
         <!-- Images -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3"><i class="bi bi-images"></i> Property Images</h5>
-<input type="file" name="images" id="imageInput" class="form-control" multiple accept="image/*" required>
-<div id="imagePreview" class="d-flex flex-wrap gap-2 mt-3"></div>
-<small class="text-muted mt-1 d-block">
-    <i class="bi bi-info-circle"></i> Hold <kbd>Cmd</kbd> (Mac) or <kbd>Ctrl</kbd> (Windows) to select multiple files.
-    Minimum 3, maximum 15. First image is the cover photo.
-</small>
+            <input type="file" name="images" id="imageInput" class="form-control" multiple accept="image/*">
+            <div id="imagePreview" class="d-flex flex-wrap gap-2 mt-3"></div>
+            <small class="text-muted mt-1 d-block">
+                <i class="bi bi-info-circle"></i> Hold <kbd>Cmd</kbd> (Mac) or <kbd>Ctrl</kbd> (Windows) to select multiple files.
+                Minimum 3, maximum 15. First image is the cover photo.
+            </small>
         </div>
 
-        <!-- Extra Details -->
+        <!-- Additional Details -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3">Additional Details</h5>
             <div class="row g-3">
@@ -142,9 +203,19 @@
             </div>
         </div>
 
-        {% if listing_form.errors %}
+        {% if listing_form.errors or facilities_form.errors %}
         <div class="alert alert-danger">
-            Please fix the errors above before submitting.
+            <strong>Please fix the errors above before submitting:</strong>
+            <ul class="mb-0 mt-1">
+                {% for field in listing_form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in listing_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </div>
         {% endif %}
 
@@ -161,11 +232,11 @@
 {% block extra_js %}
 {{ districts|json_script:"districts-data" }}
 <script>
-    // Image preview and validation
-const imageInput = document.getElementById('imageInput');
+// ── Image preview & validation ──────────────────────────────────────────────
+const imageInput   = document.getElementById('imageInput');
 const imagePreview = document.getElementById('imagePreview');
 
-imageInput.addEventListener('change', function() {
+imageInput.addEventListener('change', function () {
     imagePreview.innerHTML = '';
     const files = Array.from(this.files);
 
@@ -178,18 +249,17 @@ imageInput.addEventListener('change', function() {
         return;
     }
 
-    // Show count badge
     imagePreview.innerHTML = `<div class="w-100 mb-2"><span class="badge bg-success">${files.length} images selected</span> <small class="text-muted">First image = cover photo</small></div>`;
 
-    // Show previews
-    files.forEach(function(file, index) {
+    files.forEach(function (file, index) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const div = document.createElement('div');
             div.style.cssText = 'position:relative;';
             div.innerHTML = `
                 <img src="${e.target.result}"
-                     style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid ${index === 0 ? '#0d6efd' : '#dee2e6'};">
+                     style="width:80px;height:80px;object-fit:cover;border-radius:8px;
+                            border:2px solid ${index === 0 ? '#0d6efd' : '#dee2e6'};">
                 ${index === 0 ? '<span style="position:absolute;bottom:2px;left:2px;background:#0d6efd;color:white;font-size:9px;padding:1px 4px;border-radius:4px;">COVER</span>' : ''}
             `;
             imagePreview.appendChild(div);
@@ -198,37 +268,87 @@ imageInput.addEventListener('change', function() {
     });
 });
 
-// Validate on form submit
-document.querySelector('form').addEventListener('submit', function(e) {
+// Block submit if < 3 images
+document.querySelector('form').addEventListener('submit', function (e) {
     const files = imageInput.files;
     if (files.length < 3) {
         e.preventDefault();
         imagePreview.innerHTML = '<div class="text-danger w-100"><i class="bi bi-exclamation-circle"></i> Please select at least 3 images before submitting.</div>';
-        imageInput.scrollIntoView({behavior: 'smooth'});
+        imageInput.scrollIntoView({ behavior: 'smooth' });
     }
 });
-const districts = JSON.parse(document.getElementById("districts-data").textContent);
-const provinceSelect = document.querySelector('select[name="province"]');
-const districtSelect = document.getElementById('districtSelect');
-const currentDistrict = "{{ listing_form.district.value|default:'' }}";
 
-function loadDistricts(province) {
-    districtSelect.innerHTML = '<option value="">Select district</option>';
-    if (districts[province]) {
-        districts[province].forEach(function(d) {
-            const opt = document.createElement('option');
-            opt.value = d;
-            opt.text = d;
-            if (d === currentDistrict) opt.selected = true;
-            districtSelect.appendChild(opt);
-        });
-    }
+// ── Map search ──────────────────────────────────────────────────────────────
+function searchMap() {
+    const query = document.getElementById('mapSearch').value.trim();
+    if (!query) return;
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Nepal')}&limit=1`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.length > 0) {
+                setCoordinates(parseFloat(data[0].lat), parseFloat(data[0].lon));
+            } else {
+                alert('Location not found. Try a more specific search.');
+            }
+        })
+        .catch(() => alert('Search failed. Please enter coordinates manually.'));
 }
 
+function setCoordinates(lat, lng) {
+    const rLat = parseFloat(lat.toFixed(6));
+    const rLng = parseFloat(lng.toFixed(6));
+
+    document.querySelector('input[name="latitude"]').value  = rLat;
+    document.querySelector('input[name="longitude"]').value = rLng;
+    document.getElementById('latDisplay').value = rLat;
+    document.getElementById('lngDisplay').value = rLng;
+    const mapFrame = document.getElementById('mapFrame');
+    mapFrame.src = `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+    mapFrame.style.display = 'block';
+    document.getElementById('mapPlaceholder').style.display = 'none';
+}
+
+document.getElementById('mapSearch').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); searchMap(); }
+});
+
+const existingLat = "{{ listing_form.latitude.value|default:'' }}";
+const existingLng = "{{ listing_form.longitude.value|default:'' }}";
+if (existingLat && existingLng) {
+    setCoordinates(parseFloat(existingLat), parseFloat(existingLng));
+}
+
+// ── Province → District filtering ──────────────────────────────────────────
+// The district <select> is now rendered by Django (id="districtSelect").
+// We hide/show options based on the selected province.
+const DISTRICTS = JSON.parse(document.getElementById("districts-data").textContent);
+const provinceSelect  = document.getElementById('provinceSelect');
+const districtSelect  = document.getElementById('districtSelect');
+
+// Collect ALL options once (they're already in the DOM from Django's ChoiceField)
+const allOptions = Array.from(districtSelect.options).slice(1); // skip blank option
+
+function filterDistricts(province) {
+    // Remove all non-blank options
+    while (districtSelect.options.length > 1) {
+        districtSelect.remove(1);
+    }
+    const allowed = province ? (DISTRICTS[province] || []) : allOptions.map(o => o.value);
+    allOptions.forEach(function (opt) {
+        if (!province || allowed.includes(opt.value)) {
+            districtSelect.appendChild(opt.cloneNode(true));
+        }
+    });
+}
+
+// On province change, refilter and reset district
 if (provinceSelect) {
-    if (provinceSelect.value) loadDistricts(provinceSelect.value);
-    provinceSelect.addEventListener('change', function() {
-        loadDistricts(provinceSelect.value);
+    // Initial filter on page load (handles validation re-render with selected province)
+    filterDistricts(provinceSelect.value);
+
+    provinceSelect.addEventListener('change', function () {
+        districtSelect.value = '';   // reset selection
+        filterDistricts(this.value);
     });
 }
 </script>

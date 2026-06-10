@@ -9,6 +9,13 @@ from apps.listings.models import Listing, ListingReport
 from apps.documents.models import LandlordDocument
 from apps.accounts.models import CustomUser
 from apps.advertisements.models import Advertisement
+from apps.accounts.notifications import (
+    send_listing_approved_email,
+    send_listing_rejected_email,
+    send_document_approved_email,
+    send_document_rejected_email,
+)
+
 
 @staff_member_required
 def dashboard(request):
@@ -71,7 +78,8 @@ def approve_listing(request, pk):
             doc.verification_status = 'approved'
             doc.reviewed_at = timezone.now()
             doc.save()
-        messages.success(request, f'Listing "{listing.title}" approved.')
+        send_listing_approved_email(listing)
+        messages.success(request, f'Listing "{listing.title}" approved. Landlord notified.')
     return redirect('admin_panel:pending_listings')
 
 
@@ -86,7 +94,8 @@ def reject_listing(request, pk):
         listing.status = 'rejected'
         listing.rejection_reason = reason
         listing.save()
-        messages.success(request, f'Listing "{listing.title}" rejected.')
+        send_listing_rejected_email(listing)
+        messages.success(request, f'Listing "{listing.title}" rejected. Landlord notified.')
     return redirect('admin_panel:pending_listings')
 
 
@@ -122,7 +131,8 @@ def approve_document(request, pk):
         doc.reviewed_at = timezone.now()
         doc.rejection_reason = ''
         doc.save()
-        messages.success(request, f'Documents for {doc.user.email} approved.')
+        send_document_approved_email(doc)
+        messages.success(request, f'Documents for {doc.user.email} approved. Landlord notified.')
     return redirect('admin_panel:pending_documents')
 
 
@@ -138,7 +148,8 @@ def reject_document(request, pk):
         doc.rejection_reason = reason
         doc.reviewed_at = timezone.now()
         doc.save()
-        messages.success(request, f'Documents for {doc.user.email} rejected.')
+        send_document_rejected_email(doc)
+        messages.success(request, f'Documents for {doc.user.email} rejected. Landlord notified.')
     return redirect('admin_panel:pending_documents')
 
 
@@ -181,10 +192,12 @@ def resolve_report(request, pk):
         messages.success(request, 'Report resolved.')
     return redirect('admin_panel:reports_queue')
 
+
 @staff_member_required
 def manage_ads(request):
     ads = Advertisement.objects.all().order_by('-created_at')
     return render(request, 'admin_panel/ads.html', {'ads': ads})
+
 
 @staff_member_required
 def toggle_ad(request, pk):

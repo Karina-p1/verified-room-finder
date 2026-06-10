@@ -16,4 +16,5 @@ urlpatterns = [
     path('saved/', views.saved_listings, name='saved_listings'),
     path('report/<int:pk>/', views.report_listing, name='report_listing'),
     path('ajax/districts/', views.get_districts, name='get_districts'),
+    path('mark-rented/<int:pk>/', views.mark_rented, name='mark_rented'),
 ]
