@@ -37,6 +37,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
+    # New profile fields
+    profile_picture = models.ImageField(
+        upload_to='profiles/', null=True, blank=True
+    )
+    bio = models.TextField(max_length=300, blank=True)
+    address = models.CharField(max_length=300, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    facebook_url = models.URLField(blank=True)
+    is_phone_verified = models.BooleanField(default=False)
+
+    def get_profile_picture(self):
+        if self.profile_picture:
+            return self.profile_picture.url
+        return None  # will use default avatar in template
     objects = CustomUserManager()
 
     def __str__(self):

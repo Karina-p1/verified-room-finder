@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import RegistrationForm, LoginForm, OTPForm
 from .models import CustomUser, OTP
+from .forms import ProfileUpdateForm, PasswordChangeForm
+from apps.listings.models import Listing
+from django.shortcuts import get_object_or_404
 
 
 def register_view(request):
@@ -31,7 +35,8 @@ def register_view(request):
             print(f'{"="*50}\n')
 
         request.session['otp_user_id'] = user.id
-        messages.success(request, 'Account created! Enter the OTP sent to your email. (Development: check terminal)')
+        messages.success(
+            request, 'Account created! Enter the OTP sent to your email. (Development: check terminal)')
         return redirect('accounts:verify_otp')
 
     return render(request, 'accounts/register.html', {'form': form})
@@ -55,10 +60,12 @@ def verify_otp_view(request):
                 otp.user.save()
                 otp.delete()
                 del request.session['otp_user_id']
-                messages.success(request, 'Email verified! You can now log in.')
+                messages.success(
+                    request, 'Email verified! You can now log in.')
                 return redirect('accounts:login')
             else:
-                form.add_error('code', 'OTP has expired. Please register again.')
+                form.add_error(
+                    'code', 'OTP has expired. Please register again.')
 
         except OTP.DoesNotExist:
             form.add_error('code', 'Invalid OTP. Please try again.')
@@ -94,7 +101,8 @@ def login_view(request):
                 print(f'{"="*50}\n')
 
             request.session['otp_user_id'] = user.id
-            messages.warning(request, 'Email not verified. Check your terminal for OTP.')
+            messages.warning(
+                request, 'Email not verified. Check your terminal for OTP.')
             return redirect('accounts:verify_otp')
 
         else:
@@ -105,6 +113,62 @@ def login_view(request):
             return redirect('listings:homepage')
 
     return render(request, 'accounts/login.html', {'form': form})
+
+
+@login_required
+def profile_view(request, user_id=None):
+    """View any user's public profile."""
+    if user_id:
+        profile_user = get_object_or_404(CustomUser, pk=user_id)
+    else:
+        profile_user = request.user
+
+    listings = None
+    if profile_user.role == 'landlord':
+        listings = Listing.objects.filter(
+            owner=profile_user, status='approved'
+        ).prefetch_related('images')[:6]
+
+    return render(request, 'accounts/profile.html', {
+        'profile_user': profile_user,
+        'listings': listings,
+        'is_own_profile': profile_user == request.user,
+    })
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('accounts:profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+
+    return render(request, 'accounts/edit_profile.html', {'form': form})
+
+
+@login_required
+def change_password(request):
+    form = PasswordChangeForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user = request.user
+        if not user.check_password(form.cleaned_data['current_password']):
+            form.add_error('current_password',
+                           'Current password is incorrect.')
+        else:
+            user.set_password(form.cleaned_data['new_password'])
+            user.save()
+            # Keep user logged in after password change
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Password changed successfully!')
+            return redirect('accounts:profile')
+
+    return render(request, 'accounts/change_password.html', {'form': form})
 
 
 def logout_view(request):

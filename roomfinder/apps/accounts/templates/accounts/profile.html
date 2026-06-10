@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.get_full_name }} — RoomFinder{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+
+        <!-- Left: Profile Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+
+                <!-- Avatar -->
+                {% if profile_user.profile_picture %}
+                    <img src="{{ profile_user.profile_picture.url }}"
+                         class="rounded-circle mx-auto mb-3"
+                         style="width:120px;height:120px;object-fit:cover;">
+                {% else %}
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:120px;height:120px;">
+                        <span class="text-white fw-bold" style="font-size:2.5rem;">
+                            {{ profile_user.first_name|first|upper }}
+                        </span>
+                    </div>
+                {% endif %}
+
+                <h4 class="fw-bold mb-1">{{ profile_user.get_full_name }}</h4>
+                <span class="badge bg-primary mb-2">{{ profile_user.role|capfirst }}</span>
+
+                {% if profile_user.bio %}
+                    <p class="text-muted small mb-3">{{ profile_user.bio }}</p>
+                {% endif %}
+
+                <!-- Verification badges -->
+                <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                    {% if profile_user.email_verified %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-envelope-check"></i> Email Verified
+                        </span>
+                    {% endif %}
+                    {% if profile_user.role == 'landlord' %}
+                        {% if profile_user.documents.verification_status == 'approved' %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-patch-check-fill"></i> Verified Landlord
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-clock"></i> Unverified
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Contact info -->
+                <div class="text-start border-top pt-3">
+                    <p class="mb-2 small">
+                        <i class="bi bi-envelope text-primary"></i>
+                        {{ profile_user.email }}
+                    </p>
+                    {% if is_own_profile %}
+                        <p class="mb-2 small">
+                            <i class="bi bi-telephone text-primary"></i>
+                            {{ profile_user.phone }}
+                        </p>
+                    {% endif %}
+                    {% if profile_user.address %}
+                        <p class="mb-2 small">
+                            <i class="bi bi-geo-alt text-primary"></i>
+                            {{ profile_user.address }}
+                        </p>
+                    {% endif %}
+                    {% if profile_user.facebook_url %}
+                        <p class="mb-2 small">
+                            <i class="bi bi-facebook text-primary"></i>
+                            <a href="{{ profile_user.facebook_url }}" target="_blank">Facebook</a>
+                        </p>
+                    {% endif %}
+                    <p class="mb-0 small text-muted">
+                        <i class="bi bi-calendar"></i>
+                        Member since {{ profile_user.date_joined|date:"M Y" }}
+                    </p>
+                </div>
+
+                <!-- Edit buttons (own profile only) -->
+                {% if is_own_profile %}
+                <div class="mt-3 d-flex flex-column gap-2">
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-lock"></i> Change Password
+                    </a>
+                    {% if profile_user.role == 'landlord' %}
+                        <a href="{% url 'documents:status' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-file-earmark-text"></i> My Documents
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Stats card -->
+            <div class="card border-0 shadow-sm p-4 mt-3">
+                <h6 class="fw-bold mb-3">Stats</h6>
+                {% if profile_user.role == 'landlord' %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Active Listings</span>
+                        <strong>{{ profile_user.listings.count }}</strong>
+                    </div>
+                {% endif %}
+                {% if profile_user.role == 'tenant' %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Saved Listings</span>
+                        <strong>{{ profile_user.saved_listings.count }}</strong>
+                    </div>
+                {% endif %}
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Member Since</span>
+                    <strong>{{ profile_user.date_joined|date:"M d, Y" }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Listings (for landlords) or activity -->
+        <div class="col-lg-8">
+            {% if profile_user.role == 'landlord' and listings %}
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-house"></i> Active Listings
+                </h5>
+                <div class="row g-3">
+                    {% for listing in listings %}
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm listing-card h-100">
+                            {% with listing.primary_image as img %}
+                                {% if img %}
+                                    <img src="{{ img.image.url }}" class="card-img-top"
+                                         style="height:160px;object-fit:cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                         style="height:160px;">
+                                        <i class="bi bi-image text-muted fs-2"></i>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-1">{{ listing.title|truncatechars:35 }}</h6>
+                                <p class="text-primary fw-bold mb-1">NPR {{ listing.monthly_rent }}/month</p>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-geo-alt"></i> {{ listing.district }}
+                                </p>
+                                <a href="{% url 'listings:detail' listing.pk %}"
+                                   class="btn btn-outline-primary btn-sm w-100">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% elif profile_user.role == 'tenant' %}
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-person-circle"></i> Account Overview</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4 text-center">
+                            <div class="card border-0 bg-light p-3">
+                                <div class="fs-2 fw-bold text-primary">
+                                    {{ profile_user.saved_listings.count }}
+                                </div>
+                                <small class="text-muted">Saved Listings</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card border-0 bg-light p-3">
+                                <div class="fs-2 fw-bold text-warning">
+                                    {{ profile_user.listreport_set.count|default:0 }}
+                                </div>
+                                <small class="text-muted">Reports Submitted</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card border-0 bg-light p-3">
+                                <i class="bi bi-shield-check text-success fs-2"></i>
+                                <div class="small text-muted mt-1">Verified Account</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% elif profile_user.role == 'admin' or profile_user.is_staff %}
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3">Admin Account</h5>
+                    <p class="text-muted">This is a platform administrator account.</p>
+                    <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-primary">
+                        Go to Admin Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
