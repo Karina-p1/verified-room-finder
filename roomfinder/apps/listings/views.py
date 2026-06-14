@@ -200,7 +200,6 @@ def my_listings(request):
 def edit_listing(request, pk):
     listing = get_object_or_404(Listing, pk=pk, owner=request.user)
 
-    # Get or create facilities
     try:
         facilities_instance = listing.facilities
     except Exception:
@@ -209,15 +208,40 @@ def edit_listing(request, pk):
     if request.method == 'POST':
         listing_form = ListingForm(request.POST, instance=listing)
         facilities_form = FacilitiesForm(request.POST, instance=facilities_instance)
+
+        # Grab district manually since it's a custom JS-populated select
+        district_value = request.POST.get('district', '').strip()
+
         if listing_form.is_valid() and facilities_form.is_valid():
             updated = listing_form.save(commit=False)
+            updated.district = district_value  # ← manually inject it
             updated.status = 'pending'
+            updated.rejection_reason = ''
             updated.save()
+
             fac = facilities_form.save(commit=False)
             fac.listing = updated
             fac.save()
+
+            # Handle optional new images
+            new_images = request.FILES.getlist('new_images')
+            if new_images:
+                current_count = updated.images.count()
+                slots_left = 15 - current_count
+                if slots_left > 0:
+                    for img in new_images[:slots_left]:
+                        ListingImage.objects.create(
+                            listing=updated,
+                            image=img,
+                            is_primary=False
+                        )
+                    if len(new_images) > slots_left:
+                        messages.warning(request, f'Only {slots_left} images added — max 15 total.')
+
             messages.success(request, 'Listing updated and resubmitted for approval.')
             return redirect('listings:my_listings')
+        else:
+            messages.error(request, 'Please fix the errors below.')
     else:
         listing_form = ListingForm(instance=listing)
         facilities_form = FacilitiesForm(instance=facilities_instance)
@@ -237,6 +261,27 @@ def delete_listing(request, pk):
         messages.success(request, 'Listing deleted.')
     return redirect('listings:my_listings')
 
+@login_required
+def delete_listing_image(request, image_id):
+    from .models import ListingImage
+    image = get_object_or_404(ListingImage, pk=image_id, listing__owner=request.user)
+    listing_pk = image.listing.pk
+    
+    # Don't allow deleting if only 3 images remain
+    if image.listing.images.count() <= 3:
+        messages.error(request, 'Minimum 3 images required. Cannot delete.')
+        return redirect('listings:edit_listing', pk=listing_pk)
+    
+    # If deleting primary image, make next one primary
+    if image.is_primary:
+        next_img = image.listing.images.exclude(pk=image.pk).first()
+        if next_img:
+            next_img.is_primary = True
+            next_img.save()
+    
+    image.delete()
+    messages.success(request, 'Image deleted.')
+    return redirect('listings:edit_listing', pk=listing_pk)
 
 @login_required
 def save_listing(request, pk):

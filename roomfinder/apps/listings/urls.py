@@ -17,4 +17,5 @@ urlpatterns = [
     path('report/<int:pk>/', views.report_listing, name='report_listing'),
     path('ajax/districts/', views.get_districts, name='get_districts'),
     path('mark-rented/<int:pk>/', views.mark_rented, name='mark_rented'),
+    path('image/delete/<int:image_id>/', views.delete_listing_image, name='delete_image'),
 ]

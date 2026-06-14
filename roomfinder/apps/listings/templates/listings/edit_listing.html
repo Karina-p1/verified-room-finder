@@ -1,7 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Edit Listing — RoomFinder{% endblock %}
+
 {% block content %}
 <div class="container my-5" style="max-width:800px;">
+
+    <!-- =====================================================
+         DELETE FORMS — must be OUTSIDE the main edit form
+         Browsers do not allow nested <form> tags
+    ====================================================== -->
+    {% for img in listing.images.all %}
+    <form method="POST"
+          action="{% url 'listings:delete_image' img.pk %}"
+          id="delete-form-{{ img.pk }}"
+          style="display:none;">
+        {% csrf_token %}
+    </form>
+    {% endfor %}
+
+    <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold"><i class="bi bi-pencil-square"></i> Edit Listing</h3>
         <a href="{% url 'listings:my_listings' %}" class="btn btn-outline-secondary btn-sm">← My Listings</a>
@@ -12,18 +28,26 @@
         Editing this listing will re-submit it for admin approval.
     </div>
 
+    <!-- MAIN EDIT FORM -->
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
+        <!-- Basic Info -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3">Basic Information</h5>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Property Title</label>
                 {{ listing_form.title }}
+                {% if listing_form.title.errors %}
+                    <div class="text-danger small">{{ listing_form.title.errors }}</div>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Description</label>
                 {{ listing_form.description }}
+                {% if listing_form.description.errors %}
+                    <div class="text-danger small">{{ listing_form.description.errors }}</div>
+                {% endif %}
             </div>
             <div class="row g-3">
                 <div class="col-md-6">
@@ -37,6 +61,7 @@
             </div>
         </div>
 
+        <!-- Location -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt"></i> Location</h5>
             <div class="row g-3">
@@ -46,11 +71,10 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">District</label>
-                    <select name="district" id="districtSelect" class="form-select">
-                        <option value="{{ listing_form.district.value|default:'' }}">
-                            {{ listing_form.district.value|default:'Select district' }}
-                        </option>
+                    <select name="district" id="districtSelect" class="form-select" required>
+                        <option value="{{ listing.district }}">{{ listing.district }}</option>
                     </select>
+                    <small class="text-muted">Current: <strong>{{ listing.district }}</strong></small>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">City</label>
@@ -69,6 +93,7 @@
             {{ listing_form.longitude }}
         </div>
 
+        <!-- Pricing -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3"><i class="bi bi-cash"></i> Pricing</h5>
             <div class="row g-3">
@@ -100,6 +125,7 @@
             </div>
         </div>
 
+        <!-- Facilities -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3"><i class="bi bi-grid"></i> Facilities</h5>
             <div class="row g-3">
@@ -114,6 +140,64 @@
             </div>
         </div>
 
+        <!-- Images -->
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-images"></i> Property Images</h5>
+
+            {% if listing.images.all %}
+                <p class="text-muted small mb-3">
+                    Current images ({{ listing.images.count }}/15) — minimum 3 required:
+                </p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% for img in listing.images.all %}
+                    <div style="position:relative;width:100px;height:80px;flex-shrink:0;">
+
+                        <img src="{{ img.image.url }}"
+                             style="width:100px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #dee2e6;display:block;">
+
+                        {% if img.is_primary %}
+                        <span style="position:absolute;top:4px;left:4px;background:#0d6efd;color:white;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;z-index:5;">
+                            Cover
+                        </span>
+                        {% endif %}
+
+                        {% if listing.images.count > 3 %}
+                        <button type="button"
+                                onclick="confirmDelete('{{ img.pk }}')"
+                                style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:#dc3545;border:2px solid white;color:white;font-size:11px;cursor:pointer;padding:0;line-height:1;z-index:10;">
+                            ✕
+                        </button>
+                        {% else %}
+                        <span style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10;"
+                              title="Minimum 3 images required">
+                            <i class="bi bi-lock-fill text-white" style="font-size:9px;"></i>
+                        </span>
+                        {% endif %}
+
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if listing.images.count < 15 %}
+                <label class="form-label fw-semibold">
+                    Add More Images
+                    <small class="text-muted fw-normal">({{ listing.images.count }} of 15 used)</small>
+                </label>
+                <input type="file" name="new_images" class="form-control" multiple accept="image/*">
+                <small class="text-muted mt-1 d-block">
+                    <i class="bi bi-info-circle"></i>
+                    New images will be added alongside existing ones.
+                </small>
+            {% else %}
+                <div class="alert alert-warning py-2 mb-0">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Maximum 15 images reached. Delete some above to add new ones.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Additional Details -->
         <div class="card border-0 shadow-sm p-4 mb-4">
             <h5 class="fw-bold mb-3">Additional Details</h5>
             <div class="mb-3">
@@ -126,38 +210,64 @@
             </div>
         </div>
 
+        {% if listing_form.errors %}
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-circle"></i>
+            Please fix the errors above before submitting.
+        </div>
+        {% endif %}
+
         <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
             <i class="bi bi-send"></i> Save & Resubmit for Approval
         </button>
-    </form>
+        <p class="text-muted text-center mt-2 small">
+            Your listing will be hidden until re-approved by an admin.
+        </p>
+
+    </form><!-- END MAIN FORM -->
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
 {{ districts|json_script:"districts-data" }}
 <script>
+// Finds the hidden delete form by ID and submits it
+// These forms live OUTSIDE the main edit form — no nesting issue
+function confirmDelete(imageId) {
+    if (confirm('Delete this image?')) {
+        document.getElementById('delete-form-' + imageId).submit();
+    }
+}
+
+// District dynamic loading
 const districts = JSON.parse(document.getElementById("districts-data").textContent);
 const provinceSelect = document.querySelector('select[name="province"]');
 const districtSelect = document.getElementById('districtSelect');
-const currentDistrict = "{{ listing_form.district.value|default:'' }}";
+const currentDistrict = "{{ listing.district }}";
 
-function loadDistricts(province) {
+function loadDistricts(province, preselectValue) {
     districtSelect.innerHTML = '<option value="">Select district</option>';
     if (districts[province]) {
         districts[province].forEach(function(d) {
             const opt = document.createElement('option');
             opt.value = d;
             opt.text = d;
-            if (d === currentDistrict) opt.selected = true;
+            if (d === (preselectValue !== undefined ? preselectValue : currentDistrict)) {
+                opt.selected = true;
+            }
             districtSelect.appendChild(opt);
         });
     }
 }
 
+if (provinceSelect && provinceSelect.value) {
+    loadDistricts(provinceSelect.value);
+}
+
 if (provinceSelect) {
-    if (provinceSelect.value) loadDistricts(provinceSelect.value);
     provinceSelect.addEventListener('change', function() {
-        loadDistricts(provinceSelect.value);
+        loadDistricts(provinceSelect.value, '');
     });
 }
 </script>

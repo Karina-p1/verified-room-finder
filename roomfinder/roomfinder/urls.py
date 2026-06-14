@@ -27,4 +27,4 @@ urlpatterns = [
     path('ads/', include('apps.advertisements.urls')),
     path('panel/', include('apps.admin_panel.urls')),
     path('', include('apps.listings.urls')),   # handles / and /listing/ etc.
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
