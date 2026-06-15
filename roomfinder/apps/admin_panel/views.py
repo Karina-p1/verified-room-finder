@@ -1,4 +1,8 @@
 # apps/admin_panel/views.py
+import datetime
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+from apps.advertisements.models import PhoneRevealLog, Advertisement
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
