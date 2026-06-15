@@ -14,6 +14,9 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from .models import Inquiry, Message
 from .forms import InquiryMessageForm
+from .models import Review
+from .forms import ReviewForm
+from django.db.models import Avg
 
 DISTRICTS = {
     'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
@@ -501,3 +504,67 @@ def get_districts(request):
     province = request.GET.get('province', '')
     districts = DISTRICTS.get(province, [])
     return JsonResponse({'districts': districts})
+
+@login_required
+def submit_review(request, listing_pk):
+    """Tenant submits a review for a listing/landlord."""
+    listing = get_object_or_404(Listing, pk=listing_pk, status='approved')
+
+    # Only tenants can review
+    if request.user.role != 'tenant':
+        messages.error(request, 'Only tenants can submit reviews.')
+        return redirect('listings:detail', pk=listing_pk)
+
+    # Can't review your own listing
+    if listing.owner == request.user:
+        messages.error(request, 'You cannot review your own listing.')
+        return redirect('listings:detail', pk=listing_pk)
+
+    # Check if already reviewed
+    existing = Review.objects.filter(
+        listing=listing, reviewer=request.user
+    ).first()
+
+    if existing:
+        messages.info(request, 'You have already reviewed this listing.')
+        return redirect('listings:detail', pk=listing_pk)
+
+    # Must have sent an inquiry first (contacted landlord)
+    has_inquired = Inquiry.objects.filter(
+        listing=listing, tenant=request.user
+    ).exists()
+
+    if not has_inquired:
+        messages.warning(
+            request,
+            'You must contact the landlord before leaving a review.'
+        )
+        return redirect('listings:detail', pk=listing_pk)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.listing = listing
+            review.reviewer = request.user
+            review.landlord = listing.owner
+            review.save()
+            messages.success(request, 'Review submitted! Thank you.')
+            return redirect('listings:detail', pk=listing_pk)
+    else:
+        form = ReviewForm()
+
+    return render(request, 'listings/submit_review.html', {
+        'listing': listing,
+        'form': form,
+    })
+
+
+@login_required
+def delete_review(request, pk):
+    """Reviewer can delete their own review."""
+    review = get_object_or_404(Review, pk=pk, reviewer=request.user)
+    listing_pk = review.listing.pk
+    review.delete()
+    messages.success(request, 'Review deleted.')
+    return redirect('listings:detail', pk=listing_pk)

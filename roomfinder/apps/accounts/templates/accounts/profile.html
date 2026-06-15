@@ -98,26 +98,59 @@
                 {% endif %}
             </div>
 
-            <!-- Stats card -->
-            <div class="card border-0 shadow-sm p-4 mt-3">
-                <h6 class="fw-bold mb-3">Stats</h6>
-                {% if profile_user.role == 'landlord' %}
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Active Listings</span>
-                        <strong>{{ profile_user.listings.count }}</strong>
-                    </div>
-                {% endif %}
-                {% if profile_user.role == 'tenant' %}
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Saved Listings</span>
-                        <strong>{{ profile_user.saved_listings.count }}</strong>
-                    </div>
-                {% endif %}
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted small">Member Since</span>
-                    <strong>{{ profile_user.date_joined|date:"M d, Y" }}</strong>
-                </div>
+           <!-- Stats card -->
+<div class="card border-0 shadow-sm p-4 mt-3">
+    <h6 class="fw-bold mb-3">Stats</h6>
+
+    {% if profile_user.role == 'landlord' %}
+        <!-- Average rating -->
+        {% with avg=profile_user.average_rating %}
+        {% if avg %}
+        <div class="text-center mb-3 pb-3 border-bottom">
+            <div class="fw-bold" style="font-size:2rem;">{{ avg }}</div>
+            <div class="text-warning">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= avg %}
+                        <i class="bi bi-star-fill"></i>
+                    {% else %}
+                        <i class="bi bi-star text-muted"></i>
+                    {% endif %}
+                {% endfor %}
             </div>
+            <small class="text-muted">
+                {{ profile_user.review_count }}
+                review{{ profile_user.review_count|pluralize }}
+            </small>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Active Listings</span>
+            <strong>{{ profile_user.listings.count }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Total Reviews</span>
+            <strong>{{ profile_user.review_count }}</strong>
+        </div>
+    {% endif %}
+
+    {% if profile_user.role == 'tenant' %}
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Saved Listings</span>
+            <strong>{{ profile_user.saved_listings.count }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted small">Reviews Given</span>
+            <strong>{{ profile_user.reviews_given.count }}</strong>
+        </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between">
+        <span class="text-muted small">Member Since</span>
+        <strong>{{ profile_user.date_joined|date:"M d, Y" }}</strong>
+    </div>
+</div>
         </div>
 
         <!-- Right: Listings (for landlords) or activity -->

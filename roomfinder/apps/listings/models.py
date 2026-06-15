@@ -199,3 +199,38 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender.email} at {self.sent_at}"
+    
+class Review(models.Model):
+    RATING_CHOICES = [
+        (1, '⭐ Poor'),
+        (2, '⭐⭐ Fair'),
+        (3, '⭐⭐⭐ Good'),
+        (4, '⭐⭐⭐⭐ Very Good'),
+        (5, '⭐⭐⭐⭐⭐ Excellent'),
+    ]
+
+    listing = models.ForeignKey(
+        Listing, on_delete=models.CASCADE, related_name='reviews'
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_given'
+    )
+    landlord = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_received'
+    )
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+    title = models.CharField(max_length=100)
+    body = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=True)  # admin can hide if needed
+
+    class Meta:
+        unique_together = ['listing', 'reviewer']  # one review per tenant per listing
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.reviewer.email} → {self.listing.title} ({self.rating}★)"

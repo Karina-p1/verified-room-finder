@@ -56,6 +56,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
+    def average_rating(self):
+        from apps.listings.models import Review
+        reviews = Review.objects.filter(landlord=self, is_approved=True)
+        if not reviews.exists():
+            return None
+        total = sum(r.rating for r in reviews)
+        return round(total / reviews.count(), 1)
+
+    def review_count(self):
+        from apps.listings.models import Review
+        return Review.objects.filter(landlord=self, is_approved=True).count()
 
 import random
 from django.utils import timezone

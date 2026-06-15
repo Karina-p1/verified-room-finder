@@ -30,4 +30,9 @@ path('inquiry/<int:pk>/',
      views.inquiry_thread, name='inquiry_thread'),
 path('inquiries/', 
      views.my_inquiries, name='my_inquiries'),
+
+     path('review/submit/<int:listing_pk>/',
+     views.submit_review, name='submit_review'),
+path('review/delete/<int:pk>/',
+     views.delete_review, name='delete_review'),
 ]

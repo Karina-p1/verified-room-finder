@@ -3,7 +3,7 @@
 from django.contrib import admin
 from .models import Listing, Facilities, ListingImage, SavedListing, ListingReport
 from .models import Inquiry, Message
-
+from .models import Review
 class ListingImageInline(admin.TabularInline):
     model = ListingImage
     extra = 0
@@ -32,3 +32,14 @@ class InquiryAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['tenant__email', 'landlord__email', 'listing__title']
     inlines = [MessageInline]
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = [
+        'listing', 'reviewer', 'rating', 'title', 'is_approved', 'created_at'
+    ]
+    list_filter = ['rating', 'is_approved']
+    list_editable = ['is_approved']
+    search_fields = ['reviewer__email', 'listing__title', 'title']
+    readonly_fields = ['listing', 'reviewer', 'landlord', 'created_at']
+

@@ -2,6 +2,7 @@
 
 from django import forms
 from .models import Listing, Facilities, ListingImage, ListingReport
+from .models import Review
 
 PROVINCES = [
     ('', 'Select Province'),
@@ -161,3 +162,23 @@ class InquiryMessageForm(forms.Form):
         }),
         max_length=1000,
     )
+class ReviewForm(forms.ModelForm):
+    rating = forms.ChoiceField(
+        choices=Review.RATING_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'rating-input'}),
+    )
+
+    class Meta:
+        model = Review
+        fields = ['rating', 'title', 'body']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Summarize your experience...',
+            }),
+            'body': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Describe your experience with this landlord...',
+            }),
+        }

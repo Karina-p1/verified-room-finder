@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Leave a Review — RoomFinder{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Star rating radio buttons */
+.rating-group {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 6px;
+    justify-content: flex-end;
+}
+.rating-group input[type="radio"] { display: none; }
+.rating-group label {
+    font-size: 2rem;
+    color: #dee2e6;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+.rating-group input:checked ~ label,
+.rating-group label:hover,
+.rating-group label:hover ~ label {
+    color: #ffc107;
+}
+.rating-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 4px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width:600px;">
+
+    <!-- Listing preview -->
+    <div class="card border-0 shadow-sm p-3 mb-4">
+        <div class="d-flex gap-3 align-items-center">
+            {% with listing.primary_image as img %}
+                {% if img %}
+                    <img src="{{ img.image.url }}"
+                         class="rounded"
+                         style="width:80px;height:60px;object-fit:cover;">
+                {% endif %}
+            {% endwith %}
+            <div>
+                <h6 class="fw-bold mb-1">{{ listing.title }}</h6>
+                <p class="text-muted small mb-0">
+                    Landlord:
+                    <strong>{{ listing.owner.get_full_name }}</strong>
+                    &nbsp;·&nbsp;
+                    {{ listing.district }}, {{ listing.province }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4">
+        <h5 class="fw-bold mb-1">
+            <i class="bi bi-star-fill text-warning"></i>
+            Leave a Review
+        </h5>
+        <p class="text-muted small mb-4">
+            Share your experience to help other tenants.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Star rating -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold d-block">
+                    Your Rating <span class="text-danger">*</span>
+                </label>
+                <div class="rating-group" id="starGroup">
+                    {% for value, label in form.rating.field.choices reversed %}
+                    <input type="radio"
+                           name="rating"
+                           id="star{{ value }}"
+                           value="{{ value }}"
+                           {% if form.rating.value == value|stringformat:"s" %}
+                               checked
+                           {% endif %}>
+                    <label for="star{{ value }}" title="{{ label }}">★</label>
+                    {% endfor %}
+                </div>
+                <div class="rating-label" id="ratingLabel">
+                    Click to select a rating
+                </div>
+                {% if form.rating.errors %}
+                    <div class="text-danger small mt-1">
+                        Please select a rating.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Review title -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    Review Title <span class="text-danger">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="text-danger small">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Review body -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    Your Experience <span class="text-danger">*</span>
+                </label>
+                {{ form.body }}
+                <small class="text-muted">Max 500 characters</small>
+                {% if form.body.errors %}
+                    <div class="text-danger small">{{ form.body.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-bold flex-grow-1">
+                    <i class="bi bi-send"></i> Submit Review
+                </button>
+                <a href="{% url 'listings:detail' listing.pk %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const labels = {
+    1: '⭐ Poor',
+    2: '⭐⭐ Fair',
+    3: '⭐⭐⭐ Good',
+    4: '⭐⭐⭐⭐ Very Good',
+    5: '⭐⭐⭐⭐⭐ Excellent',
+};
+const ratingLabel = document.getElementById('ratingLabel');
+const inputs = document.querySelectorAll('.rating-group input');
+
+inputs.forEach(input => {
+    input.addEventListener('change', () => {
+        ratingLabel.textContent = labels[input.value];
+        ratingLabel.style.color = '#ffc107';
+        ratingLabel.style.fontWeight = '600';
+    });
+});
+
+// Set label if already selected
+inputs.forEach(input => {
+    if (input.checked) {
+        ratingLabel.textContent = labels[input.value];
+        ratingLabel.style.color = '#ffc107';
+        ratingLabel.style.fontWeight = '600';
+    }
+});
+</script>
+{% endblock %}
