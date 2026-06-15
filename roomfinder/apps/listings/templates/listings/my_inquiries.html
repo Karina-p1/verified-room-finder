@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}My Messages — RoomFinder{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width:750px;">
+
+    <h3 class="fw-bold mb-4">
+        <i class="bi bi-chat-dots text-primary"></i> My Messages
+    </h3>
+
+    {% if inquiries %}
+    <div class="d-flex flex-column gap-3">
+        {% for inquiry in inquiries %}
+        <a href="{% url 'listings:inquiry_thread' inquiry.pk %}"
+           class="text-decoration-none">
+            <div class="card border-0 shadow-sm p-3
+                        {% if inquiry.unread > 0 %}
+                            border-start border-primary border-3
+                        {% endif %}"
+                 style="transition:box-shadow 0.2s;">
+
+                <div class="d-flex gap-3 align-items-center">
+
+                    <!-- Listing thumbnail -->
+                    {% with inquiry.listing.primary_image as img %}
+                        {% if img %}
+                            <img src="{{ img.image.url }}"
+                                 class="rounded"
+                                 style="width:60px;height:50px;
+                                        object-fit:cover;flex-shrink:0;">
+                        {% else %}
+                            <div class="bg-light rounded d-flex align-items-center
+                                        justify-content-center flex-shrink-0"
+                                 style="width:60px;height:50px;">
+                                <i class="bi bi-house text-muted"></i>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Info -->
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-bold text-dark">
+                                    {% if request.user == inquiry.tenant %}
+                                        {{ inquiry.landlord.get_full_name }}
+                                    {% else %}
+                                        {{ inquiry.tenant.get_full_name }}
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">
+                                    {{ inquiry.listing.title|truncatechars:40 }}
+                                </div>
+                            </div>
+
+                            <!-- Unread badge + time -->
+                            <div class="text-end flex-shrink-0 ms-2">
+                                {% with inquiry.last_message as last %}
+                                    {% if last %}
+                                        <div class="text-muted"
+                                             style="font-size:0.72rem;">
+                                            {{ last.sent_at|timesince }} ago
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                                {% if inquiry.unread > 0 %}
+                                    <span class="badge bg-primary rounded-pill">
+                                        {{ inquiry.unread }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Last message preview -->
+                        {% with inquiry.last_message as last %}
+                            {% if last %}
+                                <p class="text-muted mb-0 mt-1"
+                                   style="font-size:0.82rem;
+                                          white-space:nowrap;
+                                          overflow:hidden;
+                                          text-overflow:ellipsis;">
+                                    {% if last.sender == request.user %}
+                                        <span class="text-muted">You: </span>
+                                    {% endif %}
+                                    {{ last.body|truncatechars:60 }}
+                                </p>
+                            {% else %}
+                                <p class="text-muted mb-0 mt-1"
+                                   style="font-size:0.82rem;">
+                                    No messages yet
+                                </p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-chat-square-dots text-muted"
+           style="font-size:4rem;opacity:0.3;"></i>
+        <h5 class="mt-3 text-muted">No messages yet</h5>
+        {% if request.user.role == 'tenant' %}
+            <p class="text-muted small">
+                Browse listings and click
+                "Contact Landlord" to start a conversation.
+            </p>
+            <a href="{% url 'listings:homepage' %}"
+               class="btn btn-primary mt-2">
+                Browse Listings
+            </a>
+        {% else %}
+            <p class="text-muted small">
+                Tenants will message you when they're interested in your listings.
+            </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

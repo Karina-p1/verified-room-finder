@@ -180,6 +180,18 @@
                     </a>
                 {% endif %}
 
+                <!-- Contact Landlord button — tenants only -->
+{% if user.is_authenticated and user.role == 'tenant' and listing.owner != user %}
+    <a href="{% url 'listings:start_inquiry' listing.pk %}"
+       class="btn btn-success w-100 mt-3">
+        <i class="bi bi-chat-dots"></i> Contact Landlord
+    </a>
+{% elif not user.is_authenticated %}
+    <a href="{% url 'accounts:login' %}"
+       class="btn btn-outline-success w-100 mt-3">
+        <i class="bi bi-chat-dots"></i> Login to Contact Landlord
+    </a>
+{% endif %}
                 <!-- Property Type -->
                 <hr>
                 <p class="mb-1"><strong>Type:</strong> {{ listing.get_property_type_display }}</p>
@@ -214,6 +226,117 @@
         </div>
     </div>
 </div>
+
+<!-- Similar Listings -->
+{% if similar_listings %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-houses text-primary"></i>
+            Similar Listings in {{ listing.district }}
+        </h5>
+        <a href="{% url 'listings:homepage' %}?district={{ listing.district }}"
+           class="btn btn-sm btn-outline-primary">
+            See All in {{ listing.district }}
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for similar in similar_listings %}
+        <div class="col-md-4">
+            <div class="card listing-card h-100 border-0 shadow-sm overflow-hidden">
+
+                <!-- Image with price overlay -->
+                <div class="position-relative" style="height:180px;overflow:hidden;">
+                    {% with similar.primary_image as img %}
+                        {% if img %}
+                            <img src="{{ img.image.url }}"
+                                 class="w-100 h-100"
+                                 style="object-fit:cover;transition:transform 0.3s;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center
+                                        justify-content-center h-100">
+                                <i class="bi bi-image text-muted fs-2"></i>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Price gradient overlay -->
+                    <div class="position-absolute bottom-0 start-0 w-100 px-3 py-2"
+                         style="background:linear-gradient(transparent,rgba(0,0,0,0.65));">
+                        <span class="text-white fw-bold small">
+                            NPR {{ similar.monthly_rent|floatformat:0 }}/mo
+                        </span>
+                    </div>
+
+                    <!-- Verified badge -->
+                    <span class="badge bg-success position-absolute"
+                          style="top:8px;right:8px;font-size:0.7rem;">
+                        <i class="bi bi-patch-check-fill"></i> Verified
+                    </span>
+                </div>
+
+                <div class="card-body pb-2">
+                    <h6 class="fw-bold mb-1">
+                        {{ similar.title|truncatechars:40 }}
+                    </h6>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-geo-alt-fill text-primary"></i>
+                        {{ similar.district }}, {{ similar.province }}
+                    </p>
+
+                    <!-- Match reason badge -->
+                    {% if similar.district == listing.district and similar.property_type == listing.property_type %}
+                        <span class="badge bg-success bg-opacity-10 text-success
+                                     border border-success small mb-2">
+                            <i class="bi bi-stars"></i> Best match
+                        </span>
+                    {% elif similar.district == listing.district %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary
+                                     border border-primary small mb-2">
+                            <i class="bi bi-geo-alt"></i> Same district
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary
+                                     border border-secondary small mb-2">
+                            <i class="bi bi-map"></i> Same province
+                        </span>
+                    {% endif %}
+
+                    <!-- Facility chips -->
+                    <div class="d-flex gap-1 flex-wrap">
+                        <span class="badge bg-light text-dark border"
+                              style="font-size:0.7rem;">
+                            {{ similar.get_property_type_display }}
+                        </span>
+                        {% if similar.facilities.wifi %}
+                            <span class="badge bg-light text-dark border"
+                                  style="font-size:0.7rem;">
+                                <i class="bi bi-wifi"></i>
+                            </span>
+                        {% endif %}
+                        {% if similar.facilities.attached_bathroom %}
+                            <span class="badge bg-light text-dark border"
+                                  style="font-size:0.7rem;">
+                                <i class="bi bi-droplet"></i>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                    <a href="{% url 'listings:detail' similar.pk %}"
+                       class="btn btn-outline-primary btn-sm w-100">
+                        View Details <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block extra_js %}

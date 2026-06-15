@@ -144,7 +144,6 @@ class FacilitiesForm(forms.ModelForm):
             ]
         }
 
-
 class ListingReportForm(forms.ModelForm):
     class Meta:
         model = ListingReport
@@ -152,3 +151,13 @@ class ListingReportForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
+
+class InquiryMessageForm(forms.Form):
+    body = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Write your message...',
+        }),
+        max_length=1000,
+    )

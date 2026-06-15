@@ -147,3 +147,55 @@ class ListingReport(models.Model):
 
     def __str__(self):
         return f"Report on {self.listing.title} by {self.reported_by.email}"
+    
+class Inquiry(models.Model):
+    """A conversation thread between a tenant and landlord about a listing."""
+    listing = models.ForeignKey(
+        Listing, on_delete=models.CASCADE, related_name='inquiries'
+    )
+    tenant = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_inquiries'
+    )
+    landlord = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='received_inquiries'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_archived = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['listing', 'tenant']  # one thread per tenant per listing
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.tenant.email} → {self.listing.title}"
+
+    def last_message(self):
+        return self.messages.order_by('-sent_at').first()
+
+    def unread_count(self, user):
+        return self.messages.filter(is_read=False).exclude(sender=user).count()
+
+
+class Message(models.Model):
+    """Individual message within an inquiry thread."""
+    inquiry = models.ForeignKey(
+        Inquiry, on_delete=models.CASCADE, related_name='messages'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_messages'
+    )
+    body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['sent_at']
+
+    def __str__(self):
+        return f"Message from {self.sender.email} at {self.sent_at}"

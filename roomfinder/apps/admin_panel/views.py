@@ -20,6 +20,80 @@ from apps.accounts.notifications import (
     send_document_rejected_email,
 )
 
+@staff_member_required
+def revenue_analytics(request):
+    from django.utils import timezone
+    import datetime
+
+    thirty_days_ago = timezone.now() - datetime.timedelta(days=30)
+
+    # Daily phone reveals for chart (last 30 days)
+    daily_reveals = (
+        PhoneRevealLog.objects
+        .filter(revealed_at__gte=thirty_days_ago)
+        .annotate(day=TruncDate('revealed_at'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    # Top listings by reveal count
+    top_listings = (
+        PhoneRevealLog.objects
+        .values('listing__title', 'listing__pk', 'listing__district')
+        .annotate(reveal_count=Count('id'))
+        .order_by('-reveal_count')[:10]
+    )
+
+    # User growth (joined last 30 days)
+    new_users = (
+        CustomUser.objects
+        .filter(date_joined__gte=thirty_days_ago)
+        .annotate(day=TruncDate('date_joined'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    # Listing stats by province
+    listings_by_province = (
+        Listing.objects
+        .filter(status='approved')
+        .values('province')
+        .annotate(count=Count('id'))
+        .order_by('-count')
+    )
+
+    context = {
+        # Summary cards
+        'total_reveals': PhoneRevealLog.objects.count(),
+        'reveals_this_month': PhoneRevealLog.objects.filter(
+            revealed_at__gte=thirty_days_ago
+        ).count(),
+        'total_users': CustomUser.objects.count(),
+        'new_users_month': CustomUser.objects.filter(
+            date_joined__gte=thirty_days_ago
+        ).count(),
+        'landlord_count': CustomUser.objects.filter(role='landlord').count(),
+        'tenant_count': CustomUser.objects.filter(role='tenant').count(),
+        'total_listings': Listing.objects.count(),
+        'approved_listings': Listing.objects.filter(status='approved').count(),
+        'pending_listings': Listing.objects.filter(status='pending').count(),
+        'rejected_listings': Listing.objects.filter(status='rejected').count(),
+        'active_ads': Advertisement.objects.filter(is_active=True).count(),
+
+        # Chart data (convert to JSON-safe format)
+        'daily_reveals_labels': [str(r['day']) for r in daily_reveals],
+        'daily_reveals_data': [r['count'] for r in daily_reveals],
+        'new_users_labels': [str(r['day']) for r in new_users],
+        'new_users_data': [r['count'] for r in new_users],
+        'province_labels': [r['province'] for r in listings_by_province],
+        'province_data': [r['count'] for r in listings_by_province],
+
+        # Tables
+        'top_listings': top_listings,
+    }
+    return render(request, 'admin_panel/analytics.html', context)
 
 @staff_member_required
 def dashboard(request):

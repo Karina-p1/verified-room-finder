@@ -299,4 +299,67 @@
     loadDistricts(provinceSelect.value);
   });
 </script>
+<!-- Recently Viewed -->
+{% if recently_viewed %}
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-clock-history text-secondary"></i> Recently Viewed
+        </h5>
+        <button class="btn btn-sm btn-outline-secondary"
+                onclick="clearRecentlyViewed()">
+            <i class="bi bi-x"></i> Clear
+        </button>
+    </div>
+
+    <div class="row g-3">
+        {% for listing in recently_viewed %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="{% url 'listings:detail' listing.pk %}"
+               class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 listing-card">
+                    <!-- Thumbnail -->
+                    {% with listing.primary_image as img %}
+                        {% if img %}
+                            <img src="{{ img.image.url }}"
+                                 class="card-img-top"
+                                 style="height:90px;object-fit:cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center
+                                        justify-content-center"
+                                 style="height:90px;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="card-body p-2">
+                        <p class="mb-0 small fw-semibold text-dark"
+                           style="font-size:0.75rem;line-height:1.3;">
+                            {{ listing.title|truncatechars:30 }}
+                        </p>
+                        <p class="mb-0 text-primary"
+                           style="font-size:0.72rem;">
+                            NPR {{ listing.monthly_rent }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function clearRecentlyViewed() {
+    fetch("{% url 'listings:clear_recently_viewed' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    }).then(() => location.reload());
+}
+</script>
+{% endif %}
 {% endblock %}
+

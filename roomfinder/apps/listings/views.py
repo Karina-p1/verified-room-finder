@@ -11,6 +11,9 @@ from apps.advertisements.models import Advertisement
 from apps.listings.models import ListingReport
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
+from .models import Inquiry, Message
+from .forms import InquiryMessageForm
 
 DISTRICTS = {
     'Koshi': ['Taplejung', 'Sankhuwasabha', 'Solukhumbu', 'Okhaldhunga',
@@ -32,7 +35,133 @@ DISTRICTS = {
     'Sudurpashchim': ['Kailali', 'Kanchanpur', 'Dadeldhura', 'Baitadi',
                       'Darchula', 'Bajhang', 'Bajura', 'Achham', 'Doti'],
 }
+def track_recently_viewed(request, listing_id):
+    """Store last 6 viewed listing IDs in session."""
+    viewed = request.session.get('recently_viewed', [])
+    
+    # Remove if already exists (to re-add at front)
+    if listing_id in viewed:
+        viewed.remove(listing_id)
+    
+    # Add to front
+    viewed.insert(0, listing_id)
+    
+    # Keep only last 6
+    viewed = viewed[:6]
+    
+    request.session['recently_viewed'] = viewed
+    request.session.modified = True
 
+@require_POST
+def clear_recently_viewed(request):
+    """AJAX — clears recently viewed from session."""
+    from django.http import JsonResponse
+    request.session['recently_viewed'] = []
+    request.session.modified = True
+    return JsonResponse({'status': 'cleared'})
+
+@login_required
+def start_inquiry(request, listing_pk):
+    """Tenant starts or continues an inquiry thread."""
+    listing = get_object_or_404(Listing, pk=listing_pk, status='approved')
+
+    # Only tenants can start inquiries
+    if request.user.role != 'tenant':
+        messages.error(request, 'Only tenants can send inquiries.')
+        return redirect('listings:detail', pk=listing_pk)
+
+    # Prevent tenant messaging their own listing
+    if listing.owner == request.user:
+        messages.error(request, 'You cannot message yourself.')
+        return redirect('listings:detail', pk=listing_pk)
+
+    # Get or create inquiry thread
+    inquiry, created = Inquiry.objects.get_or_create(
+        listing=listing,
+        tenant=request.user,
+        defaults={'landlord': listing.owner}
+    )
+
+    if request.method == 'POST':
+        form = InquiryMessageForm(request.POST)
+        if form.is_valid():
+            Message.objects.create(
+                inquiry=inquiry,
+                sender=request.user,
+                body=form.cleaned_data['body'],
+            )
+            messages.success(request, 'Message sent!')
+            return redirect('listings:inquiry_thread', pk=inquiry.pk)
+    else:
+        form = InquiryMessageForm()
+
+    return render(request, 'listings/inquiry_start.html', {
+        'listing': listing,
+        'inquiry': inquiry,
+        'form': form,
+        'created': created,
+    })
+
+
+@login_required
+def inquiry_thread(request, pk):
+    """View and reply in a conversation thread."""
+    inquiry = get_object_or_404(Inquiry, pk=pk)
+
+    # Only tenant or landlord of this inquiry can view it
+    if request.user not in [inquiry.tenant, inquiry.landlord]:
+        messages.error(request, 'Access denied.')
+        return redirect('listings:homepage')
+
+    # Mark messages as read
+    inquiry.messages.filter(
+        is_read=False
+    ).exclude(sender=request.user).update(is_read=True)
+
+    form = InquiryMessageForm()
+
+    if request.method == 'POST':
+        form = InquiryMessageForm(request.POST)
+        if form.is_valid():
+            Message.objects.create(
+                inquiry=inquiry,
+                sender=request.user,
+                body=form.cleaned_data['body'],
+            )
+            return redirect('listings:inquiry_thread', pk=pk)
+
+    return render(request, 'listings/inquiry_thread.html', {
+        'inquiry': inquiry,
+        'form': form,
+        'other_user': inquiry.landlord if request.user == inquiry.tenant
+                      else inquiry.tenant,
+    })
+
+
+@login_required
+def my_inquiries(request):
+    """List all inquiry threads for the logged-in user."""
+    if request.user.role == 'tenant':
+        inquiries = Inquiry.objects.filter(
+            tenant=request.user
+        ).select_related(
+            'listing', 'landlord'
+        ).prefetch_related('messages')
+    else:
+        # Landlord sees received inquiries
+        inquiries = Inquiry.objects.filter(
+            landlord=request.user
+        ).select_related(
+            'listing', 'tenant'
+        ).prefetch_related('messages')
+
+    # Attach unread count to each inquiry
+    for inquiry in inquiries:
+        inquiry.unread = inquiry.unread_count(request.user)
+
+    return render(request, 'listings/my_inquiries.html', {
+        'inquiries': inquiries,
+    })
 
 @login_required
 def my_reports(request):
@@ -120,16 +249,55 @@ def homepage(request):
 
 def listing_detail(request, pk):
     listing = get_object_or_404(Listing, pk=pk, status='approved')
+
+    # Track recently viewed
+    track_recently_viewed(request, pk)
+
+    # Similar listings — same district first, fallback to same province
+    similar = Listing.objects.filter(
+        status='approved',
+        is_rented=False
+    ).exclude(pk=pk)
+
+    # Try same district + property type first (best match)
+    similar_listings = similar.filter(
+        district=listing.district,
+        property_type=listing.property_type,
+    ).prefetch_related('images')[:3]
+
+    # Not enough? Fill with same district any type
+    if similar_listings.count() < 3:
+        exclude_pks = [pk] + list(similar_listings.values_list('pk', flat=True))
+        extra = similar.filter(
+            district=listing.district
+        ).exclude(
+            pk__in=exclude_pks
+        ).prefetch_related('images')[:3 - similar_listings.count()]
+        similar_listings = list(similar_listings) + list(extra)
+
+    # Still not enough? Fill with same province
+    if len(similar_listings) < 3:
+        exclude_pks = [pk] + [l.pk for l in similar_listings]
+        extra = similar.filter(
+            province=listing.province
+        ).exclude(
+            pk__in=exclude_pks
+        ).prefetch_related('images')[:3 - len(similar_listings)]
+        similar_listings = list(similar_listings) + list(extra)
+
     is_saved = False
     if request.user.is_authenticated:
         is_saved = SavedListing.objects.filter(
             user=request.user, listing=listing
         ).exists()
+
     report_form = ListingReportForm()
+
     return render(request, 'listings/detail.html', {
         'listing': listing,
         'is_saved': is_saved,
         'report_form': report_form,
+        'similar_listings': similar_listings,
     })
 
 

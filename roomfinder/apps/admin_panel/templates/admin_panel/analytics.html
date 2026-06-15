@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% block title %}Revenue Analytics — Admin{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4 px-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-bar-chart-fill text-primary"></i> Revenue Analytics
+            </h3>
+            <small class="text-muted">Last 30 days overview</small>
+        </div>
+        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            ← Dashboard
+        </a>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100"
+                 style="border-left:4px solid #0d6efd !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Total Phone Reveals</div>
+                        <div class="fs-2 fw-bold text-primary">{{ total_reveals }}</div>
+                        <div class="text-success small">
+                            <i class="bi bi-arrow-up"></i>
+                            {{ reveals_this_month }} this month
+                        </div>
+                    </div>
+                    <i class="bi bi-telephone-fill text-primary opacity-25"
+                       style="font-size:2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100"
+                 style="border-left:4px solid #198754 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Total Users</div>
+                        <div class="fs-2 fw-bold text-success">{{ total_users }}</div>
+                        <div class="text-success small">
+                            <i class="bi bi-arrow-up"></i>
+                            {{ new_users_month }} new this month
+                        </div>
+                    </div>
+                    <i class="bi bi-people-fill text-success opacity-25"
+                       style="font-size:2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100"
+                 style="border-left:4px solid #ffc107 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Active Listings</div>
+                        <div class="fs-2 fw-bold text-warning">{{ approved_listings }}</div>
+                        <div class="text-muted small">
+                            {{ pending_listings }} pending review
+                        </div>
+                    </div>
+                    <i class="bi bi-house-fill text-warning opacity-25"
+                       style="font-size:2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 h-100"
+                 style="border-left:4px solid #0dcaf0 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Active Ads</div>
+                        <div class="fs-2 fw-bold text-info">{{ active_ads }}</div>
+                        <div class="text-muted small">
+                            {{ landlord_count }} landlords · {{ tenant_count }} tenants
+                        </div>
+                    </div>
+                    <i class="bi bi-megaphone-fill text-info opacity-25"
+                       style="font-size:2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="row g-4 mb-4">
+
+        <!-- Phone reveals chart -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-graph-up text-primary"></i>
+                    Phone Reveals — Last 30 Days
+                </h6>
+                {% if daily_reveals_labels %}
+                    <canvas id="revealsChart" height="100"></canvas>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-graph-up" style="font-size:3rem;opacity:0.3;"></i>
+                        <p class="mt-2">No reveal data yet. Data appears once tenants
+                        start revealing phone numbers.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Listings by province chart -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-pie-chart text-success"></i>
+                    Listings by Province
+                </h6>
+                {% if province_labels %}
+                    <canvas id="provinceChart"></canvas>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-pie-chart" style="font-size:3rem;opacity:0.3;"></i>
+                        <p class="mt-2">No approved listings yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Second charts row -->
+    <div class="row g-4 mb-4">
+
+        <!-- User growth chart -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-person-plus text-info"></i>
+                    New User Registrations — Last 30 Days
+                </h6>
+                {% if new_users_labels %}
+                    <canvas id="usersChart" height="120"></canvas>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <p>No new user data in the last 30 days.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Listing status breakdown -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-house text-warning"></i>
+                    Listing Status Breakdown
+                </h6>
+                <canvas id="statusChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top listings table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-trophy text-warning"></i>
+                Top Listings by Phone Reveals
+            </h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Listing</th>
+                        <th>District</th>
+                        <th>Reveals</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_listings %}
+                    <tr>
+                        <td class="text-muted">{{ forloop.counter }}</td>
+                        <td><strong>{{ item.listing__title|truncatechars:40 }}</strong></td>
+                        <td>{{ item.listing__district }}</td>
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ item.reveal_count }} reveals
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'admin_panel:review_listing' item.listing__pk %}"
+                               class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No reveal data yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const primaryColor = '#0d6efd';
+const successColor = '#198754';
+const warningColor = '#ffc107';
+const dangerColor  = '#dc3545';
+
+// --- Phone Reveals Chart ---
+{% if daily_reveals_labels %}
+new Chart(document.getElementById('revealsChart'), {
+    type: 'line',
+    data: {
+        labels: {{ daily_reveals_labels|safe }},
+        datasets: [{
+            label: 'Phone Reveals',
+            data: {{ daily_reveals_data|safe }},
+            borderColor: primaryColor,
+            backgroundColor: 'rgba(13,110,253,0.08)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: primaryColor,
+            pointRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+{% endif %}
+
+// --- Province Pie Chart ---
+{% if province_labels %}
+new Chart(document.getElementById('provinceChart'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ province_labels|safe }},
+        datasets: [{
+            data: {{ province_data|safe }},
+            backgroundColor: [
+                '#0d6efd','#198754','#ffc107',
+                '#dc3545','#0dcaf0','#6f42c1','#fd7e14'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 15, font: { size: 12 } } }
+        }
+    }
+});
+{% endif %}
+
+// --- User Growth Chart ---
+{% if new_users_labels %}
+new Chart(document.getElementById('usersChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ new_users_labels|safe }},
+        datasets: [{
+            label: 'New Users',
+            data: {{ new_users_data|safe }},
+            backgroundColor: 'rgba(13,202,240,0.7)',
+            borderColor: '#0dcaf0',
+            borderWidth: 1,
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+{% endif %}
+
+// --- Listing Status Doughnut ---
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Approved', 'Pending', 'Rejected'],
+        datasets: [{
+            data: [
+                {{ approved_listings }},
+                {{ pending_listings }},
+                {{ rejected_listings }}
+            ],
+            backgroundColor: [successColor, warningColor, dangerColor],
+            borderWidth: 2,
+            borderColor: '#fff',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 15 } }
+        }
+    }
+});
+</script>
+{% endblock %}
