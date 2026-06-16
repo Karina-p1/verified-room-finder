@@ -1,38 +1,189 @@
 {% extends 'base.html' %}
 {% block title %}Approved Listings — Admin{% endblock %}
+
 {% block content %}
-<div class="container-fluid my-4 px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold"><i class="bi bi-check-circle text-success"></i> Approved Listings</h3>
-        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+
+<div class="container-fluid py-5">
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Listing Management
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Approved Listings
+        </h1>
+
+        <p class="text-muted mb-0">
+            Manage and monitor approved property listings.
+        </p>
     </div>
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr><th>Title</th><th>Landlord</th><th>Location</th><th>Rent</th><th>Date</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                    {% for listing in listings %}
-                    <tr>
-                        <td>{{ listing.title|truncatechars:30 }}</td>
-                        <td>{{ listing.owner.email }}</td>
-                        <td>{{ listing.district }}, {{ listing.province }}</td>
-                        <td>NPR {{ listing.monthly_rent }}</td>
-                        <td>{{ listing.created_at|date:"M d, Y" }}</td>
-                        <td>
-                            <form method="POST" action="{% url 'admin_panel:remove_listing' listing.pk %}">
+
+    <a href="{% url 'admin_panel:dashboard' %}"
+       class="btn btn-outline-secondary">
+        ← Dashboard
+    </a>
+
+</div>
+
+{% if listings %}
+
+    <div class="row g-4">
+
+        {% for listing in listings %}
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="border-radius:24px;overflow:hidden;">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center">
+
+                        <!-- Listing Info -->
+                        <div class="col-lg-5">
+
+                            <div class="d-flex align-items-start gap-3">
+
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width:60px;height:60px;background:#ecfdf5;">
+                                    <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        {{ listing.title|truncatechars:40 }}
+                                    </h5>
+
+                                    <div class="text-muted mb-2">
+                                        {{ listing.district }}, {{ listing.province }}
+                                    </div>
+
+                                    <span class="badge bg-success rounded-pill">
+                                        Approved
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Landlord -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Landlord
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ listing.owner.email }}
+                            </div>
+
+                        </div>
+
+                        <!-- Rent -->
+                        <div class="col-lg-2 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Monthly Rent
+                            </small>
+
+                            <div class="fw-bold fs-5"
+                                 style="color:var(--navy);">
+                                NPR {{ listing.monthly_rent }}
+                            </div>
+
+                        </div>
+
+                        <!-- Remove Action -->
+                        <div class="col-lg-2 mt-4 mt-lg-0 text-lg-end">
+
+                            <form method="POST"
+                                  action="{% url 'admin_panel:remove_listing' listing.pk %}">
                                 {% csrf_token %}
-                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this listing?')">Remove</button>
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger"
+                                        onclick="return confirm('Remove this listing?')">
+                                    <i class="bi bi-trash"></i>
+                                    Remove
+                                </button>
                             </form>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="6" class="text-center text-muted py-4">No approved listings yet.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Location
+                            </small>
+
+                            <span class="fw-medium">
+                                {{ listing.district }}, {{ listing.province }}
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6 text-md-end">
+
+                            <small class="text-muted d-block">
+                                Approved Listing Date
+                            </small>
+
+                            <span class="fw-medium">
+                                {{ listing.created_at|date:"M d, Y" }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+        {% endfor %}
+
     </div>
+
+{% else %}
+
+    <div class="card border-0 shadow-sm"
+         style="border-radius:24px;">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-house-check text-success"
+               style="font-size:5rem;"></i>
+
+            <h3 class="fw-bold mt-4">
+                No Approved Listings Yet
+            </h3>
+
+            <p class="text-muted mb-0">
+                Approved properties will appear here once listings are verified.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+```
+
 </div>
 {% endblock %}

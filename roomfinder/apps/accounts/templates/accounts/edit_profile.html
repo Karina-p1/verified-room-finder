@@ -1,80 +1,298 @@
 {% extends 'base.html' %}
 {% block title %}Edit Profile — RoomFinder{% endblock %}
 
+{% block extra_css %}
+<style>
+    .settings-page { background: var(--off-white); min-height: calc(100vh - 72px); padding-bottom: 4rem; }
+    .settings-header {
+        background: linear-gradient(160deg, #0F1B2D 0%, #1a2d4a 55%, #142238 100%);
+        padding: 2rem 0 3.5rem;
+        margin-bottom: -2rem;
+    }
+    .settings-header h1 {
+        font-family: var(--font-display);
+        font-size: 1.6rem; font-weight: 800; color: white; margin-bottom: 0.2rem;
+    }
+    .settings-header p { font-size: 13.5px; color: rgba(255,255,255,0.55); margin: 0; }
+    .settings-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 13px; color: rgba(255,255,255,0.5);
+        text-decoration: none; margin-bottom: 1.25rem; transition: color 0.15s;
+    }
+    .settings-back:hover { color: white; }
+    .settings-card {
+        background: #fff; border-radius: 16px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 24px rgba(15,27,45,0.07);
+        overflow: hidden; margin-bottom: 1.25rem;
+    }
+    .settings-card-header {
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; gap: 10px;
+    }
+    .settings-card-icon {
+        width: 34px; height: 34px; border-radius: 9px; background: var(--surface);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.95rem; color: var(--coral); flex-shrink: 0;
+    }
+    .settings-card-title { font-size: 14.5px; font-weight: 700; color: var(--navy); margin: 0; }
+    .settings-card-body { padding: 1.5rem; }
+    .form-label-styled { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
+    .form-control-styled, .form-select-styled {
+        border-radius: 10px !important; border: 1.5px solid var(--border) !important;
+        padding: 0.65rem 1rem !important; font-size: 14px !important;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-control-styled:focus, .form-select-styled:focus {
+        border-color: var(--coral) !important;
+        box-shadow: 0 0 0 3px rgba(232,64,42,0.08) !important;
+    }
+    /* Avatar upload zone */
+    .avatar-wrap { position: relative; display: inline-block; }
+    .avatar-img {
+        width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 4px 14px rgba(15,27,45,0.14);
+    }
+    .avatar-placeholder {
+        width: 90px; height: 90px; border-radius: 50%;
+        background: var(--coral); display: flex; align-items: center;
+        justify-content: center; font-size: 2rem; color: white; font-weight: 700;
+        border: 3px solid white; box-shadow: 0 4px 14px rgba(15,27,45,0.14);
+    }
+    .avatar-upload-btn {
+        position: absolute; bottom: 0; right: 0;
+        width: 28px; height: 28px; border-radius: 50%;
+        background: var(--coral); color: white;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 13px; border: 2px solid white;
+        transition: background 0.15s;
+    }
+    .avatar-upload-btn:hover { background: var(--coral-dk); }
+    .avatar-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    /* Char counter */
+    .char-counter { font-size: 11.5px; color: var(--text-muted); text-align: right; margin-top: 3px; }
+    .char-counter.warn { color: #f97316; }
+    .char-counter.over { color: #dc3545; }
+    /* Buttons */
+    .btn-save {
+        background: var(--navy) !important; border: none !important;
+        border-radius: 10px !important; font-size: 14.5px !important;
+        font-weight: 600 !important; padding: 0.7rem 1.5rem !important;
+        transition: background 0.15s, transform 0.1s !important;
+    }
+    .btn-save:hover { background: var(--coral) !important; transform: translateY(-1px); }
+    .btn-save:active { transform: translateY(0); }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-5" style="max-width:700px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold"><i class="bi bi-pencil-square"></i> Edit Profile</h3>
-        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+<div class="settings-page">
+    <!-- Header banner -->
+    <div class="settings-header">
+        <div class="container" style="max-width:760px;">
+            <a href="{% url 'accounts:profile' %}" class="settings-back">
+                <i class="bi bi-arrow-left"></i> Back to profile
+            </a>
+            <h1><i class="bi bi-pencil-square me-2"></i>Edit Profile</h1>
+            <p>Update your personal information and how others see you.</p>
+        </div>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="card border-0 shadow-sm p-4 mb-4">
-            <h5 class="fw-bold mb-3">Profile Picture</h5>
-            {% if request.user.profile_picture %}
-                <img src="{{ request.user.profile_picture.url }}"
-                     class="rounded-circle mb-3"
-                     style="width:80px;height:80px;object-fit:cover;">
-            {% else %}
-                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mb-3"
-                     style="width:80px;height:80px;">
-                    <span class="text-white fw-bold fs-3">
-                        {{ request.user.first_name|first|upper }}
-                    </span>
-                </div>
-            {% endif %}
-            {{ form.profile_picture }}
-            <small class="text-muted mt-1 d-block">Upload a square photo for best results.</small>
-        </div>
-
-        <div class="card border-0 shadow-sm p-4 mb-4">
-            <h5 class="fw-bold mb-3">Basic Information</h5>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">First Name</label>
-                    {{ form.first_name }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Last Name</label>
-                    {{ form.last_name }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Phone Number</label>
-                    {{ form.phone }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Date of Birth</label>
-                    {{ form.date_of_birth }}
-                </div>
-            </div>
-        </div>
-
-        <div class="card border-0 shadow-sm p-4 mb-4">
-            <h5 class="fw-bold mb-3">About You</h5>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Bio</label>
-                {{ form.bio }}
-                <small class="text-muted">Max 300 characters</small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Address</label>
-                {{ form.address }}
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Facebook Profile URL</label>
-                {{ form.facebook_url }}
-            </div>
-        </div>
+    <div class="container" style="max-width:760px; position:relative; z-index:1;">
 
         {% if form.errors %}
-            <div class="alert alert-danger">Please fix the errors above.</div>
+        <div class="alert alert-danger small mb-3">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            Please fix the errors highlighted below.
+        </div>
         {% endif %}
 
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-            <i class="bi bi-check-circle"></i> Save Changes
-        </button>
-    </form>
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <!-- ── Profile Picture ── -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="bi bi-person-circle"></i></div>
+                    <p class="settings-card-title">Profile picture</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
+                        <div class="avatar-wrap">
+                            {% if request.user.profile_picture %}
+                                <img src="{{ request.user.profile_picture.url }}"
+                                     class="avatar-img" id="avatarPreview" alt="Profile picture">
+                            {% else %}
+                                <div class="avatar-placeholder" id="avatarPlaceholder">
+                                    {{ request.user.first_name|first|upper }}
+                                </div>
+                                <img src="" class="avatar-img d-none" id="avatarPreview" alt="">
+                            {% endif %}
+                            <label for="{{ form.profile_picture.id_for_label }}" class="avatar-upload-btn" title="Change photo">
+                                <i class="bi bi-camera-fill"></i>
+                            </label>
+                        </div>
+                        <div>
+                            <p class="mb-1 fw-semibold" style="font-size:14px;">{{ request.user.get_full_name }}</p>
+                            <p class="avatar-hint mb-2">Square photo, min 200×200px. JPG or PNG.</p>
+                            <label for="{{ form.profile_picture.id_for_label }}"
+                                   class="btn btn-outline-secondary btn-sm"
+                                   style="border-radius:8px; cursor:pointer; font-size:13px;">
+                                <i class="bi bi-upload me-1"></i> Upload new photo
+                            </label>
+                            {{ form.profile_picture }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Basic Information ── -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="bi bi-person"></i></div>
+                    <p class="settings-card-title">Basic information</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-styled" for="{{ form.first_name.id_for_label }}">First name</label>
+                            <input
+                                type="text" name="{{ form.first_name.html_name }}"
+                                id="{{ form.first_name.id_for_label }}"
+                                class="form-control form-control-styled"
+                                value="{{ form.first_name.value|default:'' }}"
+                                placeholder="Aarav"
+                                autocomplete="given-name"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-styled" for="{{ form.last_name.id_for_label }}">Last name</label>
+                            <input
+                                type="text" name="{{ form.last_name.html_name }}"
+                                id="{{ form.last_name.id_for_label }}"
+                                class="form-control form-control-styled"
+                                value="{{ form.last_name.value|default:'' }}"
+                                placeholder="Sharma"
+                                autocomplete="family-name"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-styled" for="{{ form.phone.id_for_label }}">Phone number</label>
+                            <input
+                                type="tel" name="{{ form.phone.html_name }}"
+                                id="{{ form.phone.id_for_label }}"
+                                class="form-control form-control-styled"
+                                value="{{ form.phone.value|default:'' }}"
+                                placeholder="+977 98XXXXXXXX"
+                                autocomplete="tel"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-styled" for="{{ form.date_of_birth.id_for_label }}">Date of birth</label>
+                            <input
+                                type="date" name="{{ form.date_of_birth.html_name }}"
+                                id="{{ form.date_of_birth.id_for_label }}"
+                                class="form-control form-control-styled"
+                                value="{{ form.date_of_birth.value|default:'' }}"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── About You ── -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="bi bi-chat-quote"></i></div>
+                    <p class="settings-card-title">About you</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label-styled mb-0" for="{{ form.bio.id_for_label }}">Bio</label>
+                            <span class="char-counter" id="bioCounter">0 / 300</span>
+                        </div>
+                        <textarea
+                            name="{{ form.bio.html_name }}"
+                            id="{{ form.bio.id_for_label }}"
+                            class="form-control form-control-styled"
+                            rows="3"
+                            maxlength="300"
+                            placeholder="Tell landlords or tenants a bit about yourself…"
+                            oninput="updateCounter(this,'bioCounter',300)"
+                        >{{ form.bio.value|default:'' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-styled" for="{{ form.address.id_for_label }}">Address</label>
+                        <input
+                            type="text" name="{{ form.address.html_name }}"
+                            id="{{ form.address.id_for_label }}"
+                            class="form-control form-control-styled"
+                            value="{{ form.address.value|default:'' }}"
+                            placeholder="Thamel, Kathmandu"
+                            autocomplete="street-address"
+                        >
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label-styled" for="{{ form.facebook_url.id_for_label }}">
+                            <i class="bi bi-facebook me-1 text-muted"></i> Facebook profile URL
+                        </label>
+                        <input
+                            type="url" name="{{ form.facebook_url.html_name }}"
+                            id="{{ form.facebook_url.id_for_label }}"
+                            class="form-control form-control-styled"
+                            value="{{ form.facebook_url.value|default:'' }}"
+                            placeholder="https://facebook.com/yourprofile"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 justify-content-end mt-1">
+                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary"
+                   style="border-radius:10px; padding:0.7rem 1.25rem; font-size:14px;">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary btn-save">
+                    <i class="bi bi-check-circle me-1"></i> Save changes
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Bio char counter
+function updateCounter(el, counterId, max) {
+    const len = el.value.length;
+    const counter = document.getElementById(counterId);
+    counter.textContent = len + ' / ' + max;
+    counter.className = 'char-counter' + (len > max * 0.9 ? (len >= max ? ' over' : ' warn') : '');
+}
+// Init on load
+(function() {
+    const bio = document.getElementById('{{ form.bio.id_for_label }}');
+    if (bio) updateCounter(bio, 'bioCounter', 300);
+})();
+
+// Avatar preview
+document.getElementById('{{ form.profile_picture.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const preview = document.getElementById('avatarPreview');
+        const placeholder = document.getElementById('avatarPlaceholder');
+        preview.src = ev.target.result;
+        preview.classList.remove('d-none');
+        if (placeholder) placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+});
+</script>
 {% endblock %}

@@ -1,13 +1,384 @@
 {% extends 'base.html' %}
-{% block title %}Register — RoomFinder{% endblock %}
+{% block title %}Create Account — RoomFinder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: calc(100vh - 72px);
+        background: linear-gradient(160deg, #0F1B2D 0%, #1a2d4a 45%, #142238 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem 1rem;
+    }
+    .auth-card {
+        background: #fff;
+        border-radius: 18px !important;
+        border: none !important;
+        box-shadow: 0 24px 60px rgba(15,27,45,0.22) !important;
+        padding: 2.5rem 2.25rem;
+        width: 100%;
+        max-width: 520px;
+    }
+    .auth-logo-icon {
+        width: 52px; height: 52px;
+        background: var(--coral);
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    .auth-title {
+        font-family: var(--font-display);
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--navy);
+        margin-bottom: 0.25rem;
+    }
+    .auth-subtitle {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-bottom: 1.75rem;
+    }
+    .auth-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 6px;
+        display: block;
+    }
+    .auth-input {
+        border-radius: 10px !important;
+        border: 1.5px solid var(--border) !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 14px !important;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        width: 100%;
+    }
+    .auth-input:focus {
+        border-color: var(--coral) !important;
+        box-shadow: 0 0 0 3px rgba(232,64,42,0.08) !important;
+        outline: none;
+    }
+    .auth-input.is-invalid {
+        border-color: #dc3545 !important;
+    }
+    .auth-select {
+        border-radius: 10px !important;
+        border: 1.5px solid var(--border) !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 14px !important;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        width: 100%;
+        background-color: #fff;
+        appearance: auto;
+    }
+    .auth-select:focus {
+        border-color: var(--coral) !important;
+        box-shadow: 0 0 0 3px rgba(232,64,42,0.08) !important;
+        outline: none;
+    }
+    .auth-field-error {
+        font-size: 12px;
+        color: #dc3545;
+        margin-top: 4px;
+    }
+    .auth-help {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    /* Role picker cards */
+    .role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .role-card {
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 12px;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .role-card:hover { border-color: var(--coral); background: #fff8f7; }
+    .role-card input[type="radio"] { display: none; }
+    .role-card.selected {
+        border-color: var(--coral);
+        background: #fff8f7;
+        box-shadow: 0 0 0 3px rgba(232,64,42,0.08);
+    }
+    .role-icon {
+        width: 36px; height: 36px;
+        border-radius: 9px;
+        background: var(--surface);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        transition: background 0.15s;
+    }
+    .role-card.selected .role-icon {
+        background: var(--coral);
+        color: white;
+    }
+    .role-card-label { font-size: 13.5px; font-weight: 600; color: var(--text-main); }
+    .role-card-desc  { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+
+    /* Section divider */
+    .auth-section {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin: 1.4rem 0 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .auth-section::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    .auth-btn {
+        background: var(--navy) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-size: 14.5px !important;
+        font-weight: 600 !important;
+        padding: 0.7rem 1rem !important;
+        width: 100%;
+        transition: background 0.15s, transform 0.1s !important;
+    }
+    .auth-btn:hover {
+        background: var(--coral) !important;
+        transform: translateY(-1px);
+    }
+    .auth-btn:active { transform: translateY(0); }
+    .auth-switch {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 1.25rem;
+        margin-bottom: 0;
+    }
+    .auth-switch a {
+        color: var(--coral);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-switch a:hover { text-decoration: underline; }
+    .auth-terms {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 1rem;
+        line-height: 1.5;
+    }
+    .auth-terms a { color: var(--coral); text-decoration: none; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-5" style="max-width:500px;">
-    <h3 class="fw-bold mb-4">Create Account</h3>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary w-100">Register</button>
-    </form>
-    <p class="mt-3 text-center">Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
+<div class="auth-page">
+    <div class="auth-card">
+
+        <!-- Brand -->
+        <div class="text-center">
+            <div class="auth-logo-icon">
+                <i class="bi bi-house-heart-fill"></i>
+            </div>
+            <h1 class="auth-title">Create your account</h1>
+            <p class="auth-subtitle">Join thousands finding rooms across Nepal</p>
+        </div>
+
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger small py-2 mb-3" role="alert">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <!-- Role picker -->
+            <div class="auth-section">I want to</div>
+            <div class="role-picker mb-3" id="rolePicker">
+                <label class="role-card {% if form.role.value == 'tenant' %}selected{% endif %}" id="role-tenant">
+                    <input type="radio" name="{{ form.role.html_name }}" value="tenant"
+                           {% if form.role.value == 'tenant' or not form.role.value %}checked{% endif %}>
+                    <div class="role-icon"><i class="bi bi-search"></i></div>
+                    <div>
+                        <div class="role-card-label">Find a room</div>
+                        <div class="role-card-desc">Browse &amp; rent verified listings</div>
+                    </div>
+                </label>
+                <label class="role-card {% if form.role.value == 'landlord' %}selected{% endif %}" id="role-landlord">
+                    <input type="radio" name="{{ form.role.html_name }}" value="landlord"
+                           {% if form.role.value == 'landlord' %}checked{% endif %}>
+                    <div class="role-icon"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="role-card-label">List a property</div>
+                        <div class="role-card-desc">Post &amp; manage your rooms</div>
+                    </div>
+                </label>
+            </div>
+            {% if form.role.errors %}
+                <div class="auth-field-error mb-2">
+                    <i class="bi bi-exclamation-circle"></i> {{ form.role.errors|join:", " }}
+                </div>
+            {% endif %}
+
+            <!-- Personal info -->
+            <div class="auth-section">Personal info</div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="auth-label" for="{{ form.first_name.id_for_label }}">First name</label>
+                    <input
+                        type="text"
+                        name="{{ form.first_name.html_name }}"
+                        id="{{ form.first_name.id_for_label }}"
+                        class="form-control auth-input{% if form.first_name.errors %} is-invalid{% endif %}"
+                        placeholder="Aarav"
+                        value="{{ form.first_name.value|default:'' }}"
+                        autocomplete="given-name"
+                    >
+                    {% if form.first_name.errors %}
+                        <div class="auth-field-error">{{ form.first_name.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-6">
+                    <label class="auth-label" for="{{ form.last_name.id_for_label }}">Last name</label>
+                    <input
+                        type="text"
+                        name="{{ form.last_name.html_name }}"
+                        id="{{ form.last_name.id_for_label }}"
+                        class="form-control auth-input{% if form.last_name.errors %} is-invalid{% endif %}"
+                        placeholder="Sharma"
+                        value="{{ form.last_name.value|default:'' }}"
+                        autocomplete="family-name"
+                    >
+                    {% if form.last_name.errors %}
+                        <div class="auth-field-error">{{ form.last_name.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="auth-label" for="{{ form.email.id_for_label }}">Email address</label>
+                <input
+                    type="email"
+                    name="{{ form.email.html_name }}"
+                    id="{{ form.email.id_for_label }}"
+                    class="form-control auth-input{% if form.email.errors %} is-invalid{% endif %}"
+                    placeholder="you@example.com"
+                    value="{{ form.email.value|default:'' }}"
+                    autocomplete="email"
+                >
+                {% if form.email.errors %}
+                    <div class="auth-field-error">
+                        <i class="bi bi-exclamation-circle"></i> {{ form.email.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="auth-label" for="{{ form.phone_number.id_for_label }}">
+                    Phone number <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input
+                    type="tel"
+                    name="{{ form.phone_number.html_name }}"
+                    id="{{ form.phone_number.id_for_label }}"
+                    class="form-control auth-input{% if form.phone_number.errors %} is-invalid{% endif %}"
+                    placeholder="+977 98XXXXXXXX"
+                    value="{{ form.phone_number.value|default:'' }}"
+                    autocomplete="tel"
+                >
+                {% if form.phone_number.errors %}
+                    <div class="auth-field-error">{{ form.phone_number.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div class="auth-section">Security</div>
+
+            <div class="mb-3">
+                <label class="auth-label" for="{{ form.password1.id_for_label }}">Password</label>
+                <input
+                    type="password"
+                    name="{{ form.password1.html_name }}"
+                    id="{{ form.password1.id_for_label }}"
+                    class="form-control auth-input{% if form.password1.errors %} is-invalid{% endif %}"
+                    placeholder="Create a strong password"
+                    autocomplete="new-password"
+                >
+                {% if form.password1.errors %}
+                    <div class="auth-field-error">
+                        <i class="bi bi-exclamation-circle"></i> {{ form.password1.errors|join:", " }}
+                    </div>
+                {% else %}
+                    <div class="auth-help">
+                        <i class="bi bi-info-circle"></i>
+                        Min. 8 characters, mix of letters &amp; numbers.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="auth-label" for="{{ form.password2.id_for_label }}">Confirm password</label>
+                <input
+                    type="password"
+                    name="{{ form.password2.html_name }}"
+                    id="{{ form.password2.id_for_label }}"
+                    class="form-control auth-input{% if form.password2.errors %} is-invalid{% endif %}"
+                    placeholder="Repeat your password"
+                    autocomplete="new-password"
+                >
+                {% if form.password2.errors %}
+                    <div class="auth-field-error">
+                        <i class="bi bi-exclamation-circle"></i> {{ form.password2.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-btn">
+                <i class="bi bi-person-plus me-1"></i> Create account
+            </button>
+        </form>
+
+        <p class="auth-terms">
+            By registering you agree to our
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        </p>
+
+        <p class="auth-switch">
+            Already have an account?
+            <a href="{% url 'accounts:login' %}">Sign in</a>
+        </p>
+
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Role card visual toggle
+    const cards = document.querySelectorAll('.role-card');
+    cards.forEach(card => {
+        card.addEventListener('click', function() {
+            cards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+</script>
 {% endblock %}

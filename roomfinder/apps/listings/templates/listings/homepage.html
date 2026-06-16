@@ -210,7 +210,6 @@
   </div>
 </div>
 
-{% endblock %}
 <!-- Pagination -->
 {% if page_obj.paginator.num_pages > 1 %}
 <div class="container mb-5">
@@ -273,32 +272,6 @@
 </div>
 {% endif %}
 
-{% block extra_js %}
-{{ districts|json_script:"districts-data" }}
-<script>
-  const districts = JSON.parse(document.getElementById("districts-data").textContent);
-  const provinceSelect = document.getElementById("provinceSelect");
-  const districtSelect = document.getElementById("districtSelect");
-  const currentDistrict = "{{ current_filters.district }}";
-
-  function loadDistricts(province) {
-    districtSelect.innerHTML = '<option value="">All Districts</option>';
-    if (districts[province]) {
-      districts[province].forEach(function(d) {
-        const opt = document.createElement("option");
-        opt.value = d;
-        opt.text = d;
-        if (d === currentDistrict) opt.selected = true;
-        districtSelect.appendChild(opt);
-      });
-    }
-  }
-
-  if (provinceSelect.value) loadDistricts(provinceSelect.value);
-  provinceSelect.addEventListener("change", function() {
-    loadDistricts(provinceSelect.value);
-  });
-</script>
 <!-- Recently Viewed -->
 {% if recently_viewed %}
 <div class="container mb-5">
@@ -348,18 +321,44 @@
         {% endfor %}
     </div>
 </div>
-
-<script>
-function clearRecentlyViewed() {
-    fetch("{% url 'listings:clear_recently_viewed' %}", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest',
-        }
-    }).then(() => location.reload());
-}
-</script>
 {% endif %}
+
 {% endblock %}
 
+{% block extra_js %}
+{{ districts|json_script:"districts-data" }}
+<script>
+  const districts = JSON.parse(document.getElementById("districts-data").textContent);
+  const provinceSelect = document.getElementById("provinceSelect");
+  const districtSelect = document.getElementById("districtSelect");
+  const currentDistrict = "{{ current_filters.district }}";
+
+  function loadDistricts(province) {
+    districtSelect.innerHTML = '<option value="">All Districts</option>';
+    if (districts[province]) {
+      districts[province].forEach(function(d) {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.text = d;
+        if (d === currentDistrict) opt.selected = true;
+        districtSelect.appendChild(opt);
+      });
+    }
+  }
+
+  if (provinceSelect.value) loadDistricts(provinceSelect.value);
+  provinceSelect.addEventListener("change", function() {
+    loadDistricts(provinceSelect.value);
+  });
+
+  function clearRecentlyViewed() {
+    fetch("{% url 'listings:clear_recently_viewed' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+    }).then(() => location.reload());
+  }
+</script>
+{% endblock %}

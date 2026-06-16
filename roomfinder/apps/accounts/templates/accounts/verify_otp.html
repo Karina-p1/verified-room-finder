@@ -1,13 +1,148 @@
 {% extends 'base.html' %}
 {% block title %}Verify Email — RoomFinder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: calc(100vh - 72px);
+        background: linear-gradient(160deg, #0F1B2D 0%, #1a2d4a 45%, #142238 100%);
+        display: flex; align-items: center; justify-content: center;
+        padding: 2.5rem 1rem;
+    }
+    .auth-card {
+        background: #fff; border-radius: 18px !important; border: none !important;
+        box-shadow: 0 24px 60px rgba(15,27,45,0.22) !important;
+        padding: 2.5rem 2.25rem; width: 100%; max-width: 400px; text-align: center;
+    }
+    .auth-icon-circle {
+        width: 76px; height: 76px; border-radius: 50%; background: #eff6ff;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 2.2rem; color: #1e40af; margin-bottom: 1.25rem;
+    }
+    .auth-title {
+        font-family: var(--font-display);
+        font-size: 1.65rem; font-weight: 800; color: var(--navy); margin-bottom: 0.25rem;
+    }
+    .auth-subtitle { font-size: 13.5px; color: var(--text-muted); margin-bottom: 1.75rem; line-height: 1.6; }
+    /* OTP input row */
+    .otp-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 1.5rem; }
+    .otp-cell {
+        width: 48px; height: 56px;
+        border: 1.5px solid var(--border); border-radius: 12px;
+        font-size: 1.4rem; font-weight: 700; color: var(--navy);
+        text-align: center; transition: border-color 0.15s, box-shadow 0.15s;
+        background: var(--off-white);
+    }
+    .otp-cell:focus {
+        border-color: var(--coral) !important;
+        box-shadow: 0 0 0 3px rgba(232,64,42,0.1) !important;
+        outline: none; background: #fff;
+    }
+    /* Hidden real input */
+    #otpHidden { display: none; }
+    .auth-btn {
+        background: var(--navy) !important; border: none !important;
+        border-radius: 10px !important; font-size: 14.5px !important;
+        font-weight: 600 !important; padding: 0.7rem 1rem !important; width: 100%;
+        transition: background 0.15s, transform 0.1s !important;
+    }
+    .auth-btn:hover { background: var(--coral) !important; transform: translateY(-1px); }
+    .auth-btn:active { transform: translateY(0); }
+    .resend-row { margin-top: 1.25rem; font-size: 13px; color: var(--text-muted); }
+    .resend-row a { color: var(--coral); font-weight: 600; text-decoration: none; }
+    .resend-row a:hover { text-decoration: underline; }
+    .field-error { font-size: 12px; color: #dc3545; margin-bottom: 10px; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-5" style="max-width:400px;">
-    <h3 class="fw-bold mb-2">Verify Your Email</h3>
-    <p class="text-muted mb-4">Enter the 6-digit code sent to your email.</p>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary w-100">Verify</button>
-    </form>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-icon-circle">
+            <i class="bi bi-envelope-open-fill"></i>
+        </div>
+        <h1 class="auth-title">Verify your email</h1>
+        <p class="auth-subtitle">
+            We sent a 6-digit code to your email address.<br>
+            Enter it below to activate your account.
+        </p>
+
+        {% if form.errors %}
+        <div class="field-error">
+            <i class="bi bi-exclamation-circle"></i>
+            {% for field in form %}{{ field.errors|join:", " }}{% endfor %}
+            {{ form.non_field_errors|join:", " }}
+        </div>
+        {% endif %}
+
+        <form method="POST" novalidate id="otpForm">
+            {% csrf_token %}
+
+            <!-- Visual OTP cells -->
+            <div class="otp-row" id="otpCells">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            </div>
+
+            <!-- Hidden field with real name for Django form -->
+            {% for field in form %}
+                <input type="hidden" name="{{ field.html_name }}" id="otpHidden">
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary auth-btn" id="verifyBtn" disabled>
+                <i class="bi bi-check-circle me-1"></i> Verify email
+            </button>
+        </form>
+
+        <div class="resend-row">
+            Didn't get the code?
+            <a href="?resend=1">Resend code</a>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const cells   = Array.from(document.querySelectorAll('.otp-cell'));
+    const hidden  = document.getElementById('otpHidden');
+    const btn     = document.getElementById('verifyBtn');
+
+    function syncHidden() {
+        const val = cells.map(c => c.value).join('');
+        hidden.value = val;
+        btn.disabled = val.length < 6;
+    }
+
+    cells.forEach((cell, idx) => {
+        cell.addEventListener('input', e => {
+            const v = e.target.value.replace(/\D/g,'');
+            cell.value = v.slice(-1);
+            if (v && idx < cells.length - 1) cells[idx + 1].focus();
+            syncHidden();
+        });
+        cell.addEventListener('keydown', e => {
+            if (e.key === 'Backspace' && !cell.value && idx > 0) {
+                cells[idx - 1].focus();
+                cells[idx - 1].value = '';
+                syncHidden();
+            }
+        });
+        cell.addEventListener('paste', e => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+            cells.forEach((c, i) => { c.value = text[i] || ''; });
+            cells[Math.min(text.length, cells.length - 1)].focus();
+            syncHidden();
+        });
+    });
+
+    cells[0].focus();
+})();
+</script>
 {% endblock %}

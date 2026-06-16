@@ -1,37 +1,172 @@
 {% extends 'base.html' %}
 {% block title %}Pending Documents — Admin{% endblock %}
+
 {% block content %}
-<div class="container-fluid my-4 px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold"><i class="bi bi-file-earmark-text text-info"></i> Pending Documents</h3>
-        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+
+<div class="container-fluid py-5">
+
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Verification Center
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Pending Documents
+        </h1>
+
+        <p class="text-muted mb-0">
+            Review landlord verification documents awaiting approval.
+        </p>
     </div>
-    {% if docs %}
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr><th>Landlord</th><th>Email</th><th>Phone</th><th>Submitted</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                    {% for doc in docs %}
-                    <tr>
-                        <td><strong>{{ doc.user.get_full_name }}</strong></td>
-                        <td>{{ doc.user.email }}</td>
-                        <td>{{ doc.user.phone }}</td>
-                        <td>{{ doc.submitted_at|date:"M d, Y" }}</td>
-                        <td><a href="{% url 'admin_panel:review_document' doc.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> Review</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <a href="{% url 'admin_panel:dashboard' %}"
+       class="btn btn-outline-secondary">
+        ← Dashboard
+    </a>
+
+</div>
+
+{% if docs %}
+
+    <div class="row g-4">
+
+        {% for doc in docs %}
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="border-radius:24px;overflow:hidden;">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center">
+
+                        <!-- User -->
+                        <div class="col-lg-4">
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="
+                                        width:64px;
+                                        height:64px;
+                                        background:rgba(201,168,76,.12);
+                                     ">
+                                    <i class="bi bi-person-badge fs-3"
+                                       style="color:var(--gold);"></i>
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        {{ doc.user.get_full_name }}
+                                    </h5>
+
+                                    <div class="text-muted">
+                                        {{ doc.user.email }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Phone Number
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ doc.user.phone }}
+                            </div>
+
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Submitted
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ doc.submitted_at|date:"M d, Y" }}
+                            </div>
+
+                        </div>
+
+                        <!-- Review -->
+                        <div class="col-lg-2 mt-4 mt-lg-0 text-lg-end">
+
+                            <a href="{% url 'admin_panel:review_document' doc.pk %}"
+                               class="btn btn-primary px-4">
+                                <i class="bi bi-eye"></i>
+                                Review
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge rounded-pill text-bg-warning px-3 py-2">
+                            Verification Pending
+                        </span>
+
+                        <span class="badge rounded-pill bg-light text-dark px-3 py-2">
+                            Identity Check
+                        </span>
+
+                        <span class="badge rounded-pill bg-light text-dark px-3 py-2">
+                            Property Ownership Review
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+        {% endfor %}
+
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-check-all text-success" style="font-size:4rem;"></i>
-        <h5 class="mt-3 text-muted">No pending documents!</h5>
+
+{% else %}
+
+    <div class="card border-0 shadow-sm"
+         style="border-radius:24px;">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-check-all text-success"
+               style="font-size:5rem;"></i>
+
+            <h3 class="fw-bold mt-4">
+                No Pending Documents
+            </h3>
+
+            <p class="text-muted mb-0">
+                All submitted verification documents have been reviewed.
+            </p>
+
+        </div>
+
     </div>
-    {% endif %}
+
+{% endif %}
+```
+
 </div>
 {% endblock %}

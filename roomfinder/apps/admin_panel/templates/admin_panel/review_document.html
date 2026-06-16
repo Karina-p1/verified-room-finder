@@ -1,56 +1,230 @@
 {% extends 'base.html' %}
 {% block title %}Review Document — Admin{% endblock %}
+
 {% block content %}
-<div class="container my-4" style="max-width:800px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">Review Documents</h3>
-        <a href="{% url 'admin_panel:pending_documents' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+
+<div class="container py-5">
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Verification Review
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Review Documents
+        </h1>
+
+        <p class="text-muted mb-0">
+            Verify landlord identity and ownership documents.
+        </p>
     </div>
-    <div class="card border-0 shadow-sm p-4 mb-4">
-        <h6 class="fw-bold mb-1">{{ doc.user.get_full_name }}</h6>
-        <p class="text-muted small mb-3">{{ doc.user.email }} | Submitted: {{ doc.submitted_at|date:"M d, Y H:i" }}</p>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <p class="fw-semibold mb-1">Citizenship Front</p>
-                <a href="{{ doc.citizenship_front.url }}" target="_blank">
-                    <img src="{{ doc.citizenship_front.url }}" class="img-fluid rounded border">
-                </a>
+
+    <a href="{% url 'admin_panel:pending_documents' %}"
+       class="btn btn-outline-secondary">
+        ← Back
+    </a>
+
+</div>
+
+<!-- User Info -->
+<div class="card border-0 shadow-sm mb-4"
+     style="border-radius:24px;">
+
+    <div class="card-body p-4">
+
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                 style="
+                    width:70px;
+                    height:70px;
+                    background:rgba(201,168,76,.12);
+                 ">
+                <i class="bi bi-person-badge fs-2"
+                   style="color:var(--gold);"></i>
             </div>
-            <div class="col-md-6">
-                <p class="fw-semibold mb-1">Citizenship Back</p>
-                <a href="{{ doc.citizenship_back.url }}" target="_blank">
-                    <img src="{{ doc.citizenship_back.url }}" class="img-fluid rounded border">
-                </a>
+
+            <div>
+
+                <h4 class="fw-bold mb-1">
+                    {{ doc.user.get_full_name }}
+                </h4>
+
+                <div class="text-muted">
+                    {{ doc.user.email }}
+                </div>
+
+                <small class="text-muted">
+                    Submitted:
+                    {{ doc.submitted_at|date:"M d, Y H:i" }}
+                </small>
+
             </div>
-            <div class="col-md-6">
-                <p class="fw-semibold mb-1">Lalpurja</p>
-                <a href="{{ doc.lalpurja.url }}" target="_blank">
-                    <img src="{{ doc.lalpurja.url }}" class="img-fluid rounded border">
-                </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Documents -->
+<div class="row g-4 mb-5">
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100"
+             style="border-radius:24px;overflow:hidden;">
+
+            <div class="card-header bg-white border-0 p-3">
+                <h6 class="fw-bold mb-0">
+                    Citizenship Front
+                </h6>
             </div>
-            <div class="col-md-6">
-                <p class="fw-semibold mb-1">Selfie with Citizenship</p>
-                <a href="{{ doc.selfie_image.url }}" target="_blank">
-                    <img src="{{ doc.selfie_image.url }}" class="img-fluid rounded border">
-                </a>
-            </div>
+
+            <a href="{{ doc.citizenship_front.url }}"
+               target="_blank">
+
+                <img src="{{ doc.citizenship_front.url }}"
+                     class="img-fluid w-100"
+                     style="height:320px;object-fit:cover;">
+
+            </a>
+
         </div>
     </div>
 
-    <form method="POST" action="{% url 'admin_panel:approve_document' doc.pk %}" class="mb-3">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success w-100 py-2" onclick="return confirm('Approve these documents?')">
-            <i class="bi bi-patch-check"></i> Approve Documents
-        </button>
-    </form>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100"
+             style="border-radius:24px;overflow:hidden;">
 
-    <div class="card border-0 shadow-sm p-3">
-        <h6 class="fw-bold text-danger mb-2">Reject Documents</h6>
-        <form method="POST" action="{% url 'admin_panel:reject_document' doc.pk %}">
-            {% csrf_token %}
-            <textarea name="reason" class="form-control mb-2" rows="3" placeholder="Reason for rejection..." required></textarea>
-            <button type="submit" class="btn btn-danger w-100">Reject</button>
-        </form>
+            <div class="card-header bg-white border-0 p-3">
+                <h6 class="fw-bold mb-0">
+                    Citizenship Back
+                </h6>
+            </div>
+
+            <a href="{{ doc.citizenship_back.url }}"
+               target="_blank">
+
+                <img src="{{ doc.citizenship_back.url }}"
+                     class="img-fluid w-100"
+                     style="height:320px;object-fit:cover;">
+
+            </a>
+
+        </div>
     </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100"
+             style="border-radius:24px;overflow:hidden;">
+
+            <div class="card-header bg-white border-0 p-3">
+                <h6 class="fw-bold mb-0">
+                    Lalpurja
+                </h6>
+            </div>
+
+            <a href="{{ doc.lalpurja.url }}"
+               target="_blank">
+
+                <img src="{{ doc.lalpurja.url }}"
+                     class="img-fluid w-100"
+                     style="height:320px;object-fit:cover;">
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100"
+             style="border-radius:24px;overflow:hidden;">
+
+            <div class="card-header bg-white border-0 p-3">
+                <h6 class="fw-bold mb-0">
+                    Selfie With Citizenship
+                </h6>
+            </div>
+
+            <a href="{{ doc.selfie_image.url }}"
+               target="_blank">
+
+                <img src="{{ doc.selfie_image.url }}"
+                     class="img-fluid w-100"
+                     style="height:320px;object-fit:cover;">
+
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Approve -->
+<div class="card border-0 shadow-sm mb-4"
+     style="border-radius:24px;">
+
+    <div class="card-body p-4">
+
+        <form method="POST"
+              action="{% url 'admin_panel:approve_document' doc.pk %}">
+            {% csrf_token %}
+
+            <button type="submit"
+                    class="btn btn-success btn-lg w-100 py-3"
+                    onclick="return confirm('Approve these documents?')">
+
+                <i class="bi bi-patch-check-fill me-2"></i>
+                Approve Documents
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Reject -->
+<div class="card border-0 shadow-sm"
+     style="border-radius:24px;">
+
+    <div class="card-body p-4">
+
+        <h5 class="fw-bold text-danger mb-3">
+            Reject Documents
+        </h5>
+
+        <form method="POST"
+              action="{% url 'admin_panel:reject_document' doc.pk %}">
+
+            {% csrf_token %}
+
+            <textarea name="reason"
+                      class="form-control mb-3"
+                      rows="4"
+                      placeholder="Reason for rejection..."
+                      required></textarea>
+
+            <button type="submit"
+                    class="btn btn-danger w-100 py-3">
+
+                <i class="bi bi-x-circle-fill me-2"></i>
+                Reject Documents
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+```
+
 </div>
 {% endblock %}

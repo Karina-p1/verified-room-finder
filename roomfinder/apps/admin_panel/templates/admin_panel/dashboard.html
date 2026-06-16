@@ -2,114 +2,361 @@
 {% block title %}Admin Dashboard — RoomFinder{% endblock %}
 
 {% block content %}
-<div class="container-fluid my-4 px-4">
-    <h3 class="fw-bold mb-4"><i class="bi bi-speedometer2"></i> Admin Dashboard</h3>
+<div class="container-fluid py-5">
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm text-center p-3">
-                <div class="fs-2 fw-bold text-primary">{{ total_users }}</div>
-                <div class="text-muted">Total Users</div>
+    <!-- Hero Header -->
+    <div class="mb-5">
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Admin Center
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Dashboard
+        </h1>
+
+        <p class="text-muted mb-0">
+            Monitor listings, users, reports, documents and platform activity.
+        </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 h-100 shadow-sm"
+                 style="border-radius:20px;">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase">
+                                Total Users
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-0"
+                                style="color:var(--navy);">
+                                {{ total_users }}
+                            </h2>
+                        </div>
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;background:rgba(15,27,45,.08);">
+                            <i class="bi bi-people fs-4"
+                               style="color:var(--navy);"></i>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm text-center p-3">
-                <div class="fs-2 fw-bold text-warning">{{ pending_listings }}</div>
-                <div class="text-muted">Pending Listings</div>
-                <a href="{% url 'admin_panel:pending_listings' %}" class="btn btn-warning btn-sm mt-2">Review</a>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 h-100 shadow-sm"
+                 style="border-radius:20px;">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase">
+                                Pending Listings
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-2 text-warning">
+                                {{ pending_listings }}
+                            </h2>
+
+                            <a href="{% url 'admin_panel:pending_listings' %}"
+                               class="btn btn-sm btn-warning">
+                                Review
+                            </a>
+                        </div>
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;background:#fff8e1;">
+                            <i class="bi bi-clock-history fs-4 text-warning"></i>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm text-center p-3">
-                <div class="fs-2 fw-bold text-success">{{ approved_listings }}</div>
-                <div class="text-muted">Approved Listings</div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 h-100 shadow-sm"
+                 style="border-radius:20px;">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase">
+                                Approved Listings
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-0 text-success">
+                                {{ approved_listings }}
+                            </h2>
+                        </div>
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;background:#ecfdf5;">
+                            <i class="bi bi-check-circle fs-4 text-success"></i>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm text-center p-3">
-                <div class="fs-2 fw-bold text-info">{{ pending_documents }}</div>
-                <div class="text-muted">Pending Documents</div>
-                <a href="{% url 'admin_panel:pending_documents' %}" class="btn btn-info btn-sm mt-2 text-white">Review</a>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 h-100 shadow-sm"
+                 style="border-radius:20px;">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase">
+                                Pending Documents
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-2 text-info">
+                                {{ pending_documents }}
+                            </h2>
+
+                            <a href="{% url 'admin_panel:pending_documents' %}"
+                               class="btn btn-sm btn-info text-white">
+                                Review
+                            </a>
+                        </div>
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;background:#e6f7fb;">
+                            <i class="bi bi-file-earmark-text fs-4 text-info"></i>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mb-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0"
+                style="font-family:var(--font-display);">
+                Quick Actions
+            </h4>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:pending_listings' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-clock-history fs-1 text-warning"></i>
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Pending Listings
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:approved_listings' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-check-circle fs-1 text-success"></i>
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Approved Listings
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:rejected_listings' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-x-circle fs-1 text-danger"></i>
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Rejected Listings
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:pending_documents' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-file-earmark-text fs-1 text-info"></i>
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Documents
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:user_management' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-people fs-1"
+                               style="color:var(--navy);"></i>
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Users
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:reports_queue' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4 position-relative">
+
+                            {% if total_reports > 0 %}
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-3">
+                                {{ total_reports }}
+                            </span>
+                            {% endif %}
+
+                            <i class="bi bi-flag fs-1 text-danger"></i>
+
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Reports
+                            </h6>
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'admin_panel:analytics' %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100"
+                         style="border-radius:20px;">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-bar-chart-fill fs-1"
+                               style="color:var(--coral);"></i>
+
+                            <h6 class="fw-bold mt-3 mb-0 text-dark">
+                                Analytics
+                            </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:pending_listings' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-clock-history fs-3 text-warning"></i>
-                <div class="mt-2 fw-semibold small">Pending Listings</div>
-            </a>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:approved_listings' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-check-circle fs-3 text-success"></i>
-                <div class="mt-2 fw-semibold small">Approved</div>
-            </a>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:rejected_listings' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-x-circle fs-3 text-danger"></i>
-                <div class="mt-2 fw-semibold small">Rejected</div>
-            </a>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:pending_documents' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-file-earmark-text fs-3 text-info"></i>
-                <div class="mt-2 fw-semibold small">Documents</div>
-            </a>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:user_management' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-people fs-3 text-primary"></i>
-                <div class="mt-2 fw-semibold small">Users</div>
-            </a>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'admin_panel:reports_queue' %}" class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-                <i class="bi bi-flag fs-3 text-danger"></i>
-                <div class="mt-2 fw-semibold small">Reports</div>
-                {% if total_reports > 0 %}<span class="badge bg-danger">{{ total_reports }}</span>{% endif %}
-            </a>
-        </div>
-        <div class="col-md-2">
-    <a href="{% url 'admin_panel:analytics' %}"
-       class="card border-0 shadow-sm p-3 text-decoration-none text-dark text-center d-block">
-        <i class="bi bi-bar-chart-fill fs-3 text-primary"></i>
-        <div class="mt-2 fw-semibold small">Analytics</div>
-    </a>
-</div>
-    </div>
+    <!-- Recent Listings -->
+    <div class="card border-0 shadow-sm"
+         style="border-radius:24px;overflow:hidden;">
 
-    <h5 class="fw-bold mb-3">Recent Submissions</h5>
-    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 p-4">
+            <h4 class="fw-bold mb-0"
+                style="font-family:var(--font-display);">
+                Recent Submissions
+            </h4>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table align-middle mb-0">
+
+                <thead style="background:var(--surface);">
                     <tr>
-                        <th>Title</th><th>Landlord</th><th>District</th>
-                        <th>Rent</th><th>Status</th><th>Submitted</th><th>Action</th>
+                        <th>Title</th>
+                        <th>Landlord</th>
+                        <th>District</th>
+                        <th>Rent</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th></th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                     {% for listing in recent_listings %}
                     <tr>
-                        <td>{{ listing.title|truncatechars:30 }}</td>
-                        <td>{{ listing.owner.email }}</td>
-                        <td>{{ listing.district }}</td>
-                        <td>NPR {{ listing.monthly_rent }}</td>
+
                         <td>
-                            <span class="badge {% if listing.status == 'approved' %}bg-success{% elif listing.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                                {{ listing.status|capfirst }}
-                            </span>
+                            <strong>
+                                {{ listing.title|truncatechars:30 }}
+                            </strong>
                         </td>
-                        <td>{{ listing.created_at|date:"M d, Y" }}</td>
-                        <td><a href="{% url 'admin_panel:review_listing' listing.pk %}" class="btn btn-sm btn-outline-primary">Review</a></td>
+
+                        <td>{{ listing.owner.email }}</td>
+
+                        <td>{{ listing.district }}</td>
+
+                        <td>
+                            NPR {{ listing.monthly_rent }}
+                        </td>
+
+                        <td>
+
+                            {% if listing.status == 'approved' %}
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            {% elif listing.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    Rejected
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ listing.created_at|date:"M d, Y" }}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'admin_panel:review_listing' listing.pk %}"
+                               class="btn btn-outline-primary btn-sm">
+                                Review
+                            </a>
+                        </td>
+
                     </tr>
                     {% endfor %}
+
                 </tbody>
+
             </table>
         </div>
+
     </div>
+
 </div>
 {% endblock %}

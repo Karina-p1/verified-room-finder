@@ -1,31 +1,151 @@
 {% extends 'base.html' %}
 {% block title %}Rejected Listings — Admin{% endblock %}
+
 {% block content %}
-<div class="container-fluid my-4 px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold"><i class="bi bi-x-circle text-danger"></i> Rejected Listings</h3>
-        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+
+<div class="container-fluid py-5">
+
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Moderation History
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Rejected Listings
+        </h1>
+
+        <p class="text-muted mb-0">
+            Review listings that were rejected and their associated reasons.
+        </p>
     </div>
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr><th>Title</th><th>Landlord</th><th>Rejection Reason</th><th>Date</th></tr>
-                </thead>
-                <tbody>
-                    {% for listing in listings %}
-                    <tr>
-                        <td>{{ listing.title|truncatechars:30 }}</td>
-                        <td>{{ listing.owner.email }}</td>
-                        <td class="text-danger">{{ listing.rejection_reason|truncatechars:60 }}</td>
-                        <td>{{ listing.created_at|date:"M d, Y" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="text-center text-muted py-4">No rejected listings.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <a href="{% url 'admin_panel:dashboard' %}"
+       class="btn btn-outline-secondary">
+        ← Dashboard
+    </a>
+
+</div>
+
+{% if listings %}
+
+    <div class="row g-4">
+
+        {% for listing in listings %}
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="
+                    border-radius:24px;
+                    overflow:hidden;
+                    border-left:5px solid #dc3545 !important;
+                 ">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center">
+
+                        <!-- Listing -->
+                        <div class="col-lg-4">
+
+                            <div class="d-flex align-items-start gap-3">
+
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width:60px;height:60px;background:#fef2f2;">
+                                    <i class="bi bi-x-circle-fill fs-4 text-danger"></i>
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        {{ listing.title|truncatechars:40 }}
+                                    </h5>
+
+                                    <div class="text-muted">
+                                        {{ listing.owner.email }}
+                                    </div>
+
+                                    <span class="badge bg-danger rounded-pill mt-2">
+                                        Rejected
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Rejection Reason -->
+                        <div class="col-lg-6 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block mb-2">
+                                Rejection Reason
+                            </small>
+
+                            <div class="p-3 rounded"
+                                 style="
+                                    background:#fef2f2;
+                                    color:#991b1b;
+                                    border:1px solid #fecaca;
+                                 ">
+                                {{ listing.rejection_reason|truncatechars:60 }}
+                            </div>
+
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-lg-2 mt-4 mt-lg-0 text-lg-end">
+
+                            <small class="text-muted d-block">
+                                Submitted
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ listing.created_at|date:"M d, Y" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+        {% endfor %}
+
     </div>
+
+{% else %}
+
+    <div class="card border-0 shadow-sm"
+         style="border-radius:24px;">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-check-circle-fill text-success"
+               style="font-size:5rem;"></i>
+
+            <h3 class="fw-bold mt-4">
+                No Rejected Listings
+            </h3>
+
+            <p class="text-muted mb-0">
+                Great news — there are currently no rejected listings.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+```
+
 </div>
 {% endblock %}

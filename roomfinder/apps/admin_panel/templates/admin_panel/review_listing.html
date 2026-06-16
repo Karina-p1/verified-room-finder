@@ -1,99 +1,368 @@
 {% extends 'base.html' %}
 {% block title %}Review Listing — Admin{% endblock %}
+
 {% block content %}
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">Review Listing</h3>
-        <a href="{% url 'admin_panel:pending_listings' %}" class="btn btn-outline-secondary btn-sm">← Back</a>
+
+<div class="container py-5">
+
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Listing Moderation
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Review Listing
+        </h1>
+
+        <p class="text-muted mb-0">
+            Verify listing details before publishing to the marketplace.
+        </p>
     </div>
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm p-4 mb-4">
-                <h5 class="fw-bold mb-3">{{ listing.title }}</h5>
-                {% if listing.images.all %}
-                <div class="d-flex gap-2 flex-wrap mb-3">
+
+    <a href="{% url 'admin_panel:pending_listings' %}"
+       class="btn btn-outline-secondary">
+        ← Back
+    </a>
+
+</div>
+
+<div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+        <!-- Property Hero -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;overflow:hidden;">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+
+                    <div>
+                        <h2 class="fw-bold mb-2">
+                            {{ listing.title }}
+                        </h2>
+
+                        <div class="text-muted mb-2">
+                            {{ listing.province }} → {{ listing.district }} → {{ listing.city }}
+                        </div>
+
+                        <span class="badge bg-warning text-dark px-3 py-2">
+                            Pending Review
+                        </span>
+                    </div>
+
+                    <div class="text-end mt-3 mt-md-0">
+
+                        <div class="small text-muted">
+                            Monthly Rent
+                        </div>
+
+                        <div class="fw-bold fs-2"
+                             style="color:var(--navy);">
+                            NPR {{ listing.monthly_rent }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Gallery -->
+        {% if listing.images.all %}
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;overflow:hidden;">
+
+            <div class="card-header bg-white border-0 p-4">
+                <h5 class="fw-bold mb-0">
+                    Property Images
+                </h5>
+            </div>
+
+            <div class="card-body p-4">
+
+                <div class="row g-3">
+
                     {% for img in listing.images.all %}
-                    <img src="{{ img.image.url }}" class="img-thumbnail" style="height:80px;width:80px;object-fit:cover;">
+                    <div class="col-md-4">
+
+                        <a href="{{ img.image.url }}"
+                           target="_blank">
+
+                            <img src="{{ img.image.url }}"
+                                 class="img-fluid rounded shadow-sm w-100"
+                                 style="height:220px;object-fit:cover;">
+
+                        </a>
+
+                    </div>
                     {% endfor %}
+
                 </div>
-                {% endif %}
-                <table class="table table-sm">
-                    <tr><th>Type</th><td>{{ listing.get_property_type_display }}</td></tr>
-                    <tr><th>Location</th><td>{{ listing.province }} → {{ listing.district }} → {{ listing.city }}</td></tr>
-                    <tr><th>Monthly Rent</th><td>NPR {{ listing.monthly_rent }}</td></tr>
-                    <tr><th>Security Deposit</th><td>NPR {{ listing.security_deposit }}</td></tr>
-                    <tr><th>Furnished</th><td>{{ listing.get_furnished_status_display }}</td></tr>
-                    <tr><th>Available</th><td>{{ listing.available_date|default:"Not specified" }}</td></tr>
-                    <tr><th>Submitted</th><td>{{ listing.created_at|date:"M d, Y H:i" }}</td></tr>
-                </table>
-                <h6 class="fw-bold mt-3">Description</h6>
-                <p>{{ listing.description }}</p>
-                {% if listing.house_rules %}
-                <h6 class="fw-bold">House Rules</h6>
-                <p>{{ listing.house_rules }}</p>
-                {% endif %}
+
             </div>
+
+        </div>
+        {% endif %}
+
+        <!-- Property Details -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-4">
+                    Property Details
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Property Type</small>
+                        <strong>{{ listing.get_property_type_display }}</strong>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Furnished Status</small>
+                        <strong>{{ listing.get_furnished_status_display }}</strong>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Monthly Rent</small>
+                        <strong>NPR {{ listing.monthly_rent }}</strong>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Security Deposit</small>
+                        <strong>NPR {{ listing.security_deposit }}</strong>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Available Date</small>
+                        <strong>{{ listing.available_date|default:"Not specified" }}</strong>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted d-block">Submitted</small>
+                        <strong>{{ listing.created_at|date:"M d, Y H:i" }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm p-4 mb-4">
-                <h6 class="fw-bold mb-3"><i class="bi bi-person-circle"></i> Landlord</h6>
-                <p class="mb-1"><strong>Name:</strong> {{ listing.owner.get_full_name }}</p>
-                <p class="mb-1"><strong>Email:</strong> {{ listing.owner.email }}</p>
-                <p class="mb-1"><strong>Phone:</strong> {{ listing.owner.phone }}</p>
-                <p class="mb-0"><strong>Joined:</strong> {{ listing.owner.date_joined|date:"M d, Y" }}</p>
+        <!-- Description -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    Description
+                </h5>
+
+                <p class="mb-0">
+                    {{ listing.description }}
+                </p>
+
             </div>
 
-            {% if doc %}
-            <div class="card border-0 shadow-sm p-4 mb-4">
-                <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-text"></i> Documents</h6>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <p class="small text-muted mb-1">Citizenship Front</p>
-                        <a href="{{ doc.citizenship_front.url }}" target="_blank">
-                            <img src="{{ doc.citizenship_front.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <p class="small text-muted mb-1">Citizenship Back</p>
-                        <a href="{{ doc.citizenship_back.url }}" target="_blank">
-                            <img src="{{ doc.citizenship_back.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <p class="small text-muted mb-1">Lalpurja</p>
-                        <a href="{{ doc.lalpurja.url }}" target="_blank">
-                            <img src="{{ doc.lalpurja.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <p class="small text-muted mb-1">Selfie</p>
-                        <a href="{{ doc.selfie_image.url }}" target="_blank">
-                            <img src="{{ doc.selfie_image.url }}" class="img-thumbnail w-100" style="height:80px;object-fit:cover;">
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No documents submitted.</div>
-            {% endif %}
-
-            <form method="POST" action="{% url 'admin_panel:approve_listing' listing.pk %}" class="mb-3">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success w-100 py-2" onclick="return confirm('Approve this listing?')">
-                    <i class="bi bi-check-circle"></i> Approve Listing
-                </button>
-            </form>
-
-            <div class="card border-0 shadow-sm p-3">
-                <h6 class="fw-bold text-danger mb-2"><i class="bi bi-x-circle"></i> Reject Listing</h6>
-                <form method="POST" action="{% url 'admin_panel:reject_listing' listing.pk %}">
-                    {% csrf_token %}
-                    <textarea name="reason" class="form-control mb-2" rows="3" placeholder="Reason for rejection..." required></textarea>
-                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Reject this listing?')">Reject</button>
-                </form>
-            </div>
         </div>
+
+        <!-- House Rules -->
+        {% if listing.house_rules %}
+        <div class="card border-0 shadow-sm"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    House Rules
+                </h5>
+
+                <p class="mb-0">
+                    {{ listing.house_rules }}
+                </p>
+
+            </div>
+
+        </div>
+        {% endif %}
+
     </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+        <!-- Landlord -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Landlord Information
+                </h5>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Name</small>
+                    <strong>{{ listing.owner.get_full_name }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Email</small>
+                    <strong>{{ listing.owner.email }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Phone</small>
+                    <strong>{{ listing.owner.phone }}</strong>
+                </div>
+
+                <div>
+                    <small class="text-muted d-block">Joined</small>
+                    <strong>{{ listing.owner.date_joined|date:"M d, Y" }}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Documents -->
+        {% if doc %}
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    Verification Documents
+                </h5>
+
+                <div class="row g-2">
+
+                    <div class="col-6">
+                        <a href="{{ doc.citizenship_front.url }}" target="_blank">
+                            <img src="{{ doc.citizenship_front.url }}"
+                                 class="img-fluid rounded border">
+                        </a>
+                    </div>
+
+                    <div class="col-6">
+                        <a href="{{ doc.citizenship_back.url }}" target="_blank">
+                            <img src="{{ doc.citizenship_back.url }}"
+                                 class="img-fluid rounded border">
+                        </a>
+                    </div>
+
+                    <div class="col-6">
+                        <a href="{{ doc.lalpurja.url }}" target="_blank">
+                            <img src="{{ doc.lalpurja.url }}"
+                                 class="img-fluid rounded border">
+                        </a>
+                    </div>
+
+                    <div class="col-6">
+                        <a href="{{ doc.selfie_image.url }}" target="_blank">
+                            <img src="{{ doc.selfie_image.url }}"
+                                 class="img-fluid rounded border">
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-warning shadow-sm">
+            <i class="bi bi-exclamation-triangle"></i>
+            No documents submitted.
+        </div>
+
+        {% endif %}
+
+        <!-- Approve -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <form method="POST"
+                      action="{% url 'admin_panel:approve_listing' listing.pk %}">
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="btn btn-success btn-lg w-100 py-3"
+                            onclick="return confirm('Approve this listing?')">
+
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Approve Listing
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- Reject -->
+        <div class="card border-0 shadow-sm"
+             style="border-radius:24px;">
+
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold text-danger mb-3">
+                    Reject Listing
+                </h5>
+
+                <form method="POST"
+                      action="{% url 'admin_panel:reject_listing' listing.pk %}">
+
+                    {% csrf_token %}
+
+                    <textarea name="reason"
+                              class="form-control mb-3"
+                              rows="4"
+                              placeholder="Reason for rejection..."
+                              required></textarea>
+
+                    <button type="submit"
+                            class="btn btn-danger w-100 py-3"
+                            onclick="return confirm('Reject this listing?')">
+
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        Reject Listing
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
 </div>
 {% endblock %}
