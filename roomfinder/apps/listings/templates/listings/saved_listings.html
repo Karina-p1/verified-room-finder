@@ -1,57 +1,220 @@
 {% extends 'base.html' %}
 {% block title %}Saved Listings — RoomFinder{% endblock %}
+
 {% block content %}
 <div class="container my-5">
-    <h3 class="fw-bold mb-4"><i class="bi bi-bookmark-heart"></i> Saved Listings</h3>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-bookmark-heart-fill text-danger"></i>
+                Saved Listings
+            </h3>
+            <p class="text-muted mb-0">
+                Your favourite rooms and properties saved for later.
+            </p>
+        </div>
+
+        <a href="{% url 'listings:homepage' %}" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Browse More Listings
+        </a>
+    </div>
+
     {% if saved %}
-    <div class="row g-4">
-        {% for item in saved %}
-        {% with listing=item.listing %}
-        <div class="col-md-4">
-            <div class="card listing-card h-100 border-0 shadow-sm">
-                {% with listing.primary_image as img %}
-                    {% if img %}
-                        <img src="{{ img.image.url }}" class="card-img-top"
-                             style="height:200px;object-fit:cover;" alt="{{ listing.title }}">
-                    {% else %}
-                        <div class="bg-secondary d-flex align-items-center justify-content-center"
-                             style="height:200px;">
-                            <i class="bi bi-image text-white" style="font-size:3rem;"></i>
-                        </div>
-                    {% endif %}
-                {% endwith %}
-                <div class="card-body">
-                    <h6 class="fw-bold mb-1">{{ listing.title }}</h6>
-                    <p class="text-primary fw-bold mb-1">NPR {{ listing.monthly_rent }}/month</p>
-                    <p class="text-muted small mb-2">
-                        <i class="bi bi-geo-alt"></i> {{ listing.district }}, {{ listing.province }}
-                    </p>
-                    <p class="text-muted small mb-3">{{ listing.description|truncatechars:80 }}</p>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'listings:detail' listing.pk %}" class="btn btn-primary btn-sm flex-grow-1">
-                            View Details
-                        </a>
-                        <a href="{% url 'listings:save_listing' listing.pk %}"
-                           class="btn btn-outline-warning btn-sm"
-                           onclick="return confirm('Remove from saved?')">
-                            <i class="bi bi-bookmark-x"></i>
-                        </a>
-                    </div>
-                    <small class="text-muted d-block mt-2">
-                        Saved on {{ item.saved_at|date:"M d, Y" }}
-                    </small>
-                </div>
+
+    <!-- Stats Card -->
+    <div class="card border-0 shadow-sm mb-4 saved-summary-card">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h6 class="text-muted mb-1">Total Saved Listings</h6>
+                <h2 class="fw-bold text-primary mb-0">
+                    {{ saved|length }}
+                </h2>
+            </div>
+
+            <div class="text-end">
+                <i class="bi bi-bookmark-heart-fill text-danger opacity-25"
+                   style="font-size:3rem;"></i>
             </div>
         </div>
+    </div>
+
+    <!-- Saved Listings Grid -->
+    <div class="row g-4">
+
+        {% for item in saved %}
+        {% with listing=item.listing %}
+
+        <div class="col-lg-4 col-md-6">
+
+            <div class="card border-0 shadow-sm h-100 saved-card">
+
+                <!-- Image -->
+                <div class="position-relative">
+
+                    {% with listing.primary_image as img %}
+                        {% if img %}
+                            <img src="{{ img.image.url }}"
+                                 class="card-img-top"
+                                 alt="{{ listing.title }}"
+                                 style="height:230px;object-fit:cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                 style="height:230px;">
+                                <i class="bi bi-image text-muted"
+                                   style="font-size:3rem;"></i>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Rent Badge -->
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-3 px-3 py-2">
+                        NPR {{ listing.monthly_rent }}
+                    </span>
+
+                    <!-- Saved Badge -->
+                    <span class="badge bg-danger position-absolute bottom-0 start-0 m-3">
+                        <i class="bi bi-heart-fill"></i> Saved
+                    </span>
+
+                </div>
+
+                <!-- Content -->
+                <div class="card-body d-flex flex-column">
+
+                    <h5 class="fw-bold mb-2">
+                        {{ listing.title }}
+                    </h5>
+
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                        {{ listing.district }}, {{ listing.province }}
+                    </p>
+
+                    <p class="text-muted flex-grow-1">
+                        {{ listing.description|truncatechars:120 }}
+                    </p>
+
+                    <!-- Saved Date -->
+                    <div class="mb-3">
+                        <span class="badge bg-light text-dark border">
+                            <i class="bi bi-calendar3"></i>
+                            Saved on {{ item.saved_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+
+                        <a href="{% url 'listings:detail' listing.pk %}"
+                           class="btn btn-primary">
+                            <i class="bi bi-eye"></i>
+                            View Details
+                        </a>
+
+                        <a href="{% url 'listings:save_listing' listing.pk %}"
+                           class="btn btn-outline-danger"
+                           onclick="return confirm('Remove this listing from saved items?')">
+                            <i class="bi bi-bookmark-x"></i>
+                            Remove Saved
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
         {% endwith %}
         {% endfor %}
+
     </div>
+
     {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-bookmark text-muted" style="font-size:4rem;"></i>
-        <h5 class="mt-3 text-muted">No saved listings yet.</h5>
-        <a href="{% url 'listings:homepage' %}" class="btn btn-primary mt-2">Browse Listings</a>
+
+    <!-- Empty State -->
+    <div class="card border-0 shadow-sm text-center py-5">
+
+        <div class="card-body">
+
+            <div class="mb-3">
+                <i class="bi bi-bookmark-heart text-muted"
+                   style="font-size:5rem;"></i>
+            </div>
+
+            <h4 class="fw-bold">
+                No Saved Listings Yet
+            </h4>
+
+            <p class="text-muted mb-4">
+                Save listings you like so you can easily find them later.
+            </p>
+
+            <a href="{% url 'listings:homepage' %}"
+               class="btn btn-primary px-4">
+                <i class="bi bi-search"></i>
+                Browse Listings
+            </a>
+
+        </div>
+
     </div>
+
     {% endif %}
+
 </div>
+
+<style>
+.saved-card{
+    border-radius:16px;
+    overflow:hidden;
+    transition:all .3s ease;
+}
+
+.saved-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 .75rem 1.5rem rgba(0,0,0,.12)!important;
+}
+
+.saved-card img{
+    transition:transform .4s ease;
+}
+
+.saved-card:hover img{
+    transform:scale(1.05);
+}
+
+.saved-summary-card{
+    border-left:5px solid #0d6efd !important;
+    border-radius:16px;
+}
+
+.card{
+    border-radius:16px;
+}
+
+.btn{
+    border-radius:10px;
+}
+
+.badge{
+    font-weight:500;
+}
+
+@media (max-width:768px){
+
+    .saved-card img{
+        height:200px !important;
+    }
+
+    .saved-summary-card .card-body{
+        text-align:center;
+        gap:15px;
+    }
+}
+</style>
+
 {% endblock %}

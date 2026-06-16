@@ -1,106 +1,258 @@
 {% extends 'base.html' %}
 {% block title %}My Listings — RoomFinder{% endblock %}
+
 {% block content %}
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">My Listings</h3>
-        <a href="{% url 'listings:create_listing' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add New
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+            <span class="text-uppercase fw-bold small"
+                  style="color:var(--coral);letter-spacing:.15em;">
+                Landlord Dashboard
+            </span>
+
+            <h1 class="display-5 fw-bold mt-2 mb-2"
+                style="font-family:var(--font-display);color:var(--navy);">
+                My Listings
+            </h1>
+
+            <p class="text-muted mb-0">
+                Manage your property listings, approval status and rental activity.
+            </p>
+        </div>
+
+        <a href="{% url 'listings:create_listing' %}"
+           class="btn btn-primary px-4">
+            <i class="bi bi-plus-circle me-2"></i>
+            Add Listing
         </a>
+
     </div>
 
-    {% for listing in listings %}
-    <div class="card mb-3 border-0 shadow-sm">
-        <div class="card-body">
-            <div class="row align-items-center">
+    <!-- Listings -->
+    <div class="row g-4">
 
-                <!-- Thumbnail -->
-                <div class="col-md-2">
-                    {% with listing.primary_image as img %}
-                        {% if img %}
-                            <img src="{{ img.image.url }}"
-                                 class="rounded" style="width:80px;height:60px;object-fit:cover;">
-                        {% else %}
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                 style="width:80px;height:60px;">
-                                <i class="bi bi-image text-muted"></i>
+        {% for listing in listings %}
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="border-radius:24px;overflow:hidden;">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center">
+
+                        <!-- Image -->
+                        <div class="col-lg-2 mb-3 mb-lg-0">
+
+                            {% with listing.primary_image as img %}
+                                {% if img %}
+                                    <img src="{{ img.image.url }}"
+                                         class="w-100 rounded-4"
+                                         style="height:130px;object-fit:cover;">
+                                {% else %}
+                                    <div class="bg-light rounded-4 d-flex align-items-center justify-content-center"
+                                         style="height:130px;">
+                                        <i class="bi bi-house text-muted fs-1"></i>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+
+                        </div>
+
+                        <!-- Details -->
+                        <div class="col-lg-5">
+
+                            <h4 class="fw-bold mb-2">
+                                {{ listing.title }}
+                            </h4>
+
+                            <div class="text-muted mb-2">
+                                <i class="bi bi-geo-alt"></i>
+                                {{ listing.district }},
+                                {{ listing.province }}
                             </div>
-                        {% endif %}
-                    {% endwith %}
-                </div>
 
-                <!-- Info -->
-                <div class="col-md-6">
-                    <h5 class="mb-1 fw-bold">{{ listing.title }}</h5>
-                    <p class="text-muted mb-1 small">
-                        <i class="bi bi-geo-alt"></i> {{ listing.district }},
-                        {{ listing.province }} &nbsp;|&nbsp;
-                        NPR {{ listing.monthly_rent }}/mo
-                    </p>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <!-- Status badge -->
-                        <span class="badge {% if listing.status == 'approved' %}bg-success{% elif listing.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                            {{ listing.status|capfirst }}
-                        </span>
+                            <div class="fw-bold fs-5"
+                                 style="color:var(--coral);">
+                                NPR {{ listing.monthly_rent }}/month
+                            </div>
 
-                        <!-- Rented badge -->
-                        {% if listing.is_rented %}
-                            <span class="badge bg-secondary">
-                                <i class="bi bi-house-check"></i> Rented
-                            </span>
-                        {% endif %}
-                    </div>
-                    {% if listing.status == 'rejected' and listing.rejection_reason %}
-                        <p class="text-danger small mt-1 mb-0">
-                            <i class="bi bi-x-circle"></i> {{ listing.rejection_reason }}
-                        </p>
-                    {% endif %}
-                </div>
+                            <div class="mt-3 d-flex flex-wrap gap-2">
 
-                <!-- Actions -->
-                <div class="col-md-4 d-flex gap-2 justify-content-end flex-wrap">
-                    <a href="{% url 'listings:edit_listing' listing.pk %}"
-                       class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-pencil"></i> Edit
-                    </a>
+                                {% if listing.status == 'approved' %}
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="bi bi-patch-check-fill me-1"></i>
+                                        Approved
+                                    </span>
 
-                    <!-- Mark Rented / Available toggle -->
-                    {% if listing.status == 'approved' %}
-                    <form method="POST" action="{% url 'listings:mark_rented' listing.pk %}">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="btn btn-sm {% if listing.is_rented %}btn-outline-success{% else %}btn-outline-secondary{% endif %}"
-                                onclick="return confirm('{% if listing.is_rented %}Mark as available again?{% else %}Mark this listing as rented? It will be hidden from search.{% endif %}')">
-                            {% if listing.is_rented %}
-                                <i class="bi bi-arrow-counterclockwise"></i> Mark Available
-                            {% else %}
-                                <i class="bi bi-house-check"></i> Mark Rented
+                                {% elif listing.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark px-3 py-2">
+                                        <i class="bi bi-hourglass-split me-1"></i>
+                                        Pending Review
+                                    </span>
+
+                                {% elif listing.status == 'rejected' %}
+                                    <span class="badge bg-danger px-3 py-2">
+                                        <i class="bi bi-x-circle-fill me-1"></i>
+                                        Rejected
+                                    </span>
+                                {% endif %}
+
+                                {% if listing.is_rented %}
+                                    <span class="badge bg-secondary px-3 py-2">
+                                        <i class="bi bi-house-check-fill me-1"></i>
+                                        Rented
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-info px-3 py-2">
+                                        <i class="bi bi-house-door-fill me-1"></i>
+                                        Available
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+                            {% if listing.status == 'rejected' and listing.rejection_reason %}
+                            <div class="alert alert-danger mt-3 mb-0">
+                                <strong>Admin Feedback:</strong><br>
+                                {{ listing.rejection_reason }}
+                            </div>
                             {% endif %}
-                        </button>
-                    </form>
-                    {% endif %}
 
-                    <!-- Delete -->
-                    <form method="POST" action="{% url 'listings:delete_listing' listing.pk %}">
-                        {% csrf_token %}
-                        <button class="btn btn-outline-danger btn-sm"
-                                onclick="return confirm('Delete this listing permanently?')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
+                        </div>
+
+                        <!-- Status Progress -->
+                        <div class="col-lg-2 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block mb-2">
+                                Approval Status
+                            </small>
+
+                            {% if listing.status == 'approved' %}
+                                <div class="text-success fw-semibold">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Approved
+                                </div>
+
+                            {% elif listing.status == 'pending' %}
+                                <div class="text-warning fw-semibold">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    Waiting Review
+                                </div>
+
+                            {% else %}
+                                <div class="text-danger fw-semibold">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                    Rejected
+                                </div>
+                            {% endif %}
+
+                            <small class="text-muted">
+                                Submitted:
+                                {{ listing.created_at|date:"M d, Y" }}
+                            </small>
+
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <div class="d-grid gap-2">
+
+                                <a href="{% url 'listings:edit_listing' listing.pk %}"
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil-square me-1"></i>
+                                    Edit Listing
+                                </a>
+
+                                {% if listing.status == 'approved' %}
+                                <form method="POST"
+                                      action="{% url 'listings:mark_rented' listing.pk %}">
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="btn {% if listing.is_rented %}btn-outline-success{% else %}btn-outline-secondary{% endif %} w-100">
+
+                                        {% if listing.is_rented %}
+                                            <i class="bi bi-arrow-repeat me-1"></i>
+                                            Mark Available
+                                        {% else %}
+                                            <i class="bi bi-house-check me-1"></i>
+                                            Mark Rented
+                                        {% endif %}
+
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <form method="POST"
+                                      action="{% url 'listings:delete_listing' listing.pk %}">
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger w-100"
+                                            onclick="return confirm('Delete this listing permanently?')">
+
+                                        <i class="bi bi-trash me-1"></i>
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
+
+        {% empty %}
+
+        <!-- Empty State -->
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="border-radius:24px;">
+
+                <div class="card-body text-center py-5">
+
+                    <i class="bi bi-house-slash text-muted"
+                       style="font-size:5rem;"></i>
+
+                    <h3 class="fw-bold mt-4">
+                        No Listings Yet
+                    </h3>
+
+                    <p class="text-muted">
+                        Create your first property listing and start receiving inquiries.
+                    </p>
+
+                    <a href="{% url 'listings:create_listing' %}"
+                       class="btn btn-primary px-4">
+
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Create Listing
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
     </div>
-    {% empty %}
-    <div class="text-center py-5">
-        <i class="bi bi-house-slash text-muted" style="font-size:4rem;"></i>
-        <h5 class="mt-3 text-muted">No listings yet.</h5>
-        <a href="{% url 'listings:create_listing' %}" class="btn btn-primary mt-2">
-            Create Your First Listing
-        </a>
-    </div>
-    {% endfor %}
+
 </div>
 {% endblock %}

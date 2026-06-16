@@ -1,148 +1,190 @@
 {% extends 'base.html' %}
 {% block title %}Conversation — RoomFinder{% endblock %}
+
 {% block content %}
-<div class="container my-5" style="max-width:700px;">
+<div class="container my-5" style="max-width:900px;">
 
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h5 class="fw-bold mb-1">
-                <i class="bi bi-chat-dots text-primary"></i>
-                Conversation with {{ other_user.get_full_name }}
-            </h5>
-            <small class="text-muted">
-                About:
-                <a href="{% url 'listings:detail' inquiry.listing.pk %}"
-                   class="text-primary text-decoration-none">
-                    {{ inquiry.listing.title }}
+    <div class="card border-0 shadow-sm conversation-header mb-4">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="avatar-circle">
+                        {{ other_user.first_name|first|upper }}
+                    </div>
+
+                    <div>
+                        <h4 class="fw-bold mb-1">
+                            {{ other_user.get_full_name }}
+                        </h4>
+
+                        <div class="text-muted small">
+                            <i class="bi bi-house-door"></i>
+                            {{ inquiry.listing.title }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <a href="{% url 'listings:my_inquiries' %}"
+                   class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-arrow-left"></i>
+                    All Messages
                 </a>
-                &nbsp;·&nbsp;
-                {{ inquiry.listing.district }}
-                &nbsp;·&nbsp;
-                NPR {{ inquiry.listing.monthly_rent }}/mo
-            </small>
+
+            </div>
+
         </div>
-        <a href="{% url 'listings:my_inquiries' %}"
-           class="btn btn-outline-secondary btn-sm">
-            ← All Messages
-        </a>
     </div>
 
-    <!-- Messages thread -->
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body p-0">
-            <div style="height:420px;overflow-y:auto;padding:1.5rem;"
-                 id="messageThread">
+    <!-- Chat Card -->
+    <div class="card border-0 shadow-sm overflow-hidden">
 
-                {% for message in inquiry.messages.all %}
-                <div class="d-flex mb-3
-                    {% if message.sender == request.user %}
-                        justify-content-end
-                    {% else %}
-                        justify-content-start
-                    {% endif %}">
+        <!-- Messages Area -->
+        <div class="chat-body" id="messageThread">
 
-                    <!-- Avatar -->
-                    {% if message.sender != request.user %}
-                    <div class="rounded-circle bg-primary d-flex align-items-center
-                                justify-content-center me-2 flex-shrink-0"
-                         style="width:36px;height:36px;">
-                        <span class="text-white fw-bold small">
-                            {{ message.sender.first_name|first|upper }}
-                        </span>
+            {% for message in inquiry.messages.all %}
+
+            <div class="message-row {% if message.sender == request.user %}own-message{% endif %}">
+
+                {% if message.sender != request.user %}
+                <div class="avatar-small">
+                    {{ message.sender.first_name|first|upper }}
+                </div>
+                {% endif %}
+
+                <div>
+
+                    <div class="message-bubble
+                        {% if message.sender == request.user %}
+                            bubble-own
+                        {% else %}
+                            bubble-other
+                        {% endif %}
+                    ">
+                        {{ message.body }}
                     </div>
-                    {% endif %}
 
-                    <!-- Bubble -->
-                    <div style="max-width:75%;">
-                        <div class="rounded-3 px-3 py-2
-                            {% if message.sender == request.user %}
-                                bg-primary text-white
+                    <div class="message-time
+                        {% if message.sender == request.user %}
+                            text-end
+                        {% endif %}
+                    ">
+
+                        {{ message.sent_at|date:"M d, Y • g:i A" }}
+
+                        {% if message.sender == request.user %}
+                            {% if message.is_read %}
+                                <i class="bi bi-check2-all text-primary"></i>
                             {% else %}
-                                bg-light text-dark
-                            {% endif %}">
-                            {{ message.body }}
-                        </div>
-                        <div class="mt-1
-                            {% if message.sender == request.user %}
-                                text-end
-                            {% endif %}">
-                            <small class="text-muted" style="font-size:0.7rem;">
-                                {{ message.sent_at|date:"M d, g:i A" }}
-                                {% if message.sender == request.user %}
-                                    &nbsp;
-                                    {% if message.is_read %}
-                                        <i class="bi bi-check2-all text-primary"></i>
-                                    {% else %}
-                                        <i class="bi bi-check2 text-muted"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </small>
-                        </div>
+                                <i class="bi bi-check2"></i>
+                            {% endif %}
+                        {% endif %}
+
                     </div>
 
-                    <!-- Own avatar -->
-                    {% if message.sender == request.user %}
-                    <div class="rounded-circle bg-success d-flex align-items-center
-                                justify-content-center ms-2 flex-shrink-0"
-                         style="width:36px;height:36px;">
-                        <span class="text-white fw-bold small">
-                            {{ request.user.first_name|first|upper }}
-                        </span>
-                    </div>
-                    {% endif %}
+                </div>
 
+                {% if message.sender == request.user %}
+                <div class="avatar-small bg-success">
+                    {{ request.user.first_name|first|upper }}
                 </div>
-                {% empty %}
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-chat" style="font-size:3rem;opacity:0.3;"></i>
-                    <p class="mt-2">No messages yet. Start the conversation!</p>
-                </div>
-                {% endfor %}
+                {% endif %}
+
             </div>
+
+            {% empty %}
+
+            <div class="text-center py-5">
+
+                <i class="bi bi-chat-square-dots text-muted"
+                   style="font-size:4rem;"></i>
+
+                <h5 class="mt-3 text-muted">
+                    No Messages Yet
+                </h5>
+
+                <p class="text-muted">
+                    Start the conversation below.
+                </p>
+
+            </div>
+
+            {% endfor %}
+
         </div>
 
-        <!-- Reply box -->
-        <div class="card-footer bg-white border-top p-3">
+        <!-- Reply Box -->
+        <div class="chat-footer">
+
             <form method="POST">
                 {% csrf_token %}
-                <div class="d-flex gap-2 align-items-end">
-                    <div class="flex-grow-1">
-                        {{ form.body }}
-                    </div>
+
+                <div class="input-group">
+
+                    {{ form.body }}
+
                     <button type="submit"
-                            class="btn btn-primary px-3"
-                            style="height:80px;">
-                        <i class="bi bi-send-fill d-block mb-1"></i>
-                        <small>Send</small>
+                            class="btn btn-primary px-4">
+                        <i class="bi bi-send-fill"></i>
                     </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
 
-    <!-- Listing quick info -->
-    <div class="card border-0 bg-light p-3">
-        <div class="d-flex gap-3 align-items-center">
-            {% with inquiry.listing.primary_image as img %}
-                {% if img %}
-                    <img src="{{ img.image.url }}"
-                         class="rounded"
-                         style="width:60px;height:45px;object-fit:cover;">
-                {% endif %}
-            {% endwith %}
-            <div class="flex-grow-1">
-                <div class="fw-semibold small">{{ inquiry.listing.title }}</div>
-                <div class="text-muted" style="font-size:0.75rem;">
-                    NPR {{ inquiry.listing.monthly_rent }}/mo
-                    · {{ inquiry.listing.district }}
+    <!-- Listing Quick Info -->
+    <div class="card border-0 shadow-sm mt-4 listing-info-card">
+
+        <div class="card-body">
+
+            <div class="d-flex align-items-center gap-3">
+
+                {% with inquiry.listing.primary_image as img %}
+                    {% if img %}
+                        <img src="{{ img.image.url }}"
+                             class="listing-thumb">
+                    {% else %}
+                        <div class="listing-thumb bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-house text-muted"></i>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="flex-grow-1">
+
+                    <h6 class="fw-bold mb-1">
+                        {{ inquiry.listing.title }}
+                    </h6>
+
+                    <div class="text-muted small">
+                        <i class="bi bi-geo-alt"></i>
+                        {{ inquiry.listing.district }},
+                        {{ inquiry.listing.province }}
+                    </div>
+
+                    <div class="fw-bold text-primary mt-1">
+                        NPR {{ inquiry.listing.monthly_rent }}/month
+                    </div>
+
                 </div>
+
+                <a href="{% url 'listings:detail' inquiry.listing.pk %}"
+                   class="btn btn-outline-primary rounded-pill">
+                    View Listing
+                </a>
+
             </div>
-            <a href="{% url 'listings:detail' inquiry.listing.pk %}"
-               class="btn btn-sm btn-outline-primary">
-                View Listing
-            </a>
+
         </div>
+
     </div>
 
 </div>
@@ -150,8 +192,172 @@
 
 {% block extra_js %}
 <script>
-    // Auto-scroll to bottom of messages
-    const thread = document.getElementById('messageThread');
-    thread.scrollTop = thread.scrollHeight;
+const thread = document.getElementById('messageThread');
+thread.scrollTop = thread.scrollHeight;
 </script>
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.card{
+    border-radius:20px;
+}
+
+/* Header */
+
+.conversation-header{
+    border-left:5px solid #0d6efd !important;
+}
+
+/* Avatars */
+
+.avatar-circle{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#0d6efd,#4f8cff);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:1.3rem;
+}
+
+.avatar-small{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#0d6efd;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    flex-shrink:0;
+}
+
+/* Chat Area */
+
+.chat-body{
+    height:550px;
+    overflow-y:auto;
+    background:#f8fafc;
+    padding:25px;
+}
+
+.chat-body::-webkit-scrollbar{
+    width:6px;
+}
+
+.chat-body::-webkit-scrollbar-thumb{
+    background:#ced4da;
+    border-radius:10px;
+}
+
+/* Messages */
+
+.message-row{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+    align-items:flex-end;
+}
+
+.own-message{
+    justify-content:flex-end;
+}
+
+.message-bubble{
+    max-width:520px;
+    padding:12px 16px;
+    border-radius:18px;
+    word-break:break-word;
+    line-height:1.5;
+    font-size:.95rem;
+}
+
+.bubble-own{
+    background:#0d6efd;
+    color:white;
+    border-bottom-right-radius:6px;
+}
+
+.bubble-other{
+    background:white;
+    color:#212529;
+    border-bottom-left-radius:6px;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
+}
+
+.message-time{
+    font-size:.72rem;
+    color:#6c757d;
+    margin-top:5px;
+}
+
+/* Reply Area */
+
+.chat-footer{
+    background:white;
+    border-top:1px solid #edf0f2;
+    padding:18px;
+}
+
+.chat-footer textarea{
+    min-height:60px;
+    resize:none;
+    border-radius:12px !important;
+}
+
+.chat-footer .btn{
+    border-radius:12px;
+}
+
+/* Listing Card */
+
+.listing-info-card{
+    transition:.25s;
+}
+
+.listing-info-card:hover{
+    transform:translateY(-2px);
+}
+
+.listing-thumb{
+    width:95px;
+    height:72px;
+    object-fit:cover;
+    border-radius:12px;
+    flex-shrink:0;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+    .chat-body{
+        height:430px;
+        padding:15px;
+    }
+
+    .message-bubble{
+        max-width:250px;
+    }
+
+    .avatar-circle{
+        width:55px;
+        height:55px;
+    }
+
+    .listing-thumb{
+        width:70px;
+        height:60px;
+    }
+
+}
+
+</style>
 {% endblock %}

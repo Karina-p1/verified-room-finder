@@ -1,123 +1,272 @@
 {% extends 'base.html' %}
 {% block title %}My Messages — RoomFinder{% endblock %}
-{% block content %}
-<div class="container my-5" style="max-width:750px;">
 
-    <h3 class="fw-bold mb-4">
-        <i class="bi bi-chat-dots text-primary"></i> My Messages
-    </h3>
+{% block content %}
+<div class="container my-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-chat-dots-fill text-primary"></i>
+                My Messages
+            </h3>
+            <p class="text-muted mb-0">
+                Manage conversations with landlords and tenants.
+            </p>
+        </div>
+
+        {% if inquiries %}
+        <div class="badge bg-primary fs-6 px-3 py-2">
+            {{ inquiries|length }} Conversation{{ inquiries|length|pluralize }}
+        </div>
+        {% endif %}
+    </div>
 
     {% if inquiries %}
+
+    <!-- Stats Card -->
+    <div class="card border-0 shadow-sm mb-4 messages-summary-card">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <div class="text-muted small">
+                    Total Conversations
+                </div>
+                <h2 class="fw-bold text-primary mb-0">
+                    {{ inquiries|length }}
+                </h2>
+            </div>
+
+            <i class="bi bi-chat-square-text-fill text-primary opacity-25"
+               style="font-size:3rem;"></i>
+        </div>
+    </div>
+
+    <!-- Conversations -->
     <div class="d-flex flex-column gap-3">
+
         {% for inquiry in inquiries %}
+
         <a href="{% url 'listings:inquiry_thread' inquiry.pk %}"
            class="text-decoration-none">
-            <div class="card border-0 shadow-sm p-3
-                        {% if inquiry.unread > 0 %}
-                            border-start border-primary border-3
-                        {% endif %}"
-                 style="transition:box-shadow 0.2s;">
 
-                <div class="d-flex gap-3 align-items-center">
+            <div class="card border-0 shadow-sm inquiry-card">
 
-                    <!-- Listing thumbnail -->
-                    {% with inquiry.listing.primary_image as img %}
-                        {% if img %}
-                            <img src="{{ img.image.url }}"
-                                 class="rounded"
-                                 style="width:60px;height:50px;
-                                        object-fit:cover;flex-shrink:0;">
-                        {% else %}
-                            <div class="bg-light rounded d-flex align-items-center
-                                        justify-content-center flex-shrink-0"
-                                 style="width:60px;height:50px;">
-                                <i class="bi bi-house text-muted"></i>
-                            </div>
-                        {% endif %}
-                    {% endwith %}
+                <div class="card-body">
 
-                    <!-- Info -->
-                    <div class="flex-grow-1 min-w-0">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="fw-bold text-dark">
-                                    {% if request.user == inquiry.tenant %}
-                                        {{ inquiry.landlord.get_full_name }}
-                                    {% else %}
-                                        {{ inquiry.tenant.get_full_name }}
-                                    {% endif %}
-                                </div>
-                                <div class="text-muted small">
-                                    {{ inquiry.listing.title|truncatechars:40 }}
-                                </div>
-                            </div>
+                    <div class="d-flex align-items-center gap-3">
 
-                            <!-- Unread badge + time -->
-                            <div class="text-end flex-shrink-0 ms-2">
-                                {% with inquiry.last_message as last %}
-                                    {% if last %}
-                                        <div class="text-muted"
-                                             style="font-size:0.72rem;">
-                                            {{ last.sent_at|timesince }} ago
-                                        </div>
-                                    {% endif %}
-                                {% endwith %}
-                                {% if inquiry.unread > 0 %}
-                                    <span class="badge bg-primary rounded-pill">
-                                        {{ inquiry.unread }}
-                                    </span>
-                                {% endif %}
-                            </div>
+                        <!-- Avatar -->
+                        <div class="avatar-circle flex-shrink-0">
+
+                            {% if request.user == inquiry.tenant %}
+                                {{ inquiry.landlord.first_name|first|upper }}
+                            {% else %}
+                                {{ inquiry.tenant.first_name|first|upper }}
+                            {% endif %}
+
                         </div>
 
-                        <!-- Last message preview -->
-                        {% with inquiry.last_message as last %}
-                            {% if last %}
-                                <p class="text-muted mb-0 mt-1"
-                                   style="font-size:0.82rem;
-                                          white-space:nowrap;
-                                          overflow:hidden;
-                                          text-overflow:ellipsis;">
-                                    {% if last.sender == request.user %}
-                                        <span class="text-muted">You: </span>
-                                    {% endif %}
-                                    {{ last.body|truncatechars:60 }}
-                                </p>
+                        <!-- Listing Image -->
+                        {% with inquiry.listing.primary_image as img %}
+                            {% if img %}
+                                <img src="{{ img.image.url }}"
+                                     class="listing-thumb">
                             {% else %}
-                                <p class="text-muted mb-0 mt-1"
-                                   style="font-size:0.82rem;">
-                                    No messages yet
-                                </p>
+                                <div class="listing-thumb placeholder-thumb">
+                                    <i class="bi bi-house text-muted"></i>
+                                </div>
                             {% endif %}
                         {% endwith %}
+
+                        <!-- Main Info -->
+                        <div class="flex-grow-1">
+
+                            <div class="d-flex justify-content-between align-items-start">
+
+                                <div>
+
+                                    <h6 class="fw-bold text-dark mb-1">
+
+                                        {% if request.user == inquiry.tenant %}
+                                            {{ inquiry.landlord.get_full_name }}
+                                        {% else %}
+                                            {{ inquiry.tenant.get_full_name }}
+                                        {% endif %}
+
+                                    </h6>
+
+                                    <div class="text-muted small">
+                                        <i class="bi bi-house-door"></i>
+                                        {{ inquiry.listing.title|truncatechars:45 }}
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end">
+
+                                    {% with inquiry.last_message as last %}
+                                        {% if last %}
+                                        <small class="text-muted d-block">
+                                            {{ last.sent_at|timesince }} ago
+                                        </small>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                    {% if inquiry.unread > 0 %}
+                                        <span class="badge bg-danger rounded-pill mt-1">
+                                            {{ inquiry.unread }}
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                            <!-- Last Message -->
+                            {% with inquiry.last_message as last %}
+                                {% if last %}
+
+                                <div class="mt-2 small text-muted text-truncate">
+
+                                    {% if last.sender == request.user %}
+                                        <span class="fw-semibold text-primary">
+                                            You:
+                                        </span>
+                                    {% endif %}
+
+                                    {{ last.body|truncatechars:90 }}
+
+                                </div>
+
+                                {% else %}
+
+                                <div class="mt-2 small text-muted">
+                                    No messages yet
+                                </div>
+
+                                {% endif %}
+                            {% endwith %}
+
+                        </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </a>
+
         {% endfor %}
+
     </div>
 
     {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-chat-square-dots text-muted"
-           style="font-size:4rem;opacity:0.3;"></i>
-        <h5 class="mt-3 text-muted">No messages yet</h5>
-        {% if request.user.role == 'tenant' %}
-            <p class="text-muted small">
-                Browse listings and click
-                "Contact Landlord" to start a conversation.
-            </p>
-            <a href="{% url 'listings:homepage' %}"
-               class="btn btn-primary mt-2">
-                Browse Listings
-            </a>
-        {% else %}
-            <p class="text-muted small">
-                Tenants will message you when they're interested in your listings.
-            </p>
-        {% endif %}
+
+    <!-- Empty State -->
+    <div class="card border-0 shadow-sm text-center py-5">
+
+        <div class="card-body">
+
+            <i class="bi bi-chat-square-dots text-muted"
+               style="font-size:5rem;"></i>
+
+            <h4 class="fw-bold mt-3">
+                No Messages Yet
+            </h4>
+
+            {% if request.user.role == 'tenant' %}
+
+                <p class="text-muted">
+                    Browse listings and contact landlords to start conversations.
+                </p>
+
+                <a href="{% url 'listings:homepage' %}"
+                   class="btn btn-primary mt-2 px-4">
+                    <i class="bi bi-search"></i>
+                    Browse Listings
+                </a>
+
+            {% else %}
+
+                <p class="text-muted">
+                    Interested tenants will contact you here.
+                </p>
+
+            {% endif %}
+
+        </div>
+
     </div>
+
     {% endif %}
 
 </div>
+
+<style>
+
+.messages-summary-card{
+    border-left:5px solid #0d6efd !important;
+    border-radius:16px;
+}
+
+.inquiry-card{
+    border-radius:16px;
+    transition:all .25s ease;
+}
+
+.inquiry-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 .75rem 1.5rem rgba(0,0,0,.12)!important;
+}
+
+.avatar-circle{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:#0d6efd;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:1rem;
+}
+
+.listing-thumb{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:12px;
+    flex-shrink:0;
+}
+
+.placeholder-thumb{
+    background:#f8f9fa;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.card{
+    border-radius:16px;
+}
+
+@media(max-width:768px){
+
+    .listing-thumb{
+        width:60px;
+        height:60px;
+    }
+
+    .avatar-circle{
+        width:45px;
+        height:45px;
+    }
+
+}
+
+</style>
+
 {% endblock %}
