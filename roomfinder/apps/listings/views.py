@@ -174,78 +174,83 @@ def my_reports(request):
     return render(request, 'reports/my_reports.html', {'reports': reports})
 
 def homepage(request):
-    listings = Listing.objects.filter(status='approved', is_rented=False).prefetch_related('images', 'facilities')
+    listings_qs = Listing.objects.filter(
+        status='approved',
+        is_rented=False
+    ).prefetch_related('images', 'facilities')
 
-    # Search
-    q = request.GET.get('q', '')
-    province = request.GET.get('province', '')
-    district = request.GET.get('district', '')
-    property_type = request.GET.get('property_type', '')
-    min_price = request.GET.get('min_price', '')
-    max_price = request.GET.get('max_price', '')
-    wifi = request.GET.get('wifi', '')
-    attached_bathroom = request.GET.get('attached_bathroom', '')
-    pet_allowed = request.GET.get('pet_allowed', '')
-    sort = request.GET.get('sort', 'latest')
+    q                = request.GET.get('q', '')
+    province         = request.GET.get('province', '')
+    district         = request.GET.get('district', '')
+    property_type    = request.GET.get('property_type', '')
+    furnished_status = request.GET.get('furnished_status', '')
+    min_price        = request.GET.get('min_price', '')
+    max_price        = request.GET.get('max_price', '')
+    sort             = request.GET.get('sort', 'latest')
 
     if q:
-        listings = listings.filter(
+        listings_qs = listings_qs.filter(
             Q(title__icontains=q) | Q(description__icontains=q) |
-            Q(city__icontains=q) | Q(district__icontains=q)
+            Q(city__icontains=q)  | Q(district__icontains=q)
         )
-    if province:
-        listings = listings.filter(province=province)
-    if district:
-        listings = listings.filter(district=district)
-    if property_type:
-        listings = listings.filter(property_type=property_type)
-    if min_price:
-        listings = listings.filter(monthly_rent__gte=min_price)
-    if max_price:
-        listings = listings.filter(monthly_rent__lte=max_price)
-    if wifi:
-        listings = listings.filter(facilities__wifi=True)
-    if attached_bathroom:
-        listings = listings.filter(facilities__attached_bathroom=True)
-    if pet_allowed:
-        listings = listings.filter(facilities__pet_allowed=True)
+    if province:         listings_qs = listings_qs.filter(province=province)
+    if district:         listings_qs = listings_qs.filter(district=district)
+    if property_type:    listings_qs = listings_qs.filter(property_type=property_type)
+    if furnished_status: listings_qs = listings_qs.filter(furnished_status=furnished_status)
+    if min_price:        listings_qs = listings_qs.filter(monthly_rent__gte=min_price)
+    if max_price:        listings_qs = listings_qs.filter(monthly_rent__lte=max_price)
+
+    for facility in ['wifi', 'attached_bathroom', 'car_parking',
+                     'pet_allowed', 'kitchen', 'water_24_7', 'balcony', 'cctv']:
+        if request.GET.get(facility):
+            listings_qs = listings_qs.filter(**{f'facilities__{facility}': True})
 
     if sort == 'price_low':
-        listings = listings.order_by('monthly_rent')
+        listings_qs = listings_qs.order_by('monthly_rent')
     elif sort == 'price_high':
-        listings = listings.order_by('-monthly_rent')
+        listings_qs = listings_qs.order_by('-monthly_rent')
     else:
-        listings = listings.order_by('-created_at')
+        listings_qs = listings_qs.order_by('-created_at')
 
-    # Paginate — 12 listings per page
-    paginator = Paginator(listings, 12)
+    paginator   = Paginator(listings_qs, 12)
     page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
+    page_obj    = paginator.get_page(page_number)
 
-    # Insert ads every 5 cards (paginated list only)
     listing_list = list(page_obj)
     with_ads = []
     for i, listing in enumerate(listing_list):
         with_ads.append({'type': 'listing', 'obj': listing})
-        if (i + 1) % 5 == 0 and i + 1 < len(listing_list):
+        if (i + 1) % 6 == 0 and i + 1 < len(listing_list):
             with_ads.append({'type': 'ad'})
 
-    # Get banner ads
-    from apps.advertisements.models import Advertisement
     top_banner = Advertisement.objects.filter(
         position='homepage_top', is_active=True
     ).order_by('?').first()
 
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    query_params.pop('sort', None)
+    query_string = query_params.urlencode()
+
+    active_filter_count = sum(
+        1 for k, v in request.GET.items()
+        if k not in ['page', 'sort'] and v
+    )
+
     context = {
-        'listings': with_ads,
-        'page_obj': page_obj,
-        'districts': DISTRICTS,
-        'top_banner': top_banner,
-        'total_count': paginator.count,
+        'listings':            with_ads,
+        'page_obj':            page_obj,
+        'total_count':         paginator.count,
+        'districts':           DISTRICTS,
+        'provinces':           list(DISTRICTS.keys()),
+        'top_banner':          top_banner,
+        'query_string':        query_string,
+        'has_active_filters':  active_filter_count > 0,
+        'active_filter_count': active_filter_count,
         'current_filters': {
             'q': q, 'province': province, 'district': district,
-            'property_type': property_type, 'min_price': min_price,
-            'max_price': max_price, 'sort': sort,
+            'property_type': property_type, 'furnished_status': furnished_status,
+            'min_price': min_price, 'max_price': max_price, 'sort': sort,
         }
     }
     return render(request, 'listings/homepage.html', context)

@@ -313,7 +313,7 @@
 
 <!-- ═══ NAVBAR ═══ -->
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
+    <div class="container-fluid px-4">
         <a class="navbar-brand" href="{% url 'listings:homepage' %}">
             <i class="bi bi-house-heart-fill"></i> RoomFinder
         </a>
@@ -426,9 +426,9 @@
 
 <!-- ═══ FLASH MESSAGES ═══ -->
 {% if messages %}
-<div class="container mt-3">
+<div style="max-width:1400px;margin:0 auto;padding:0 1.5rem;">
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>

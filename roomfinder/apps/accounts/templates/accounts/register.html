@@ -182,6 +182,32 @@
         line-height: 1.5;
     }
     .auth-terms a { color: var(--coral); text-decoration: none; }
+
+    /* Password visibility toggle */
+    .password-wrapper {
+        position: relative;
+    }
+    .password-wrapper .auth-input {
+        padding-right: 2.6rem !important;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        user-select: none;
+    }
+    .password-toggle:hover {
+        color: var(--text-main);
+    }
 </style>
 {% endblock %}
 
@@ -314,14 +340,19 @@
 
             <div class="mb-3">
                 <label class="auth-label" for="{{ form.password1.id_for_label }}">Password</label>
-                <input
-                    type="password"
-                    name="{{ form.password1.html_name }}"
-                    id="{{ form.password1.id_for_label }}"
-                    class="form-control auth-input{% if form.password1.errors %} is-invalid{% endif %}"
-                    placeholder="Create a strong password"
-                    autocomplete="new-password"
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        name="{{ form.password1.html_name }}"
+                        id="{{ form.password1.id_for_label }}"
+                        class="form-control auth-input{% if form.password1.errors %} is-invalid{% endif %}"
+                        placeholder="Create a strong password"
+                        autocomplete="new-password"
+                    >
+                    <span class="password-toggle" data-target="{{ form.password1.id_for_label }}">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
                 {% if form.password1.errors %}
                     <div class="auth-field-error">
                         <i class="bi bi-exclamation-circle"></i> {{ form.password1.errors|join:", " }}
@@ -336,14 +367,19 @@
 
             <div class="mb-4">
                 <label class="auth-label" for="{{ form.password2.id_for_label }}">Confirm password</label>
-                <input
-                    type="password"
-                    name="{{ form.password2.html_name }}"
-                    id="{{ form.password2.id_for_label }}"
-                    class="form-control auth-input{% if form.password2.errors %} is-invalid{% endif %}"
-                    placeholder="Repeat your password"
-                    autocomplete="new-password"
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        name="{{ form.password2.html_name }}"
+                        id="{{ form.password2.id_for_label }}"
+                        class="form-control auth-input{% if form.password2.errors %} is-invalid{% endif %}"
+                        placeholder="Repeat your password"
+                        autocomplete="new-password"
+                    >
+                    <span class="password-toggle" data-target="{{ form.password2.id_for_label }}">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
                 {% if form.password2.errors %}
                     <div class="auth-field-error">
                         <i class="bi bi-exclamation-circle"></i> {{ form.password2.errors|join:", " }}
@@ -378,6 +414,24 @@
         card.addEventListener('click', function() {
             cards.forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
+        });
+    });
+
+    // Password show/hide toggle
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
         });
     });
 </script>
