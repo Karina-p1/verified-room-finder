@@ -366,6 +366,56 @@
                                 <i class="bi bi-speedometer2"></i> Admin Panel
                             </a>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-patch-check"></i> Verifications
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <span class="dropdown-item-text">
+                                        <small class="text-muted fw-semibold">PROPERTY VERIFICATIONS</small>
+                                    </span>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:pending_listings' %}">
+                                        <i class="bi bi-hourglass-split"></i> Pending Listings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:approved_listings' %}">
+                                        <i class="bi bi-check-circle"></i> Approved Listings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:rejected_listings' %}">
+                                        <i class="bi bi-x-circle"></i> Rejected Listings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <span class="dropdown-item-text">
+                                        <small class="text-muted fw-semibold">DOCUMENT VERIFICATIONS</small>
+                                    </span>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:pending_documents' %}">
+                                        <i class="bi bi-hourglass-split"></i> Pending Documents
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:approved_documents' %}">
+                                        <i class="bi bi-check-circle"></i> Approved Documents
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'admin_panel:rejected_documents' %}">
+                                        <i class="bi bi-x-circle"></i> Rejected Documents
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin_panel:analytics' %}">
                                 <i class="bi bi-bar-chart"></i> Analytics

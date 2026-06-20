@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Rejected Documents — Admin{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-5">
+
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+
+    <div>
+        <span class="text-uppercase fw-bold small"
+              style="color:var(--coral);letter-spacing:.15em;">
+            Verification Center
+        </span>
+
+        <h1 class="display-5 fw-bold mt-2 mb-2"
+            style="font-family:var(--font-display);color:var(--navy);">
+            Rejected Documents
+        </h1>
+
+        <p class="text-muted mb-0">
+            Landlord verification documents that were rejected.
+        </p>
+    </div>
+
+    <a href="{% url 'admin_panel:dashboard' %}"
+       class="btn btn-outline-secondary">
+        ← Dashboard
+    </a>
+
+</div>
+
+{% if docs %}
+
+    <div class="row g-4">
+
+        {% for doc in docs %}
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm"
+                 style="border-radius:24px;overflow:hidden;">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center">
+
+                        <!-- User -->
+                        <div class="col-lg-4">
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="
+                                        width:64px;
+                                        height:64px;
+                                        background:rgba(220,38,38,.1);
+                                     ">
+                                    <i class="bi bi-person-x fs-3"
+                                       style="color:#dc2626;"></i>
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        {{ doc.user.get_full_name }}
+                                    </h5>
+
+                                    <div class="text-muted">
+                                        {{ doc.user.email }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Phone Number
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ doc.user.phone }}
+                            </div>
+
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-lg-3 mt-4 mt-lg-0">
+
+                            <small class="text-muted d-block">
+                                Reviewed
+                            </small>
+
+                            <div class="fw-semibold">
+                                {{ doc.reviewed_at|date:"M d, Y" }}
+                            </div>
+
+                        </div>
+
+                        <!-- Review -->
+                        <div class="col-lg-2 mt-4 mt-lg-0 text-lg-end">
+
+                            <a href="{% url 'admin_panel:review_document' doc.pk %}"
+                               class="btn btn-outline-primary px-4">
+                                <i class="bi bi-eye"></i>
+                                View
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                        <span class="badge rounded-pill text-bg-danger px-3 py-2">
+                            <i class="bi bi-x-circle"></i> Rejected
+                        </span>
+
+                        {% if doc.rejection_reason %}
+                        <span class="text-muted small">
+                            <i class="bi bi-info-circle"></i>
+                            {{ doc.rejection_reason }}
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+{% else %}
+
+    <div class="card border-0 shadow-sm"
+         style="border-radius:24px;">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-folder-check text-muted"
+               style="font-size:5rem;"></i>
+
+            <h3 class="fw-bold mt-4">
+                No Rejected Documents
+            </h3>
+
+            <p class="text-muted mb-0">
+                No verification documents have been rejected.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+</div>
+{% endblock %}
