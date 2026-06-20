@@ -25,13 +25,21 @@ class DocumentUploadForm(forms.ModelForm):
             'selfie_image': 'Selfie Holding Your Citizenship',
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # Validate each image is under 5MB
-        for field in ['citizenship_front', 'citizenship_back', 'lalpurja', 'selfie_image']:
-            image = cleaned_data.get(field)
-            if image and image.size > 5 * 1024 * 1024:
-                raise forms.ValidationError(
-                    f'{self.fields[field].label} must be under 5MB.'
-                )
-        return cleaned_data
+def clean(self):
+    cleaned_data = super().clean()
+
+    for field in [
+        'citizenship_front',
+        'citizenship_back',
+        'lalpurja',
+        'selfie_image'
+    ]:
+        image = cleaned_data.get(field)
+
+        if image and image.size > 5 * 1024 * 1024:
+            self.add_error(
+                field,
+                f'{self.fields[field].label} must be under 5MB.'
+            )
+
+    return cleaned_data

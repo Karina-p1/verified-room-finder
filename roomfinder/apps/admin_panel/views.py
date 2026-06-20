@@ -98,15 +98,42 @@ def revenue_analytics(request):
 @staff_member_required
 def dashboard(request):
     context = {
-        'total_users': CustomUser.objects.count(),
-        'total_listings': Listing.objects.count(),
-        'pending_listings': Listing.objects.filter(status='pending').count(),
-        'approved_listings': Listing.objects.filter(status='approved').count(),
-        'rejected_listings': Listing.objects.filter(status='rejected').count(),
-        'pending_documents': LandlordDocument.objects.filter(verification_status='pending').count(),
-        'total_reports': ListingReport.objects.filter(is_resolved=False).count(),
-        'recent_listings': Listing.objects.order_by('-created_at')[:5],
-    }
+    'total_users': CustomUser.objects.count(),
+
+    'total_listings': Listing.objects.count(),
+
+    'pending_listings':
+        Listing.objects.filter(status='pending').count(),
+
+    'approved_listings':
+        Listing.objects.filter(status='approved').count(),
+
+    'rejected_listings':
+        Listing.objects.filter(status='rejected').count(),
+
+    'pending_documents':
+        LandlordDocument.objects.filter(
+            verification_status='pending'
+        ).count(),
+
+    'approved_documents':
+        LandlordDocument.objects.filter(
+            verification_status='approved'
+        ).count(),
+
+    'rejected_documents':
+        LandlordDocument.objects.filter(
+            verification_status='rejected'
+        ).count(),
+
+    'total_reports':
+        ListingReport.objects.filter(
+            is_resolved=False
+        ).count(),
+
+    'recent_listings':
+        Listing.objects.order_by('-created_at')[:5],
+}
     return render(request, 'admin_panel/dashboard.html', context)
 
 
@@ -189,12 +216,46 @@ def remove_listing(request, pk):
 
 @staff_member_required
 def pending_documents(request):
-    docs = LandlordDocument.objects.filter(
-        verification_status='pending'
-    ).select_related('user').order_by('-submitted_at')
-    return render(request, 'admin_panel/pending_documents.html', {'docs': docs})
+    docs = (
+        LandlordDocument.objects
+        .filter(verification_status='pending')
+        .select_related('user')
+        .order_by('-submitted_at')
+    )
 
+    context = {
+        'docs': docs,
+        'pending_count': docs.count(),
+        'approved_today': LandlordDocument.objects.filter(
+            verification_status='approved'
+        ).count(),
+    }
 
+    return render(
+        request,
+        'admin_panel/pending_documents.html',
+        context
+    )
+
+@staff_member_required
+def document_verification_result(request, pk):
+    doc = get_object_or_404(
+        LandlordDocument.objects.select_related('user'),
+        pk=pk
+    )
+
+    context = {
+        'doc': doc,
+        'identity_match': getattr(doc, 'identity_match_score', None),
+        'ownership_verified': getattr(doc, 'ownership_verified', False),
+        'face_match_score': getattr(doc, 'face_match_score', None),
+    }
+
+    return render(
+        request,
+        'admin_panel/document_verification_result.html',
+        context
+    )
 @staff_member_required
 def review_document(request, pk):
     doc = get_object_or_404(LandlordDocument, pk=pk)
@@ -285,3 +346,34 @@ def toggle_ad(request, pk):
         ad.save()
         messages.success(request, f'Ad "{ad.title}" {"activated" if ad.is_active else "deactivated"}.')
     return redirect('admin_panel:manage_ads')
+
+@staff_member_required
+def approved_documents(request):
+    docs = (
+        LandlordDocument.objects
+        .filter(verification_status='approved')
+        .select_related('user')
+        .order_by('-reviewed_at')
+    )
+
+    return render(
+        request,
+        'admin_panel/approved_documents.html',
+        {'docs': docs}
+    )
+
+
+@staff_member_required
+def rejected_documents(request):
+    docs = (
+        LandlordDocument.objects
+        .filter(verification_status='rejected')
+        .select_related('user')
+        .order_by('-reviewed_at')
+    )
+
+    return render(
+        request,
+        'admin_panel/rejected_documents.html',
+        {'docs': docs}
+    )

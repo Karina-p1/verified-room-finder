@@ -204,6 +204,54 @@
     display: block;
 }
 
+/* Quick category row */
+.cat-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 14px;
+    margin-bottom: 6px;
+    scrollbar-width: none;
+}
+.cat-row::-webkit-scrollbar { display: none; }
+.cat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 80px;
+    flex-shrink: 0;
+    padding: 11px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    text-decoration: none;
+    color: #4b5563;
+    transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.cat-item i {
+    font-size: 1.25rem;
+    color: var(--navy);
+}
+.cat-item span {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+.cat-item:hover {
+    border-color: var(--coral);
+    transform: translateY(-2px);
+}
+.cat-item.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+}
+.cat-item.active i { color: var(--gold); }
+
 /* Results bar */
 .results-bar {
     display: flex;
@@ -672,6 +720,46 @@
                 <div><span class="sn">7</span><span class="sl">Provinces</span></div>
                 <div><span class="sn">100%</span><span class="sl">Verified</span></div>
             </div>
+        </div>
+
+        <!-- Quick category row -->
+        <div class="cat-row">
+            <a href="{% url 'listings:homepage' %}"
+               class="cat-item {% if not current_filters.property_type %}active{% endif %}">
+                <i class="bi bi-grid-3x3-gap-fill"></i><span>All</span>
+            </a>
+            <a href="?property_type=single_room"
+               class="cat-item {% if current_filters.property_type == 'single_room' %}active{% endif %}">
+                <i class="bi bi-door-closed"></i><span>Room</span>
+            </a>
+            <a href="?property_type=two_rooms"
+               class="cat-item {% if current_filters.property_type == 'two_rooms' %}active{% endif %}">
+                <i class="bi bi-grid-1x2"></i><span>2 Rooms</span>
+            </a>
+            <a href="?property_type=flat"
+               class="cat-item {% if current_filters.property_type == 'flat' %}active{% endif %}">
+                <i class="bi bi-buildings"></i><span>Flat</span>
+            </a>
+            <a href="?property_type=apartment"
+               class="cat-item {% if current_filters.property_type == 'apartment' %}active{% endif %}">
+                <i class="bi bi-building"></i><span>Apartment</span>
+            </a>
+            <a href="?property_type=house"
+               class="cat-item {% if current_filters.property_type == 'house' %}active{% endif %}">
+                <i class="bi bi-house-door"></i><span>House</span>
+            </a>
+            <a href="?property_type=hostel"
+               class="cat-item {% if current_filters.property_type == 'hostel' %}active{% endif %}">
+                <i class="bi bi-people-fill"></i><span>Hostel</span>
+            </a>
+            <a href="?property_type=office"
+               class="cat-item {% if current_filters.property_type == 'office' %}active{% endif %}">
+                <i class="bi bi-briefcase-fill"></i><span>Office</span>
+            </a>
+            <a href="?property_type=shutter"
+               class="cat-item {% if current_filters.property_type == 'shutter' %}active{% endif %}">
+                <i class="bi bi-shop"></i><span>Shutter</span>
+            </a>
         </div>
 
         <!-- Mobile: show filter button -->

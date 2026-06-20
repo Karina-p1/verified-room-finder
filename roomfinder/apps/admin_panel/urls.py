@@ -17,6 +17,8 @@ urlpatterns = [
     path('listings/<int:pk>/remove/', views.remove_listing, name='remove_listing'),
 
     path('documents/pending/', views.pending_documents, name='pending_documents'),
+    path('documents/approved/', views.approved_documents, name='approved_documents'),
+    path('documents/rejected/', views.rejected_documents, name='rejected_documents'),
     path('documents/<int:pk>/review/', views.review_document, name='review_document'),
     path('documents/<int:pk>/approve/', views.approve_document, name='approve_document'),
     path('documents/<int:pk>/reject/', views.reject_document, name='reject_document'),
@@ -30,4 +32,11 @@ urlpatterns = [
     path('ads/<int:pk>/toggle/', views.toggle_ad, name='toggle_ad'),
 
     path('analytics/', views.revenue_analytics, name='analytics'),
+
+    path(
+    'documents/<int:pk>/result/',
+    views.document_verification_result,
+    name='document_verification_result'
+),
+    
 ]
