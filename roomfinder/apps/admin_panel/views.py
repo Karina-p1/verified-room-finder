@@ -348,7 +348,6 @@ def resolve_report(request, pk):
         messages.success(request, 'Report resolved.')
     return redirect('admin_panel:reports_queue')
 
-
 @staff_member_required
 def manage_ads(request):
     ads = Advertisement.objects.all().order_by('-created_at')

@@ -2,172 +2,97 @@
 {% block title %}Advertisements — Admin{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-5">
+<div class="container-fluid my-4 px-4">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-
-        <div>
-            <span class="text-uppercase fw-bold small"
-                  style="color:var(--coral);letter-spacing:.15em;">
-                Advertisement Management
-            </span>
-
-            <h1 class="display-5 fw-bold mt-2 mb-2"
-                style="font-family:var(--font-display);color:var(--navy);">
-                Advertisements
-            </h1>
-
-            <p class="text-muted mb-0">
-                Manage platform advertisements and promotional campaigns.
-            </p>
-        </div>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="bi bi-megaphone text-warning"></i> Advertisements</h3>
         <div class="d-flex gap-2">
-
-            <a href="/admin/advertisements/advertisement/add/"
-               class="btn btn-primary px-4">
-                <i class="bi bi-plus-circle me-2"></i>
-                New Advertisement
+            <a href="/admin/advertisements/advertisement/add/" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> Add New Ad
             </a>
-
-            <a href="{% url 'admin_panel:dashboard' %}"
-               class="btn btn-outline-secondary">
-                ← Dashboard
-            </a>
-
+            <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
         </div>
-
     </div>
 
-    <!-- Ads Grid -->
-    <div class="row g-4">
-
+    <div class="row g-3">
         {% for ad in ads %}
-        <div class="col-lg-4 col-md-6">
-
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius:24px;overflow:hidden;">
-
-                <!-- Image -->
-                <div style="height:220px;overflow:hidden;">
-                    <img src="{{ ad.image.url }}"
-                         class="w-100 h-100"
-                         style="object-fit:cover;">
-                </div>
-
-                <div class="card-body p-4">
-
-                    <!-- Title -->
-                    <h5 class="fw-bold mb-2">
-                        {{ ad.title }}
-                    </h5>
-
-                    <!-- Position -->
-                    <div class="mb-3">
-                        <span class="badge bg-secondary px-3 py-2">
-                            {{ ad.get_position_display }}
-                        </span>
-                    </div>
-
-                    <!-- Duration -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <img src="{{ ad.image.url }}" class="card-img-top" style="height:150px;object-fit:cover;">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1">{{ ad.title }}</h6>
+                    <p class="text-muted small mb-1">
+                        <span class="badge bg-secondary">{{ ad.get_position_display }}</span>
+                    </p>
                     {% if ad.position == 'phone_reveal' %}
-                    <div class="mb-3">
+                        <p class="text-muted small mb-2">Duration: {{ ad.duration_seconds }}s</p>
+                    {% endif %}
 
-                        <small class="text-muted d-block">
-                            Ad Duration
-                        </small>
+                    <!-- Schedule status badge -->
+                    {% with status=ad.schedule_status %}
+                        {% if status == 'running' %}
+                            <span class="badge bg-success mb-2">
+                                <i class="bi bi-play-circle"></i> Running Now
+                            </span>
+                        {% elif status == 'scheduled' %}
+                            <span class="badge bg-info text-white mb-2">
+                                <i class="bi bi-clock"></i> Scheduled
+                            </span>
+                        {% elif status == 'expired' %}
+                            <span class="badge bg-secondary mb-2">
+                                <i class="bi bi-calendar-x"></i> Expired
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger mb-2">
+                                <i class="bi bi-pause-circle"></i> Inactive
+                            </span>
+                        {% endif %}
+                    {% endwith %}
 
-                        <strong>
-                            {{ ad.duration_seconds }} seconds
-                        </strong>
-
+                    <!-- Schedule window -->
+                    {% if ad.start_date or ad.end_date %}
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-calendar-event"></i>
+                        {% if ad.start_date %}
+                            {{ ad.start_date|date:"M d, Y H:i" }}
+                        {% else %}
+                            Anytime
+                        {% endif %}
+                        &nbsp;→&nbsp;
+                        {% if ad.end_date %}
+                            {{ ad.end_date|date:"M d, Y H:i" }}
+                        {% else %}
+                            No end date
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-infinity"></i> No schedule — runs indefinitely
                     </div>
                     {% endif %}
 
-                    <!-- Status -->
-                    <div class="mb-4">
-
-                        <small class="text-muted d-block mb-2">
-                            Status
-                        </small>
-
-                        {% if ad.is_active %}
-                            <span class="badge bg-success px-3 py-2">
-                                Active
-                            </span>
-                        {% else %}
-                            <span class="badge bg-danger px-3 py-2">
-                                Inactive
-                            </span>
-                        {% endif %}
-
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <a href="/admin/advertisements/advertisement/{{ ad.pk }}/change/"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Edit Schedule
+                        </a>
+                        <form method="POST" action="{% url 'admin_panel:toggle_ad' ad.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm {% if ad.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                {% if ad.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
                     </div>
-
-                    <!-- Action -->
-                    <form method="POST"
-                          action="{% url 'admin_panel:toggle_ad' ad.pk %}">
-                        {% csrf_token %}
-
-                        <button type="submit"
-                                class="btn w-100 {% if ad.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
-
-                            {% if ad.is_active %}
-                                <i class="bi bi-pause-circle me-2"></i>
-                                Deactivate Advertisement
-                            {% else %}
-                                <i class="bi bi-check-circle me-2"></i>
-                                Activate Advertisement
-                            {% endif %}
-
-                        </button>
-
-                    </form>
-
                 </div>
-
             </div>
-
         </div>
-
         {% empty %}
-
-        <div class="col-12">
-
-            <div class="card border-0 shadow-sm"
-                 style="border-radius:24px;">
-
-                <div class="card-body text-center py-5">
-
-                    <i class="bi bi-megaphone"
-                       style="font-size:5rem;color:#d1d5db;"></i>
-
-                    <h3 class="fw-bold mt-4">
-                        No Advertisements Found
-                    </h3>
-
-                    <p class="text-muted mb-4">
-                        Create your first advertisement to start displaying
-                        promotional content across the platform.
-                    </p>
-
-                    <a href="/admin/advertisements/advertisement/add/"
-                       class="btn btn-primary px-4">
-
-                        <i class="bi bi-plus-circle me-2"></i>
-                        Create First Advertisement
-
-                    </a>
-
-                </div>
-
-            </div>
-
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-megaphone text-muted" style="font-size:4rem;"></i>
+            <h5 class="mt-3 text-muted">No advertisements yet.</h5>
+            <a href="/admin/advertisements/advertisement/add/" class="btn btn-primary mt-2">Add First Ad</a>
         </div>
-
         {% endfor %}
-
     </div>
-
 </div>
 {% endblock %}

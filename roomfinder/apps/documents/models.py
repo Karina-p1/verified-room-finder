@@ -39,3 +39,4 @@ class LandlordDocument(models.Model):
 
     def is_approved(self):
         return self.verification_status == 'approved'
+    

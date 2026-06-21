@@ -9,10 +9,8 @@ from apps.listings.models import Listing
 
 
 def get_ad(position):
-    """Helper — returns a random active ad for a given position."""
-    return Advertisement.objects.filter(
-        position=position, is_active=True
-    ).order_by('?').first()
+    """Helper — returns a random currently-running ad (active + within schedule) for a given position."""
+    return Advertisement.active.currently_running(position=position).order_by('?').first()
 
 
 @login_required
@@ -36,7 +34,7 @@ def reveal_phone(request, listing_id):
             'ad_duration': ad.duration_seconds,
         })
     else:
-        # No ad configured — reveal directly
+        # No ad currently running — reveal directly
         listing = get_object_or_404(Listing, pk=listing_id, status='approved')
         request.session[session_key] = True
         return JsonResponse({'already_revealed': True, 'phone': listing.owner.phone})

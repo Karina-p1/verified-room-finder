@@ -223,8 +223,8 @@ def homepage(request):
         if (i + 1) % 6 == 0 and i + 1 < len(listing_list):
             with_ads.append({'type': 'ad'})
 
-    top_banner = Advertisement.objects.filter(
-        position='homepage_top', is_active=True
+    top_banner = Advertisement.active.currently_running(
+    position='homepage_top'
     ).order_by('?').first()
 
     query_params = request.GET.copy()
