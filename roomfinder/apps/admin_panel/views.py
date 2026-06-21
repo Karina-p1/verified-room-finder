@@ -25,17 +25,39 @@ def revenue_analytics(request):
     from django.utils import timezone
     import datetime
 
-    thirty_days_ago = timezone.now() - datetime.timedelta(days=30)
+    # 30-day window, anchored to local "today" so chart days line up cleanly
+    today = timezone.localdate()
+    start_date = today - datetime.timedelta(days=29)  # 30 days inclusive of today
+    start_datetime = timezone.make_aware(
+        datetime.datetime.combine(start_date, datetime.time.min)
+    )
 
-    # Daily phone reveals for chart (last 30 days)
-    daily_reveals = (
+    # Full list of the last 30 calendar days (so charts have no gaps)
+    date_range = [start_date + datetime.timedelta(days=i) for i in range(30)]
+
+    # ---- Daily phone reveals (raw query may skip days with 0 activity) ----
+    daily_reveals_raw = (
         PhoneRevealLog.objects
-        .filter(revealed_at__gte=thirty_days_ago)
+        .filter(revealed_at__gte=start_datetime)
         .annotate(day=TruncDate('revealed_at'))
         .values('day')
         .annotate(count=Count('id'))
-        .order_by('day')
     )
+    reveals_by_day = {r['day']: r['count'] for r in daily_reveals_raw}
+    daily_reveals_labels = [d.isoformat() for d in date_range]
+    daily_reveals_data = [reveals_by_day.get(d, 0) for d in date_range]
+
+    # ---- Daily new user signups (same gap-filling) ----
+    new_users_raw = (
+        CustomUser.objects
+        .filter(date_joined__gte=start_datetime)
+        .annotate(day=TruncDate('date_joined'))
+        .values('day')
+        .annotate(count=Count('id'))
+    )
+    new_users_by_day = {r['day']: r['count'] for r in new_users_raw}
+    new_users_labels = [d.isoformat() for d in date_range]
+    new_users_data = [new_users_by_day.get(d, 0) for d in date_range]
 
     # Top listings by reveal count
     top_listings = (
@@ -43,16 +65,6 @@ def revenue_analytics(request):
         .values('listing__title', 'listing__pk', 'listing__district')
         .annotate(reveal_count=Count('id'))
         .order_by('-reveal_count')[:10]
-    )
-
-    # User growth (joined last 30 days)
-    new_users = (
-        CustomUser.objects
-        .filter(date_joined__gte=thirty_days_ago)
-        .annotate(day=TruncDate('date_joined'))
-        .values('day')
-        .annotate(count=Count('id'))
-        .order_by('day')
     )
 
     # Listing stats by province
@@ -64,15 +76,18 @@ def revenue_analytics(request):
         .order_by('-count')
     )
 
+    active_ads_count = Advertisement.objects.filter(is_active=True).count()
+    total_ads_count = Advertisement.objects.count()
+
     context = {
         # Summary cards
         'total_reveals': PhoneRevealLog.objects.count(),
         'reveals_this_month': PhoneRevealLog.objects.filter(
-            revealed_at__gte=thirty_days_ago
+            revealed_at__gte=start_datetime
         ).count(),
         'total_users': CustomUser.objects.count(),
         'new_users_month': CustomUser.objects.filter(
-            date_joined__gte=thirty_days_ago
+            date_joined__gte=start_datetime
         ).count(),
         'landlord_count': CustomUser.objects.filter(role='landlord').count(),
         'tenant_count': CustomUser.objects.filter(role='tenant').count(),
@@ -80,13 +95,15 @@ def revenue_analytics(request):
         'approved_listings': Listing.objects.filter(status='approved').count(),
         'pending_listings': Listing.objects.filter(status='pending').count(),
         'rejected_listings': Listing.objects.filter(status='rejected').count(),
-        'active_ads': Advertisement.objects.filter(is_active=True).count(),
+        'active_ads': active_ads_count,
+        'total_ads': total_ads_count,
+        'inactive_ads': total_ads_count - active_ads_count,
 
-        # Chart data (convert to JSON-safe format)
-        'daily_reveals_labels': [str(r['day']) for r in daily_reveals],
-        'daily_reveals_data': [r['count'] for r in daily_reveals],
-        'new_users_labels': [str(r['day']) for r in new_users],
-        'new_users_data': [r['count'] for r in new_users],
+        # Chart data (gap-filled, JSON-safe)
+        'daily_reveals_labels': daily_reveals_labels,
+        'daily_reveals_data': daily_reveals_data,
+        'new_users_labels': new_users_labels,
+        'new_users_data': new_users_data,
         'province_labels': [r['province'] for r in listings_by_province],
         'province_data': [r['count'] for r in listings_by_province],
 
