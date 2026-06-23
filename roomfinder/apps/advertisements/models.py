@@ -29,7 +29,8 @@ class Advertisement(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='ads/')
+    image = models.ImageField(upload_to='ads/', blank=True, null=True)
+    video = models.FileField(upload_to='ads/videos/', blank=True, null=True)
     link_url = models.URLField(blank=True)
     position = models.CharField(max_length=30, choices=POSITIONS)
     is_active = models.BooleanField(default=True)
@@ -51,6 +52,10 @@ class Advertisement(models.Model):
 
     def __str__(self):
         return f"{self.title} — {self.get_position_display()}"
+
+    @property
+    def is_video(self):
+        return bool(self.video)
 
     def is_currently_active(self):
         """True if is_active AND within the scheduled date window."""

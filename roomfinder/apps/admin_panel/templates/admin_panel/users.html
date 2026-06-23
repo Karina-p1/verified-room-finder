@@ -46,7 +46,7 @@
                 <div class="row align-items-center">
 
                     <!-- User Info -->
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
 
                         <div class="d-flex align-items-center gap-3">
 
@@ -137,29 +137,52 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="col-lg-2 mt-4 mt-lg-0 text-lg-end">
+                    <div class="col-lg-3 mt-4 mt-lg-0 text-lg-end">
 
-                        {% if u != request.user %}
+                        {% if u != request.user and not u.is_superuser %}
 
-                        <form method="POST"
-                              action="{% url 'admin_panel:toggle_user_active' u.pk %}">
-                            {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-lg-end">
 
-                            <button type="submit"
-                                    class="btn {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
-                                    onclick="return confirm('{% if u.is_active %}Suspend{% else %}Activate{% endif %} this user?')">
+                            <form method="POST"
+                                  action="{% url 'admin_panel:toggle_user_active' u.pk %}">
+                                {% csrf_token %}
 
-                                {% if u.is_active %}
-                                    <i class="bi bi-slash-circle me-1"></i>
-                                    Suspend
-                                {% else %}
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Activate
-                                {% endif %}
+                                <button type="submit"
+                                        class="btn {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                                        onclick="return confirm('{% if u.is_active %}Suspend{% else %}Activate{% endif %} this user?')">
 
-                            </button>
+                                    {% if u.is_active %}
+                                        <i class="bi bi-slash-circle me-1"></i>
+                                        Suspend
+                                    {% else %}
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Activate
+                                    {% endif %}
 
-                        </form>
+                                </button>
+
+                            </form>
+
+                            <form method="POST"
+                                  action="{% url 'admin_panel:delete_user' u.pk %}">
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger"
+                                        title="Delete permanently"
+                                        onclick="return confirm('Permanently delete {{ u.email }}? This cannot be undone and will remove all their listings, documents, and messages.')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        {% elif u.is_superuser %}
+
+                        <span class="badge bg-secondary px-3 py-2">
+                            Superuser
+                        </span>
 
                         {% else %}
 
@@ -208,7 +231,6 @@
     {% endfor %}
 
 </div>
-```
 
 </div>
 {% endblock %}

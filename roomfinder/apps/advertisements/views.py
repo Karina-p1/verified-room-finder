@@ -29,7 +29,7 @@ def reveal_phone(request, listing_id):
         return JsonResponse({
             'show_ad': True,
             'ad_id': ad.id,
-            'ad_image': ad.image.url,
+            'ad_image': ad.image.url if ad.image else '',
             'ad_link': ad.link_url,
             'ad_duration': ad.duration_seconds,
         })

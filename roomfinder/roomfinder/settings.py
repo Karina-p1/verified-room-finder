@@ -90,12 +90,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'roomfinder.wsgi.application'
 
 # Email (for OTP)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'roomfinder@dev.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
 PASSWORD_RESET_TIMEOUT = 3600  # link expires in 1 hour
 
 # Database

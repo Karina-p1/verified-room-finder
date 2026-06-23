@@ -393,3 +393,21 @@ def rejected_documents(request):
         'admin_panel/rejected_documents.html',
         {'docs': docs}
     )
+
+@staff_member_required
+def delete_user(request, pk):
+    if request.method == 'POST':
+        user = get_object_or_404(CustomUser, pk=pk)
+
+        if user == request.user:
+            messages.error(request, "You can't delete your own account.")
+            return redirect('admin_panel:user_management')
+
+        if user.is_superuser:
+            messages.error(request, "Superuser accounts cannot be deleted from here.")
+            return redirect('admin_panel:user_management')
+
+        email = user.email
+        user.delete()
+        messages.success(request, f'User {email} has been permanently deleted.')
+    return redirect('admin_panel:user_management')

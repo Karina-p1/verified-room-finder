@@ -223,9 +223,9 @@ def homepage(request):
         if (i + 1) % 6 == 0 and i + 1 < len(listing_list):
             with_ads.append({'type': 'ad'})
 
-    top_banner = Advertisement.active.currently_running(
-    position='homepage_top'
-    ).order_by('?').first()
+    top_banner_ads = list(
+        Advertisement.active.currently_running(position='homepage_top')[:5]
+    )
 
     query_params = request.GET.copy()
     query_params.pop('page', None)
@@ -243,7 +243,7 @@ def homepage(request):
         'total_count':         paginator.count,
         'districts':           DISTRICTS,
         'provinces':           list(DISTRICTS.keys()),
-        'top_banner':          top_banner,
+        'top_banner_ads':      top_banner_ads,
         'query_string':        query_string,
         'has_active_filters':  active_filter_count > 0,
         'active_filter_count': active_filter_count,
@@ -253,6 +253,13 @@ def homepage(request):
             'min_price': min_price, 'max_price': max_price, 'sort': sort,
         }
     }
+    viewed_ids = request.session.get('recently_viewed', [])
+    recently_viewed = list(Listing.objects.filter(
+        pk__in=viewed_ids, status='approved'
+    ).prefetch_related('images'))
+    recently_viewed.sort(key=lambda l: viewed_ids.index(l.pk))
+    context['recently_viewed'] = recently_viewed
+
     return render(request, 'listings/homepage.html', context)
 
 def listing_detail(request, pk):

@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('users/', views.user_management, name='user_management'),
     path('users/<int:pk>/toggle/', views.toggle_user_active, name='toggle_user_active'),
+    path('users/<int:pk>/delete/', views.delete_user, name='delete_user'),
 
     path('reports/', views.reports_queue, name='reports_queue'),
     path('reports/<int:pk>/resolve/', views.resolve_report, name='resolve_report'),

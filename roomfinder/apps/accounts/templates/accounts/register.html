@@ -22,7 +22,7 @@
     }
     .auth-logo-icon {
         width: 52px; height: 52px;
-        background: var(--coral);
+        background: #E8402A;
         border-radius: 14px;
         display: inline-flex;
         align-items: center;
@@ -32,100 +32,115 @@
         margin-bottom: 1rem;
     }
     .auth-title {
-        font-family: var(--font-display);
+        font-family: 'Playfair Display', Georgia, serif;
         font-size: 1.65rem;
         font-weight: 800;
-        color: var(--navy);
+        color: #0F1B2D;
         margin-bottom: 0.25rem;
     }
     .auth-subtitle {
         font-size: 13.5px;
-        color: var(--text-muted);
+        color: #6b7280;
         margin-bottom: 1.75rem;
     }
     .auth-label {
         font-size: 13px;
         font-weight: 600;
-        color: var(--text-main);
+        color: #0F1B2D;
         margin-bottom: 6px;
         display: block;
     }
     .auth-input {
         border-radius: 10px !important;
-        border: 1.5px solid var(--border) !important;
+        border: 1.5px solid #e8e8e6 !important;
         padding: 0.65rem 1rem !important;
         font-size: 14px !important;
         transition: border-color 0.15s, box-shadow 0.15s;
         width: 100%;
+        display: block;
     }
     .auth-input:focus {
-        border-color: var(--coral) !important;
+        border-color: #E8402A !important;
         box-shadow: 0 0 0 3px rgba(232,64,42,0.08) !important;
         outline: none;
     }
     .auth-input.is-invalid {
         border-color: #dc3545 !important;
-    }
-    .auth-select {
-        border-radius: 10px !important;
-        border: 1.5px solid var(--border) !important;
-        padding: 0.65rem 1rem !important;
-        font-size: 14px !important;
-        transition: border-color 0.15s, box-shadow 0.15s;
-        width: 100%;
-        background-color: #fff;
-        appearance: auto;
-    }
-    .auth-select:focus {
-        border-color: var(--coral) !important;
-        box-shadow: 0 0 0 3px rgba(232,64,42,0.08) !important;
-        outline: none;
+        box-shadow: none !important;
     }
     .auth-field-error {
         font-size: 12px;
         color: #dc3545;
-        margin-top: 4px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
     .auth-help {
         font-size: 11.5px;
-        color: var(--text-muted);
-        margin-top: 4px;
+        color: #6b7280;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
-    /* Role picker cards */
-    .role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* Role picker */
+    .role-picker {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 4px;
+    }
     .role-card {
-        border: 1.5px solid var(--border);
+        border: 1.5px solid #e8e8e6;
         border-radius: 12px;
         padding: 14px 12px;
         cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
+        transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
         display: flex;
         align-items: flex-start;
         gap: 10px;
+        user-select: none;
     }
-    .role-card:hover { border-color: var(--coral); background: #fff8f7; }
+    .role-card:hover {
+        border-color: #E8402A;
+        background: #fff8f7;
+    }
     .role-card input[type="radio"] { display: none; }
     .role-card.selected {
-        border-color: var(--coral);
+        border-color: #E8402A;
         background: #fff8f7;
         box-shadow: 0 0 0 3px rgba(232,64,42,0.08);
     }
     .role-icon {
         width: 36px; height: 36px;
         border-radius: 9px;
-        background: var(--surface);
-        display: flex; align-items: center; justify-content: center;
+        background: #f3f4f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 1.1rem;
         flex-shrink: 0;
-        transition: background 0.15s;
+        transition: background 0.15s, color 0.15s;
+        color: #0F1B2D;
     }
     .role-card.selected .role-icon {
-        background: var(--coral);
+        background: #E8402A;
         color: white;
     }
-    .role-card-label { font-size: 13.5px; font-weight: 600; color: var(--text-main); }
-    .role-card-desc  { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+    .role-card-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #0F1B2D;
+        line-height: 1.3;
+    }
+    .role-card-desc {
+        font-size: 11.5px;
+        color: #6b7280;
+        line-height: 1.4;
+        margin-top: 2px;
+    }
 
     /* Section divider */
     .auth-section {
@@ -133,8 +148,8 @@
         font-weight: 700;
         letter-spacing: 0.07em;
         text-transform: uppercase;
-        color: var(--text-muted);
-        margin: 1.4rem 0 0.8rem;
+        color: #6b7280;
+        margin: 1.4rem 0 0.85rem;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -143,70 +158,82 @@
         content: '';
         flex: 1;
         height: 1px;
-        background: var(--border);
+        background: #e8e8e6;
     }
 
+    /* Submit button */
     .auth-btn {
-        background: var(--navy) !important;
+        background: #0F1B2D !important;
         border: none !important;
         border-radius: 10px !important;
         font-size: 14.5px !important;
         font-weight: 600 !important;
-        padding: 0.7rem 1rem !important;
+        padding: 0.72rem 1rem !important;
         width: 100%;
+        color: white !important;
         transition: background 0.15s, transform 0.1s !important;
+        cursor: pointer;
     }
     .auth-btn:hover {
-        background: var(--coral) !important;
+        background: #E8402A !important;
         transform: translateY(-1px);
     }
     .auth-btn:active { transform: translateY(0); }
-    .auth-switch {
-        font-size: 13.5px;
-        color: var(--text-muted);
-        text-align: center;
-        margin-top: 1.25rem;
-        margin-bottom: 0;
-    }
-    .auth-switch a {
-        color: var(--coral);
-        font-weight: 600;
-        text-decoration: none;
-    }
-    .auth-switch a:hover { text-decoration: underline; }
+
     .auth-terms {
         font-size: 11.5px;
-        color: var(--text-muted);
+        color: #6b7280;
         text-align: center;
         margin-top: 1rem;
         line-height: 1.5;
     }
-    .auth-terms a { color: var(--coral); text-decoration: none; }
+    .auth-terms a { color: #E8402A; text-decoration: none; }
+    .auth-terms a:hover { text-decoration: underline; }
 
-    /* Password visibility toggle */
+    .auth-switch {
+        font-size: 13.5px;
+        color: #6b7280;
+        text-align: center;
+        margin-top: 0.85rem;
+        margin-bottom: 0;
+    }
+    .auth-switch a {
+        color: #E8402A;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-switch a:hover { text-decoration: underline; }
+
+    /* Password wrapper */
     .password-wrapper {
         position: relative;
+        display: block;
     }
     .password-wrapper .auth-input {
-        padding-right: 2.6rem !important;
+        padding-right: 2.8rem !important;
     }
-    .password-toggle {
+    .pw-toggle-btn {
         position: absolute;
-        right: 12px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 4px;
         cursor: pointer;
-        color: var(--text-muted);
-        font-size: 1.05rem;
+        color: #9ca3af;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
-        user-select: none;
+        z-index: 5;
+        line-height: 1;
     }
-    .password-toggle:hover {
-        color: var(--text-main);
+    .pw-toggle-btn:hover { color: #374151; }
+    .pw-toggle-btn i {
+        font-size: 1rem;
+        display: block;
+        line-height: 1;
+        pointer-events: none;
     }
 </style>
 {% endblock %}
@@ -224,170 +251,187 @@
             <p class="auth-subtitle">Join thousands finding rooms across Nepal</p>
         </div>
 
-        <!-- Non-field errors -->
+        <!-- Flash messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} small py-2 mb-3 d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill text-success{% else %}exclamation-circle-fill text-danger{% endif %} flex-shrink-0"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Non-field errors (password mismatch etc) -->
         {% if form.non_field_errors %}
-        <div class="alert alert-danger small py-2 mb-3" role="alert">
-            <i class="bi bi-exclamation-circle me-1"></i>
-            {{ form.non_field_errors }}
+        <div class="alert alert-danger small py-2 mb-3 d-flex align-items-start gap-2" role="alert">
+            <i class="bi bi-exclamation-circle-fill flex-shrink-0 mt-1"></i>
+            <div>
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
         <form method="POST" novalidate>
             {% csrf_token %}
 
-            <!-- Role picker -->
+            <!-- ── ROLE PICKER ──────────────────────────────────── -->
+            <!-- "Find a room"     → submits role=tenant   (can search/save/message) -->
+            <!-- "List a property" → submits role=landlord (must verify docs, then post listings) -->
             <div class="auth-section">I want to</div>
-            <div class="role-picker mb-3" id="rolePicker">
-                <label class="role-card {% if form.role.value == 'tenant' %}selected{% endif %}" id="role-tenant">
-                    <input type="radio" name="{{ form.role.html_name }}" value="tenant"
-                           {% if form.role.value == 'tenant' or not form.role.value %}checked{% endif %}>
-                    <div class="role-icon"><i class="bi bi-search"></i></div>
+            <div class="role-picker" id="rolePicker">
+
+                <label class="role-card {% if not form.role.value or form.role.value == 'tenant' %}selected{% endif %}"
+                       id="card-tenant">
+                    <input type="radio" name="role" value="tenant"
+                           {% if not form.role.value or form.role.value == 'tenant' %}checked{% endif %}>
+                    <div class="role-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
                     <div>
                         <div class="role-card-label">Find a room</div>
                         <div class="role-card-desc">Browse &amp; rent verified listings</div>
                     </div>
                 </label>
-                <label class="role-card {% if form.role.value == 'landlord' %}selected{% endif %}" id="role-landlord">
-                    <input type="radio" name="{{ form.role.html_name }}" value="landlord"
+
+                <label class="role-card {% if form.role.value == 'landlord' %}selected{% endif %}"
+                       id="card-landlord">
+                    <input type="radio" name="role" value="landlord"
                            {% if form.role.value == 'landlord' %}checked{% endif %}>
-                    <div class="role-icon"><i class="bi bi-building"></i></div>
+                    <div class="role-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
                     <div>
                         <div class="role-card-label">List a property</div>
                         <div class="role-card-desc">Post &amp; manage your rooms</div>
                     </div>
                 </label>
+
             </div>
             {% if form.role.errors %}
-                <div class="auth-field-error mb-2">
-                    <i class="bi bi-exclamation-circle"></i> {{ form.role.errors|join:", " }}
+                <div class="auth-field-error mt-2">
+                    <i class="bi bi-exclamation-circle"></i>
+                    {{ form.role.errors|join:", " }}
                 </div>
             {% endif %}
 
-            <!-- Personal info -->
+            <!-- ── PERSONAL INFO ────────────────────────────────── -->
             <div class="auth-section">Personal info</div>
 
             <div class="row g-3 mb-3">
                 <div class="col-6">
-                    <label class="auth-label" for="{{ form.first_name.id_for_label }}">First name</label>
-                    <input
-                        type="text"
-                        name="{{ form.first_name.html_name }}"
-                        id="{{ form.first_name.id_for_label }}"
-                        class="form-control auth-input{% if form.first_name.errors %} is-invalid{% endif %}"
-                        placeholder="Aarav"
-                        value="{{ form.first_name.value|default:'' }}"
-                        autocomplete="given-name"
-                    >
+                    <label class="auth-label" for="id_first_name">First name</label>
+                    <input type="text" name="first_name" id="id_first_name"
+                           class="auth-input{% if form.first_name.errors %} is-invalid{% endif %}"
+                           placeholder="Aarav"
+                           value="{{ form.first_name.value|default:'' }}"
+                           autocomplete="given-name">
                     {% if form.first_name.errors %}
-                        <div class="auth-field-error">{{ form.first_name.errors|join:", " }}</div>
+                        <div class="auth-field-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ form.first_name.errors|join:", " }}
+                        </div>
                     {% endif %}
                 </div>
                 <div class="col-6">
-                    <label class="auth-label" for="{{ form.last_name.id_for_label }}">Last name</label>
-                    <input
-                        type="text"
-                        name="{{ form.last_name.html_name }}"
-                        id="{{ form.last_name.id_for_label }}"
-                        class="form-control auth-input{% if form.last_name.errors %} is-invalid{% endif %}"
-                        placeholder="Sharma"
-                        value="{{ form.last_name.value|default:'' }}"
-                        autocomplete="family-name"
-                    >
+                    <label class="auth-label" for="id_last_name">Last name</label>
+                    <input type="text" name="last_name" id="id_last_name"
+                           class="auth-input{% if form.last_name.errors %} is-invalid{% endif %}"
+                           placeholder="Sharma"
+                           value="{{ form.last_name.value|default:'' }}"
+                           autocomplete="family-name">
                     {% if form.last_name.errors %}
-                        <div class="auth-field-error">{{ form.last_name.errors|join:", " }}</div>
+                        <div class="auth-field-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ form.last_name.errors|join:", " }}
+                        </div>
                     {% endif %}
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="auth-label" for="{{ form.email.id_for_label }}">Email address</label>
-                <input
-                    type="email"
-                    name="{{ form.email.html_name }}"
-                    id="{{ form.email.id_for_label }}"
-                    class="form-control auth-input{% if form.email.errors %} is-invalid{% endif %}"
-                    placeholder="you@example.com"
-                    value="{{ form.email.value|default:'' }}"
-                    autocomplete="email"
-                >
+                <label class="auth-label" for="id_email">Email address</label>
+                <input type="email" name="email" id="id_email"
+                       class="auth-input{% if form.email.errors %} is-invalid{% endif %}"
+                       placeholder="you@example.com"
+                       value="{{ form.email.value|default:'' }}"
+                       autocomplete="email">
                 {% if form.email.errors %}
                     <div class="auth-field-error">
-                        <i class="bi bi-exclamation-circle"></i> {{ form.email.errors|join:", " }}
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.email.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
 
             <div class="mb-3">
-                <label class="auth-label" for="{{ form.phone_number.id_for_label }}">
-                    Phone number <span class="text-muted fw-normal">(optional)</span>
+                <label class="auth-label" for="id_phone">
+                    Phone number
+                    <span style="font-weight:400;color:#6b7280;">(optional)</span>
                 </label>
-                <input
-                    type="tel"
-                    name="{{ form.phone_number.html_name }}"
-                    id="{{ form.phone_number.id_for_label }}"
-                    class="form-control auth-input{% if form.phone_number.errors %} is-invalid{% endif %}"
-                    placeholder="+977 98XXXXXXXX"
-                    value="{{ form.phone_number.value|default:'' }}"
-                    autocomplete="tel"
-                >
-                {% if form.phone_number.errors %}
-                    <div class="auth-field-error">{{ form.phone_number.errors|join:", " }}</div>
+                <input type="tel" name="phone" id="id_phone"
+                       class="auth-input{% if form.phone.errors %} is-invalid{% endif %}"
+                       placeholder="98XXXXXXXX"
+                       value="{{ form.phone.value|default:'' }}"
+                       autocomplete="tel">
+                {% if form.phone.errors %}
+                    <div class="auth-field-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.phone.errors|join:", " }}
+                    </div>
                 {% endif %}
             </div>
 
-            <!-- Password -->
+            <!-- ── SECURITY ─────────────────────────────────────── -->
             <div class="auth-section">Security</div>
 
             <div class="mb-3">
-                <label class="auth-label" for="{{ form.password1.id_for_label }}">Password</label>
+                <label class="auth-label" for="id_password">Password</label>
                 <div class="password-wrapper">
-                    <input
-                        type="password"
-                        name="{{ form.password1.html_name }}"
-                        id="{{ form.password1.id_for_label }}"
-                        class="form-control auth-input{% if form.password1.errors %} is-invalid{% endif %}"
-                        placeholder="Create a strong password"
-                        autocomplete="new-password"
-                    >
-                    <span class="password-toggle" data-target="{{ form.password1.id_for_label }}">
-                        <i class="bi bi-eye"></i>
-                    </span>
+                    <input type="password" name="password" id="id_password"
+                           class="auth-input{% if form.password.errors %} is-invalid{% endif %}"
+                           placeholder="Create a strong password"
+                           autocomplete="new-password">
+                    <button type="button" class="pw-toggle-btn"
+                            onclick="togglePw('id_password','eye1')">
+                        <i class="bi bi-eye" id="eye1"></i>
+                    </button>
                 </div>
-                {% if form.password1.errors %}
+                {% if form.password.errors %}
                     <div class="auth-field-error">
-                        <i class="bi bi-exclamation-circle"></i> {{ form.password1.errors|join:", " }}
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.password.errors|join:", " }}
                     </div>
                 {% else %}
                     <div class="auth-help">
                         <i class="bi bi-info-circle"></i>
-                        Min. 8 characters, mix of letters &amp; numbers.
+                        Min. 8 characters, 1 uppercase letter, 1 number.
                     </div>
                 {% endif %}
             </div>
 
             <div class="mb-4">
-                <label class="auth-label" for="{{ form.password2.id_for_label }}">Confirm password</label>
+                <label class="auth-label" for="id_confirm_password">Confirm password</label>
                 <div class="password-wrapper">
-                    <input
-                        type="password"
-                        name="{{ form.password2.html_name }}"
-                        id="{{ form.password2.id_for_label }}"
-                        class="form-control auth-input{% if form.password2.errors %} is-invalid{% endif %}"
-                        placeholder="Repeat your password"
-                        autocomplete="new-password"
-                    >
-                    <span class="password-toggle" data-target="{{ form.password2.id_for_label }}">
-                        <i class="bi bi-eye"></i>
-                    </span>
+                    <input type="password" name="confirm_password" id="id_confirm_password"
+                           class="auth-input{% if form.confirm_password.errors %} is-invalid{% endif %}"
+                           placeholder="Repeat your password"
+                           autocomplete="new-password">
+                    <button type="button" class="pw-toggle-btn"
+                            onclick="togglePw('id_confirm_password','eye2')">
+                        <i class="bi bi-eye" id="eye2"></i>
+                    </button>
                 </div>
-                {% if form.password2.errors %}
+                {% if form.confirm_password.errors %}
                     <div class="auth-field-error">
-                        <i class="bi bi-exclamation-circle"></i> {{ form.password2.errors|join:", " }}
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.confirm_password.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary auth-btn">
+            <button type="submit" class="auth-btn">
                 <i class="bi bi-person-plus me-1"></i> Create account
             </button>
         </form>
@@ -408,31 +452,26 @@
 
 {% block extra_js %}
 <script>
-    // Role card visual toggle
-    const cards = document.querySelectorAll('.role-card');
-    cards.forEach(card => {
-        card.addEventListener('click', function() {
-            cards.forEach(c => c.classList.remove('selected'));
+    // ── Role card toggle ────────────────────────────────────────
+    document.querySelectorAll('.role-card').forEach(card => {
+        card.addEventListener('click', function () {
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
         });
     });
 
-    // Password show/hide toggle
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const input = document.getElementById(targetId);
-            const icon = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
-            }
-        });
-    });
+    // ── Password show / hide ────────────────────────────────────
+    function togglePw(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon  = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
 </script>
 {% endblock %}
