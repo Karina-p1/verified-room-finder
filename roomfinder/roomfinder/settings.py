@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%kg5*5&99!%bs5v1389i)5-t*$84ma&ebv81f61r$@ggz)+0b)'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
 # Application definition
 
@@ -104,7 +104,7 @@ PASSWORD_RESET_TIMEOUT = 3600  # link expires in 1 hour
 
 # Database — keep SQLite for dev, switch to PostgreSQL for production
 import dj_database_url
-from decouple import config
+from decouple import config, Csv
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL'),
