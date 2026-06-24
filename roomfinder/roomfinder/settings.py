@@ -14,6 +14,8 @@ from pathlib import Path
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import dj_database_url
+from decouple import config, Csv
 from dotenv import load_dotenv
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -103,8 +105,7 @@ PASSWORD_RESET_TIMEOUT = 3600  # link expires in 1 hour
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database — keep SQLite for dev, switch to PostgreSQL for production
-import dj_database_url
-from decouple import config, Csv
+
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL'),
