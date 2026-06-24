@@ -103,13 +103,15 @@ PASSWORD_RESET_TIMEOUT = 3600  # link expires in 1 hour
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database — keep SQLite for dev, switch to PostgreSQL for production
+import dj_database_url
+from decouple import config
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
