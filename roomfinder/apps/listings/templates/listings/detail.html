@@ -8,11 +8,11 @@
         <div class="col-lg-8">
             <!-- Image Gallery -->
             <div id="imageCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-                <div class="carousel-inner rounded">
+                <div class="carousel-inner rounded" style="background:#1a1a2e;">
                     {% for img in listing.images.all %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
                             <img src="{{ img.image.url }}" class="d-block w-100"
-                                 style="height:400px;object-fit:cover;" alt="Room image">
+                                 style="height:450px;object-fit:contain;" alt="Room image">
                         </div>
                     {% endfor %}
                 </div>
