@@ -16,61 +16,88 @@ def register_view(request):
     if request.method == 'POST' and form.is_valid():
         user = form.save(commit=False)
         user.set_password(form.cleaned_data['password'])
-        user.email_verified = False
+
+        # ------------------------------------------------------------
+        # OTP EMAIL VERIFICATION — DISABLED
+        # ------------------------------------------------------------
+        # Users are now activated immediately on registration instead
+        # of being required to confirm a 6-digit email code. The OTP
+        # generation/sending logic below is commented out (not
+        # deleted) so it can be re-enabled later if needed.
+        # ------------------------------------------------------------
+        user.email_verified = True
         user.save()
 
-        otp = OTP.generate(user)
+        # otp = OTP.generate(user)
+        #
+        # # Try real email, fallback to terminal print
+        # try:
+        #     send_mail(
+        #         'Your RoomFinder OTP',
+        #         f'Your verification code is: {otp.code}\n\nExpires in 5 minutes.',
+        #         settings.DEFAULT_FROM_EMAIL,
+        #         [user.email],
+        #     )
+        # except Exception:
+        #     print(f'\n{"="*50}')
+        #     print(f'  OTP for {user.email}: {otp.code}')
+        #     print(f'{"="*50}\n')
+        #
+        # request.session['otp_user_id'] = user.id
+        # messages.success(
+        #     request, 'Account created! Enter the OTP sent to your email. (Development: check terminal)')
+        # return redirect('accounts:verify_otp')
 
-        # Try real email, fallback to terminal print
-        try:
-            send_mail(
-                'Your RoomFinder OTP',
-                f'Your verification code is: {otp.code}\n\nExpires in 5 minutes.',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-            )
-        except Exception:
-            print(f'\n{"="*50}')
-            print(f'  OTP for {user.email}: {otp.code}')
-            print(f'{"="*50}\n')
+        login(request, user)
+        messages.success(request, f'Welcome to RoomFinder, {user.first_name}!')
 
-        request.session['otp_user_id'] = user.id
-        messages.success(
-            request, 'Account created! Enter the OTP sent to your email. (Development: check terminal)')
-        return redirect('accounts:verify_otp')
+        if user.is_staff or user.role == 'admin':
+            return redirect('admin_panel:dashboard')
+        return redirect('listings:homepage')
 
     return render(request, 'accounts/register.html', {'form': form})
 
 
 def verify_otp_view(request):
-    user_id = request.session.get('otp_user_id')
-    if not user_id:
-        return redirect('accounts:register')
+    # ------------------------------------------------------------
+    # OTP EMAIL VERIFICATION — DISABLED
+    # ------------------------------------------------------------
+    # This view is no longer part of the registration/login flow.
+    # Accounts are activated immediately, so nothing should redirect
+    # here anymore. Kept in place (harmless redirect) instead of
+    # deleting, in case the URL is bookmarked or still referenced
+    # somewhere. The original logic is commented out below.
+    # ------------------------------------------------------------
+    return redirect('accounts:login')
 
-    form = OTPForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        try:
-            otp = OTP.objects.filter(
-                user_id=user_id,
-                code=form.cleaned_data['code']
-            ).latest('created_at')
-
-            if otp.is_valid():
-                otp.user.email_verified = True
-                otp.user.save()
-                otp.delete()
-                del request.session['otp_user_id']
-                messages.success(
-                    request, 'Email verified! You can now log in.')
-                return redirect('accounts:login')
-            else:
-                form.add_error(
-                    'code', 'OTP has expired. Please register again.')
-
-        except OTP.DoesNotExist:
-            form.add_error('code', 'Invalid OTP. Please try again.')
-
-    return render(request, 'accounts/verify_otp.html', {'form': form})
+    # user_id = request.session.get('otp_user_id')
+    # if not user_id:
+    #     return redirect('accounts:register')
+    #
+    # form = OTPForm(request.POST or None)
+    # if request.method == 'POST' and form.is_valid():
+    #     try:
+    #         otp = OTP.objects.filter(
+    #             user_id=user_id,
+    #             code=form.cleaned_data['code']
+    #         ).latest('created_at')
+    #
+    #         if otp.is_valid():
+    #             otp.user.email_verified = True
+    #             otp.user.save()
+    #             otp.delete()
+    #             del request.session['otp_user_id']
+    #             messages.success(
+    #                 request, 'Email verified! You can now log in.')
+    #             return redirect('accounts:login')
+    #         else:
+    #             form.add_error(
+    #                 'code', 'OTP has expired. Please register again.')
+    #
+    #     except OTP.DoesNotExist:
+    #         form.add_error('code', 'Invalid OTP. Please try again.')
+    #
+    # return render(request, 'accounts/verify_otp.html', {'form': form})
 
 
 def login_view(request):
@@ -85,25 +112,32 @@ def login_view(request):
         if user is None:
             form.add_error(None, 'Invalid email or password.')
 
-        elif not user.email_verified:
-            # Regenerate OTP and send again
-            otp = OTP.generate(user)
-            try:
-                send_mail(
-                    'Your RoomFinder OTP',
-                    f'Your verification code is: {otp.code}\n\nExpires in 5 minutes.',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email],
-                )
-            except Exception:
-                print(f'\n{"="*50}')
-                print(f'  OTP for {user.email}: {otp.code}')
-                print(f'{"="*50}\n')
-
-            request.session['otp_user_id'] = user.id
-            messages.warning(
-                request, 'Email not verified. Check your terminal for OTP.')
-            return redirect('accounts:verify_otp')
+        # ------------------------------------------------------------
+        # OTP EMAIL VERIFICATION — DISABLED
+        # ------------------------------------------------------------
+        # The "not verified -> resend OTP -> redirect to verify_otp"
+        # branch has been removed. All authenticated users now log
+        # in directly. Original logic kept below for reference.
+        # ------------------------------------------------------------
+        # elif not user.email_verified:
+        #     # Regenerate OTP and send again
+        #     otp = OTP.generate(user)
+        #     try:
+        #         send_mail(
+        #             'Your RoomFinder OTP',
+        #             f'Your verification code is: {otp.code}\n\nExpires in 5 minutes.',
+        #             settings.DEFAULT_FROM_EMAIL,
+        #             [user.email],
+        #         )
+        #     except Exception:
+        #         print(f'\n{"="*50}')
+        #         print(f'  OTP for {user.email}: {otp.code}')
+        #         print(f'{"="*50}\n')
+        #
+        #     request.session['otp_user_id'] = user.id
+        #     messages.warning(
+        #         request, 'Email not verified. Check your terminal for OTP.')
+        #     return redirect('accounts:verify_otp')
 
         else:
             login(request, user)
