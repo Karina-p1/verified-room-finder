@@ -4,7 +4,9 @@
 {% block extra_css %}
 <style>
 
-/* ── Slim Top Ad Bar ── */
+/* ══════════════════════════════════════════
+   AD BAR
+══════════════════════════════════════════ */
 .rf-ad-bar {
     background: #eef3ff;
     border-bottom: 1px solid #c8d8f5;
@@ -15,300 +17,173 @@
     opacity: 1;
 }
 .rf-ad-bar.dismissed {
-    max-height: 0;
-    padding: 0 !important;
-    opacity: 0;
-    pointer-events: none;
+    max-height: 0; padding: 0 !important; opacity: 0; pointer-events: none;
 }
 .rf-ad-bar-inner {
-    max-width: 1700px;
-    margin: 0 auto;
-    padding: 0 22px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    max-width: 1700px; margin: 0 auto; padding: 0 22px;
+    height: 40px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
 }
-.rf-ad-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-    flex: 1;
-}
+.rf-ad-bar-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
 .rf-ad-bar-badge {
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #3a5cc4;
-    background: #d0e1ff;
-    border-radius: 4px;
-    padding: 2px 7px;
-    flex-shrink: 0;
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: #3a5cc4; background: #d0e1ff;
+    border-radius: 4px; padding: 2px 7px; flex-shrink: 0;
 }
-.rf-ad-bar-text {
-    font-size: 0.8rem;
-    color: #374151;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.rf-ad-bar-text strong {
-    color: #1a1a2e;
-    font-weight: 600;
-}
-.rf-ad-bar-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
+.rf-ad-bar-text { font-size: 0.8rem; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rf-ad-bar-text strong { color: #1a1a2e; font-weight: 600; }
+.rf-ad-bar-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .rf-ad-bar-cta {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #3a5cc4;
-    border: 1px solid #3a5cc4;
-    border-radius: 6px;
-    padding: 4px 14px;
-    background: transparent;
-    cursor: pointer;
-    transition: background 0.14s, color 0.14s;
-    white-space: nowrap;
+    font-size: 0.75rem; font-weight: 600; color: #3a5cc4;
+    border: 1px solid #3a5cc4; border-radius: 6px; padding: 4px 14px;
+    background: transparent; cursor: pointer;
+    transition: background 0.14s, color 0.14s; white-space: nowrap;
 }
-.rf-ad-bar-cta:hover {
-    background: #3a5cc4;
-    color: #fff;
-}
+.rf-ad-bar-cta:hover { background: #3a5cc4; color: #fff; }
 .rf-ad-bar-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #9ca3af;
-    font-size: 1.1rem;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.12s;
-    display: flex;
-    align-items: center;
+    background: none; border: none; cursor: pointer; color: #9ca3af;
+    font-size: 1.1rem; line-height: 1; padding: 2px 4px; border-radius: 4px;
+    transition: color 0.12s; display: flex; align-items: center;
 }
 .rf-ad-bar-close:hover { color: #374151; }
 
-/* ── Ad Modal ── */
+/* ══════════════════════════════════════════
+   AD MODAL
+══════════════════════════════════════════ */
 .rf-ad-modal-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 15, 30, 0.6);
-    z-index: 1100;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,15,30,0.6); z-index: 1100;
+    align-items: center; justify-content: center; padding: 20px;
 }
-.rf-ad-modal-backdrop.open {
-    display: flex;
-}
+.rf-ad-modal-backdrop.open { display: flex; }
 .rf-ad-modal {
-    background: #fff;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 520px;
-    overflow: hidden;
-    position: relative;
-    animation: rf-modal-in 0.22s ease;
+    background: #fff; border-radius: 16px; width: 100%; max-width: 520px;
+    overflow: hidden; position: relative; animation: rf-modal-in 0.22s ease;
 }
 @keyframes rf-modal-in {
     from { opacity: 0; transform: translateY(14px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0)  scale(1); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .rf-ad-modal-media {
-    position: relative;
-    width: 100%;
-    height: 220px;
-    background: #0f1b2d;
-    overflow: hidden;
+    position: relative; width: 100%; height: 220px;
+    background: #0f1b2d; overflow: hidden;
 }
-.rf-ad-modal-media img,
-.rf-ad-modal-media video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.rf-ad-modal-media img, .rf-ad-modal-media video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
 }
 .rf-ad-modal-media-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: rgba(255,255,255,0.35);
-    font-size: 0.8rem;
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    color: rgba(255,255,255,0.35); font-size: 0.8rem;
 }
 .rf-ad-modal-media-placeholder i { font-size: 2.5rem; }
 .rf-ad-modal-sponsored {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #fff;
-    background: rgba(0,0,0,0.5);
-    border-radius: 4px;
-    padding: 2px 8px;
-    backdrop-filter: blur(4px);
+    position: absolute; top: 10px; right: 10px; font-size: 0.6rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+    color: #fff; background: rgba(0,0,0,0.5); border-radius: 4px;
+    padding: 2px 8px; backdrop-filter: blur(4px);
 }
 .rf-ad-modal-close {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.45);
-    border: none;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.14s;
-    backdrop-filter: blur(4px);
+    position: absolute; top: 10px; left: 10px; width: 30px; height: 30px;
+    border-radius: 50%; background: rgba(0,0,0,0.45); border: none;
+    color: #fff; font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.14s; backdrop-filter: blur(4px);
 }
 .rf-ad-modal-close:hover { background: rgba(0,0,0,0.7); }
-.rf-ad-modal-body {
-    padding: 20px 22px 22px;
-}
+.rf-ad-modal-body { padding: 20px 22px 22px; }
 .rf-ad-modal-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f1b2d;
-    margin: 0 0 6px;
+    font-size: 1rem; font-weight: 700; color: #0f1b2d; margin: 0 0 6px;
     font-family: var(--font-display, Georgia, serif);
 }
-.rf-ad-modal-desc {
-    font-size: 0.82rem;
-    color: #6b7280;
-    line-height: 1.55;
-    margin: 0 0 18px;
-}
-.rf-ad-modal-footer {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
+.rf-ad-modal-desc { font-size: 0.82rem; color: #6b7280; line-height: 1.55; margin: 0 0 18px; }
+.rf-ad-modal-footer { display: flex; gap: 10px; align-items: center; }
 .rf-ad-modal-btn-primary {
-    flex: 1;
-    background: #0f1b2d;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-    transition: background 0.14s;
-    display: block;
+    flex: 1; background: #0f1b2d; color: #fff; border: none; border-radius: 8px;
+    padding: 10px 18px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    text-decoration: none; text-align: center; transition: background 0.14s; display: block;
 }
 .rf-ad-modal-btn-primary:hover { background: #E8402A; color: #fff; }
 .rf-ad-modal-btn-secondary {
-    font-size: 0.78rem;
-    color: #9ca3af;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px 4px;
-    transition: color 0.12s;
+    font-size: 0.78rem; color: #9ca3af; background: none; border: none;
+    cursor: pointer; padding: 6px 4px; transition: color 0.12s;
 }
 .rf-ad-modal-btn-secondary:hover { color: #374151; }
 
-/* ── Layout shell ── */
+/* ══════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════ */
 .rf-page {
-    display: flex;
-    align-items: flex-start;
+    display: flex; align-items: flex-start;
     min-height: calc(100vh - 62px);
-    max-width: 1700px;
-    margin: 0 auto;
-    padding: 0;
+    max-width: 1700px; margin: 0 auto; padding: 0;
 }
 
-/* ── Sidebar ── */
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
 .rf-sidebar {
-    width: 260px;
-    flex-shrink: 0;
-    background: #fff;
+    width: 260px; flex-shrink: 0; background: #fff;
     border-right: 1px solid var(--border);
-    position: sticky;
-    top: 62px;
-    height: calc(100vh - 62px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    position: sticky; top: 62px;
+    height: calc(100vh - 62px); overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
 .rf-sidebar::-webkit-scrollbar { width: 3px; }
 .rf-sidebar::-webkit-scrollbar-thumb { background: var(--border); }
 
 .sidebar-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 18px 12px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: #fff; z-index: 2;
 }
 .sidebar-top h6 {
-    margin: 0;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    gap: 7px;
+    margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--navy);
+    display: flex; align-items: center; gap: 7px;
 }
 .clear-link {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 2px 6px;
-    border-radius: 5px;
-    transition: background 0.12s, color 0.12s;
+    font-size: 0.72rem; color: var(--text-muted); text-decoration: none;
+    padding: 2px 6px; border-radius: 5px; transition: background 0.12s, color 0.12s;
 }
 .clear-link:hover { background: #fef2f2; color: #dc3545; }
 
-.fb { padding: 13px 18px; border-bottom: 1px solid #f1f3f5; }
-.fb-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.55px;
-    color: #9ca3af;
-    margin-bottom: 8px;
+/* Accordion filter blocks */
+.fb {
+    border-bottom: 1px solid #f1f3f5;
 }
-.fb .form-control,
-.fb .form-select {
-    font-size: 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 6px 10px;
-    background: #fafafa;
-    color: var(--text-main);
+.fb-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 18px; cursor: pointer; user-select: none;
+    transition: background 0.1s;
+}
+.fb-header:hover { background: #fafafa; }
+.fb-label {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.55px; color: #6b7280;
+    display: flex; align-items: center; gap: 6px;
+}
+.fb-label i { font-size: 0.8rem; color: var(--navy); }
+.fb-chevron {
+    font-size: 0.7rem; color: #9ca3af;
+    transition: transform 0.2s;
+}
+.fb.collapsed .fb-chevron { transform: rotate(-90deg); }
+.fb-body {
+    padding: 4px 18px 13px;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s;
+    max-height: 400px;
+    opacity: 1;
+}
+.fb.collapsed .fb-body { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
+
+.fb .form-control, .fb .form-select {
+    font-size: 0.8rem; border: 1px solid var(--border); border-radius: 7px;
+    padding: 6px 10px; background: #fafafa; color: var(--text-main);
     transition: border-color 0.15s, background 0.15s;
 }
-.fb .form-control:focus,
-.fb .form-select:focus {
-    border-color: var(--coral);
-    background: #fff;
+.fb .form-control:focus, .fb .form-select:focus {
+    border-color: var(--coral); background: #fff;
     box-shadow: 0 0 0 3px rgba(232,64,42,0.07);
 }
 .price-row { display: flex; gap: 6px; }
@@ -316,157 +191,235 @@
 
 .fac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
 .fac-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 5px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.1s;
+    display: flex; align-items: center; gap: 7px; padding: 5px 4px;
+    border-radius: 6px; cursor: pointer; transition: background 0.1s;
 }
 .fac-item:hover { background: #f8f9fa; }
 .fac-item input[type="checkbox"] {
-    width: 14px; height: 14px;
-    border-radius: 3px;
-    accent-color: var(--navy);
-    cursor: pointer;
-    flex-shrink: 0;
+    width: 14px; height: 14px; border-radius: 3px;
+    accent-color: var(--navy); cursor: pointer; flex-shrink: 0;
 }
-.fac-item span { font-size: 0.77rem; color: #374151; line-height: 1.2; }
+.fac-item span { font-size: 0.75rem; color: #374151; line-height: 1.2; }
 
 .sort-pills { display: flex; gap: 5px; flex-wrap: wrap; }
 .sort-pill {
-    font-size: 0.72rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: #fafafa;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: all 0.12s;
-    white-space: nowrap;
+    font-size: 0.72rem; padding: 4px 10px; border-radius: 20px;
+    border: 1px solid var(--border); background: #fafafa;
+    color: var(--text-muted); text-decoration: none;
+    transition: all 0.12s; white-space: nowrap;
 }
-.sort-pill:hover,
-.sort-pill.active {
-    background: var(--navy);
-    border-color: var(--navy);
-    color: #fff;
+.sort-pill:hover, .sort-pill.active {
+    background: var(--navy); border-color: var(--navy); color: #fff;
 }
+
+/* Results count in apply button area */
 .apply-wrap {
-    padding: 14px 18px;
-    position: sticky;
-    bottom: 0;
-    background: #fff;
-    border-top: 1px solid var(--border);
+    padding: 14px 18px; position: sticky; bottom: 0;
+    background: #fff; border-top: 1px solid var(--border);
+}
+.apply-results-hint {
+    font-size: 0.7rem; color: var(--text-muted);
+    text-align: center; margin-bottom: 8px;
 }
 
-/* ── Main area ── */
-.rf-main { flex: 1; min-width: 0; padding: 20px 22px 40px; }
+/* ══════════════════════════════════════════
+   MAIN AREA
+══════════════════════════════════════════ */
+.rf-main { flex: 1; min-width: 0; padding: 0 22px 40px; }
 
+/* ══════════════════════════════════════════
+   HERO — with background texture + search bar
+══════════════════════════════════════════ */
 .rf-hero {
-    background: linear-gradient(135deg, var(--navy) 0%, #1a3560 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3560 60%, #0d2444 100%);
     color: #fff;
-    padding: 26px 28px;
-    margin: -20px -22px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    padding: 36px 28px 32px;
+    margin: 0 -22px 0;
+    position: relative;
+    overflow: hidden;
+}
+/* Subtle mesh/dot texture overlay */
+.rf-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+/* Warm glow accent */
+.rf-hero::after {
+    content: '';
+    position: absolute; top: -80px; right: -60px;
+    width: 340px; height: 340px;
+    background: radial-gradient(circle, rgba(232,64,42,0.18) 0%, transparent 65%);
+    pointer-events: none;
+}
+.rf-hero-inner {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 20px;
+}
+.rf-hero-top {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; gap: 16px;
 }
 .rf-hero h1 {
     font-family: var(--font-display);
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin: 0 0 5px;
+    font-size: 1.85rem; font-weight: 800; margin: 0 0 6px; line-height: 1.15;
 }
-.rf-hero p { font-size: 0.85rem; opacity: 0.65; margin: 0; }
-.hero-stats { display: flex; gap: 20px; text-align: center; flex-shrink: 0; }
-.hero-stats .sn { font-size: 1.1rem; font-weight: 700; color: var(--gold); display: block; }
-.hero-stats .sl { font-size: 0.68rem; opacity: 0.55; display: block; }
+.rf-hero p { font-size: 0.85rem; opacity: 0.6; margin: 0; }
+.hero-stats { display: flex; gap: 24px; text-align: center; flex-shrink: 0; }
+.hero-stats .sn {
+    font-size: 1.25rem; font-weight: 800; color: var(--gold);
+    display: block; line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.hero-stats .sl { font-size: 0.65rem; opacity: 0.5; display: block; margin-top: 3px; }
 
+/* Hero search bar */
+.hero-search {
+    width: 100%; max-width: 620px;
+}
+.hero-search-wrap {
+    display: flex; gap: 0;
+    background: #fff; border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.hero-search-wrap input {
+    flex: 1; border: none; outline: none;
+    padding: 13px 16px; font-size: 0.9rem;
+    color: var(--text-main); background: transparent;
+    font-family: var(--font-body);
+}
+.hero-search-wrap input::placeholder { color: #9ca3af; }
+.hero-search-btn {
+    background: var(--coral); color: #fff; border: none;
+    padding: 0 20px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s; white-space: nowrap;
+}
+.hero-search-btn:hover { background: var(--coral-dk); }
+
+/* Popular area chips inside hero */
+.hero-areas {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.hero-areas-label { font-size: 0.7rem; opacity: 0.5; white-space: nowrap; }
+.hero-area-chip {
+    font-size: 0.72rem; font-weight: 500;
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 3px 10px; text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.hero-area-chip:hover {
+    background: rgba(255,255,255,0.22); color: #fff;
+}
+
+/* ══════════════════════════════════════════
+   CATEGORY PILLS — with count badges
+══════════════════════════════════════════ */
 .cat-row {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 2px 2px 14px;
-    margin-bottom: 6px;
-    scrollbar-width: none;
+    display: flex; gap: 8px; overflow-x: auto;
+    padding: 16px 2px 14px; margin-bottom: 6px; scrollbar-width: none;
 }
 .cat-row::-webkit-scrollbar { display: none; }
 .cat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 80px;
-    flex-shrink: 0;
-    padding: 11px 8px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: #fff;
-    text-decoration: none;
-    color: #4b5563;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 5px; min-width: 80px; flex-shrink: 0;
+    padding: 11px 8px; border-radius: 10px; border: 1px solid var(--border);
+    background: #fff; text-decoration: none; color: #4b5563;
     transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    position: relative;
 }
-.cat-item i { font-size: 1.25rem; color: var(--navy); }
-.cat-item span {
-    font-size: 0.66rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    white-space: nowrap;
+.cat-item i { font-size: 1.2rem; color: var(--navy); }
+.cat-item .cat-name {
+    font-size: 0.64rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.4px; white-space: nowrap;
+}
+.cat-item .cat-count {
+    font-size: 0.58rem; font-weight: 600;
+    background: #f3f4f6; color: #6b7280;
+    border-radius: 20px; padding: 1px 5px;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1.4;
 }
 .cat-item:hover { border-color: var(--coral); transform: translateY(-2px); }
+.cat-item:hover .cat-count { background: rgba(232,64,42,0.1); color: var(--coral); }
 .cat-item.active { background: var(--navy); border-color: var(--navy); color: #fff; }
 .cat-item.active i { color: var(--gold); }
+.cat-item.active .cat-count { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); }
 
+/* ══════════════════════════════════════════
+   RESULTS BAR
+══════════════════════════════════════════ */
 .results-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
 }
 .results-count { font-size: 0.8rem; color: var(--text-muted); }
 .active-tags { display: flex; gap: 5px; flex-wrap: wrap; }
 .atag {
-    font-size: 0.7rem;
-    background: #eff6ff;
-    color: #1e40af;
-    border: 1px solid #bfdbfe;
-    border-radius: 20px;
+    font-size: 0.7rem; background: #eff6ff; color: #1e40af;
+    border: 1px solid #bfdbfe; border-radius: 20px;
     padding: 2px 8px 2px 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
+    display: inline-flex; align-items: center; gap: 3px;
 }
 .atag a { color: #6b7280; text-decoration: none; font-size: 0.82rem; line-height: 1; }
 .atag a:hover { color: #dc3545; }
 
+/* ══════════════════════════════════════════
+   LISTING GRID + SKELETON LOADING
+══════════════════════════════════════════ */
 .listing-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 14px;
 }
 
-.lc {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
+/* Skeleton cards */
+.skeleton-card {
+    background: #fff; border-radius: 12px; overflow: hidden;
     border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
+}
+.skeleton-img {
+    height: 155px;
+    background: linear-gradient(90deg, #f1f3f5 25%, #e8e8e8 50%, #f1f3f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+}
+.skeleton-body { padding: 10px 11px 8px; }
+.skeleton-line {
+    height: 10px; border-radius: 4px; margin-bottom: 8px;
+    background: linear-gradient(90deg, #f1f3f5 25%, #e8e8e8 50%, #f1f3f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+}
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+.skeleton-btn {
+    height: 32px; border-radius: 7px; margin: 8px 11px 10px;
+    background: linear-gradient(90deg, #f1f3f5 25%, #e8e8e8 50%, #f1f3f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+}
+@keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Listing cards */
+.lc {
+    background: #fff; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
     transition: transform 0.18s, box-shadow 0.18s;
 }
 .lc:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(15,27,45,0.1); }
 .lc-img {
-    position: relative;
-    height: 155px;
-    overflow: hidden;
-    background: #f1f3f5;
-    flex-shrink: 0;
+    position: relative; height: 155px; overflow: hidden;
+    background: #f1f3f5; flex-shrink: 0;
 }
 .lc-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
 .lc:hover .lc-img img { transform: scale(1.04); }
@@ -475,24 +428,53 @@
     display: flex; align-items: center; justify-content: center;
     color: #ced4da; font-size: 2.5rem;
 }
+/* Dark gradient at bottom of image for price legibility */
+.lc-img-gradient {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.65));
+    pointer-events: none;
+}
 .lc-verified {
     position: absolute; top: 7px; right: 7px;
-    background: rgba(5,150,105,0.9);
-    color: #fff; font-size: 0.6rem; font-weight: 600;
+    background: rgba(5,150,105,0.9); color: #fff;
+    font-size: 0.6rem; font-weight: 600;
     padding: 2px 6px; border-radius: 20px;
     display: flex; align-items: center; gap: 2px;
     backdrop-filter: blur(4px);
 }
+/* Save/heart button on card image */
+.lc-save-btn {
+    position: absolute; top: 7px; left: 7px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.85); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+    backdrop-filter: blur(4px); text-decoration: none;
+    opacity: 0;
+    transform: scale(0.85);
+}
+.lc:hover .lc-save-btn { opacity: 1; transform: scale(1); }
+.lc-save-btn:hover { background: #fff; color: var(--coral); }
+.lc-save-btn.saved { opacity: 1; color: var(--coral); transform: scale(1); }
+
+/* "New" / "X days ago" badge */
+.lc-age-badge {
+    position: absolute; bottom: 30px; left: 8px;
+    font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gold); color: #7a5c00;
+    border-radius: 4px; padding: 1px 5px;
+}
+
 .lc-price-overlay {
     position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.58));
     color: #fff; font-size: 0.82rem; font-weight: 700;
-    padding: 20px 9px 7px;
+    padding: 6px 9px;
 }
 .lc-body { padding: 10px 11px 6px; flex: 1; display: flex; flex-direction: column; }
 .lc-title {
-    font-size: 0.8rem; font-weight: 600; color: #1f2937;
-    margin-bottom: 3px;
+    font-size: 0.8rem; font-weight: 600; color: #1f2937; margin-bottom: 3px;
     display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35;
 }
@@ -508,26 +490,22 @@
 }
 .lc-footer { padding: 0 11px 10px; }
 .lc-footer a {
-    display: block; text-align: center;
-    font-size: 0.76rem; font-weight: 600; padding: 6px;
-    border-radius: 7px; background: var(--navy); color: #fff;
+    display: block; text-align: center; font-size: 0.76rem; font-weight: 600;
+    padding: 6px; border-radius: 7px; background: var(--navy); color: #fff;
     text-decoration: none; transition: background 0.15s;
 }
 .lc-footer a:hover { background: var(--coral); }
 
-/* ── Between-cards ad slot ── */
+/* ══════════════════════════════════════════
+   BETWEEN-CARDS AD SLOT
+══════════════════════════════════════════ */
 .ad-slot-between {
-    grid-column: 1 / -1;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    background: #f8f9fa;
-    border: 1px solid #e8e8e6;
+    grid-column: 1 / -1; border-radius: 10px; overflow: hidden;
+    position: relative; background: #f8f9fa; border: 1px solid #e8e8e6;
 }
 .rf-ad-label-inline {
-    position: absolute; top: 7px; right: 10px;
-    font-size: 0.58rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.08em;
+    position: absolute; top: 7px; right: 10px; font-size: 0.58rem;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
     color: #9ca3af; background: rgba(255,255,255,0.85);
     border: 1px solid #e5e7eb; border-radius: 4px; padding: 1px 6px;
     backdrop-filter: blur(4px); z-index: 2;
@@ -542,17 +520,20 @@
     gap: 8px; padding: 18px; color: #d1d5db; font-size: 0.75rem;
 }
 
-/* ── Empty state ── */
+/* ══════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════ */
 .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
 .empty-state i { font-size: 3rem; color: #d1d5db; }
 .empty-state h5 { color: #6b7280; margin: 12px 0 6px; font-size: 1rem; }
 .empty-state p  { color: #9ca3af; font-size: 0.82rem; }
 
-/* ── Mobile filter toggle ── */
+
+/* ══════════════════════════════════════════
+   MOBILE FILTER TOGGLE
+══════════════════════════════════════════ */
 .mobile-filter-btn {
-    display: none;
-    align-items: center;
-    gap: 6px; font-size: 0.8rem;
+    display: none; align-items: center; gap: 6px; font-size: 0.8rem;
     background: #fff; border: 1px solid var(--border);
     border-radius: 8px; padding: 7px 13px; cursor: pointer;
     margin-bottom: 12px; color: var(--navy); font-weight: 500;
@@ -563,47 +544,51 @@
 }
 .rf-overlay.open { display: block; }
 
-/* ── Recently viewed ── */
+/* ══════════════════════════════════════════
+   RECENTLY VIEWED
+══════════════════════════════════════════ */
 .rv-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .rv-card {
-    width: 120px; background: #fff;
-    border: 1px solid var(--border); border-radius: 9px;
-    overflow: hidden; text-decoration: none; transition: transform 0.15s;
+    width: 120px; background: #fff; border: 1px solid var(--border);
+    border-radius: 9px; overflow: hidden; text-decoration: none;
+    transition: transform 0.15s;
 }
 .rv-card:hover { transform: translateY(-2px); }
 .rv-card img, .rv-thumb { width: 100%; height: 65px; object-fit: cover; }
-.rv-thumb {
-    display: flex; align-items: center; justify-content: center;
-    background: #f3f4f6; color: #ced4da;
-}
+.rv-thumb { display: flex; align-items: center; justify-content: center; background: #f3f4f6; color: #ced4da; }
 .rv-info { padding: 5px 7px 6px; }
-.rv-info .t {
-    font-size: 0.68rem; font-weight: 600; color: #1f2937;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.rv-info .t { font-size: 0.68rem; font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rv-info .p { font-size: 0.65rem; color: var(--coral); font-weight: 500; }
 
-/* ── Responsive ── */
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
 @media (max-width: 820px) {
     .rf-sidebar {
-        position: fixed; top: 0; left: -280px;
-        height: 100vh; width: 275px; z-index: 100;
-        transition: left 0.26s ease;
+        position: fixed; top: 0; left: -280px; height: 100vh;
+        width: 275px; z-index: 100; transition: left 0.26s ease;
         box-shadow: 4px 0 20px rgba(0,0,0,0.14);
     }
     .rf-sidebar.open { left: 0; }
     .mobile-filter-btn { display: flex; }
-    .rf-hero { margin: -20px -22px 16px; }
     .rf-ad-bar-text { display: none; }
+
 }
 @media (max-width: 560px) {
-    .rf-main { padding: 14px 14px 30px; }
-    .rf-hero { padding: 16px; margin: -14px -14px 14px; }
-    .rf-hero h1 { font-size: 1.1rem; }
-    .hero-stats { display: none; }
+    .rf-main { padding: 0 14px 30px; }
+    .rf-hero { padding: 20px 16px 18px; margin: 0 -14px 0; }
+    .rf-hero h1 { font-size: 1.2rem; }
+    .hero-stats { display: none !important; }
     .listing-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
     .rf-ad-modal { max-width: 100%; border-radius: 12px; }
     .rf-ad-modal-media { height: 170px; }
+    .hero-areas { display: none; }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-img, .skeleton-line, .skeleton-btn { animation: none; }
+    .lc, .cat-item, .rv-card { transition: none; }
 }
 </style>
 {% endblock %}
@@ -621,9 +606,7 @@
             </span>
         </div>
         <div class="rf-ad-bar-actions">
-            <button class="rf-ad-bar-cta" id="rfAdLearnMore" type="button">
-                Learn more
-            </button>
+            <button class="rf-ad-bar-cta" id="rfAdLearnMore" type="button">Learn more</button>
             <button class="rf-ad-bar-close" id="rfAdBarClose" type="button" aria-label="Dismiss ad">
                 <i class="bi bi-x"></i>
             </button>
@@ -631,46 +614,33 @@
     </div>
 </div>
 
-<!-- Ad Modal -->
 <div class="rf-ad-modal-backdrop" id="rfAdModalBackdrop" role="dialog" aria-modal="true" aria-label="Sponsored advertisement">
     <div class="rf-ad-modal" id="rfAdModal">
         <div class="rf-ad-modal-media">
             {% if ad.is_video %}
-                <video autoplay muted loop playsinline>
-                    <source src="{{ ad.video.url }}" type="video/mp4">
-                </video>
+                <video autoplay muted loop playsinline><source src="{{ ad.video.url }}" type="video/mp4"></video>
             {% elif ad.image %}
                 <img src="{{ ad.image.url }}" alt="{{ ad.title }}">
             {% else %}
                 <div class="rf-ad-modal-media-placeholder">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Sponsored</span>
+                    <i class="bi bi-megaphone"></i><span>Sponsored</span>
                 </div>
             {% endif %}
-            <button class="rf-ad-modal-close" id="rfAdModalClose" aria-label="Close">
-                <i class="bi bi-x"></i>
-            </button>
+            <button class="rf-ad-modal-close" id="rfAdModalClose" aria-label="Close"><i class="bi bi-x"></i></button>
             <span class="rf-ad-modal-sponsored">Sponsored</span>
         </div>
         <div class="rf-ad-modal-body">
             <p class="rf-ad-modal-title">{{ ad.title }}</p>
-            <p class="rf-ad-modal-desc">
-                This is a sponsored message. Click the button below to visit the advertiser's page and learn more about their offer.
-            </p>
+            <p class="rf-ad-modal-desc">This is a sponsored message. Click the button below to visit the advertiser's page and learn more about their offer.</p>
             <div class="rf-ad-modal-footer">
                 {% if ad.link_url %}
-                    <a href="{{ ad.link_url }}" target="_blank" rel="noopener noreferrer"
-                       class="rf-ad-modal-btn-primary">
+                    <a href="{{ ad.link_url }}" target="_blank" rel="noopener noreferrer" class="rf-ad-modal-btn-primary">
                         Visit advertiser <i class="bi bi-arrow-up-right"></i>
                     </a>
                 {% else %}
-                    <span class="rf-ad-modal-btn-primary" style="cursor:default;opacity:0.5;">
-                        No link provided
-                    </span>
+                    <span class="rf-ad-modal-btn-primary" style="cursor:default;opacity:0.5;">No link provided</span>
                 {% endif %}
-                <button class="rf-ad-modal-btn-secondary" id="rfAdModalDismiss" type="button">
-                    Not interested
-                </button>
+                <button class="rf-ad-modal-btn-secondary" id="rfAdModalDismiss" type="button">Not interested</button>
             </div>
         </div>
     </div>
@@ -694,125 +664,167 @@
 
         <form method="GET" action="{% url 'listings:homepage' %}" id="filterForm">
 
-            <div class="fb">
-                <div class="fb-label">Search</div>
-                <input type="text" name="q" class="form-control"
-                       placeholder="Title, city, area…"
-                       value="{{ current_filters.q }}">
-            </div>
-
-            <div class="fb">
-                <div class="fb-label">Province</div>
-                <select name="province" class="form-select" id="provinceSelect">
-                    <option value="">All provinces</option>
-                    {% for p in provinces %}
-                        <option value="{{ p }}"
-                            {% if current_filters.province == p %}selected{% endif %}>
-                            {{ p }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="fb">
-                <div class="fb-label">District</div>
-                <select name="district" class="form-select" id="districtSelect">
-                    <option value="">All districts</option>
-                </select>
-            </div>
-
-            <div class="fb">
-                <div class="fb-label">Property type</div>
-                <select name="property_type" class="form-select">
-                    <option value="">Any type</option>
-                    <option value="single_room" {% if current_filters.property_type == 'single_room' %}selected{% endif %}>Single room</option>
-                    <option value="two_rooms"   {% if current_filters.property_type == 'two_rooms'   %}selected{% endif %}>2 rooms</option>
-                    <option value="flat"        {% if current_filters.property_type == 'flat'        %}selected{% endif %}>Flat</option>
-                    <option value="apartment"   {% if current_filters.property_type == 'apartment'   %}selected{% endif %}>Apartment</option>
-                    <option value="house"       {% if current_filters.property_type == 'house'       %}selected{% endif %}>House</option>
-                    <option value="hostel"      {% if current_filters.property_type == 'hostel'      %}selected{% endif %}>Hostel</option>
-                    <option value="office"      {% if current_filters.property_type == 'office'      %}selected{% endif %}>Office space</option>
-                    <option value="shutter"     {% if current_filters.property_type == 'shutter'     %}selected{% endif %}>Shutter</option>
-                </select>
-            </div>
-
-            <div class="fb">
-                <div class="fb-label">Price range (NPR/month)</div>
-                <div class="price-row">
-                    <input type="number" name="min_price" class="form-control"
-                           placeholder="Min" value="{{ current_filters.min_price }}">
-                    <input type="number" name="max_price" class="form-control"
-                           placeholder="Max" value="{{ current_filters.max_price }}">
+            <!-- SEARCH -->
+            <div class="fb" id="fb-search">
+                <div class="fb-header" onclick="toggleFb('fb-search')">
+                    <span class="fb-label"><i class="bi bi-search"></i> Search</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Title, city, area…"
+                           value="{{ current_filters.q }}">
                 </div>
             </div>
 
-            <div class="fb">
-                <div class="fb-label">Furnished</div>
-                <select name="furnished_status" class="form-select">
-                    <option value="">Any</option>
-                    <option value="furnished"      {% if current_filters.furnished_status == 'furnished'      %}selected{% endif %}>Furnished</option>
-                    <option value="semi_furnished" {% if current_filters.furnished_status == 'semi_furnished' %}selected{% endif %}>Semi-furnished</option>
-                    <option value="unfurnished"    {% if current_filters.furnished_status == 'unfurnished'    %}selected{% endif %}>Unfurnished</option>
-                </select>
-            </div>
-
-            <div class="fb">
-                <div class="fb-label">Facilities</div>
-                <div class="fac-grid">
-                    <label class="fac-item">
-                        <input type="checkbox" name="wifi" {% if request.GET.wifi %}checked{% endif %}>
-                        <span><i class="bi bi-wifi"></i> WiFi</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="attached_bathroom" {% if request.GET.attached_bathroom %}checked{% endif %}>
-                        <span><i class="bi bi-droplet"></i> Bathroom</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="car_parking" {% if request.GET.car_parking %}checked{% endif %}>
-                        <span><i class="bi bi-car-front"></i> Parking</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="pet_allowed" {% if request.GET.pet_allowed %}checked{% endif %}>
-                        <span><i class="bi bi-heart"></i> Pets OK</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="kitchen" {% if request.GET.kitchen %}checked{% endif %}>
-                        <span><i class="bi bi-egg-fried"></i> Kitchen</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="water_24_7" {% if request.GET.water_24_7 %}checked{% endif %}>
-                        <span><i class="bi bi-clock"></i> 24/7 water</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="balcony" {% if request.GET.balcony %}checked{% endif %}>
-                        <span><i class="bi bi-building"></i> Balcony</span>
-                    </label>
-                    <label class="fac-item">
-                        <input type="checkbox" name="cctv" {% if request.GET.cctv %}checked{% endif %}>
-                        <span><i class="bi bi-camera-video"></i> CCTV</span>
-                    </label>
+            <!-- PROVINCE -->
+            <div class="fb" id="fb-province">
+                <div class="fb-header" onclick="toggleFb('fb-province')">
+                    <span class="fb-label"><i class="bi bi-map"></i> Province</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <select name="province" class="form-select" id="provinceSelect">
+                        <option value="">All provinces</option>
+                        {% for p in provinces %}
+                            <option value="{{ p }}" {% if current_filters.province == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
-            <div class="fb">
-                <div class="fb-label">Sort by</div>
-                <div class="sort-pills">
-                    <a href="?{{ query_string }}&sort=latest"
-                       class="sort-pill {% if current_filters.sort == 'latest' or not current_filters.sort %}active{% endif %}">
-                        Latest
-                    </a>
-                    <a href="?{{ query_string }}&sort=price_low"
-                       class="sort-pill {% if current_filters.sort == 'price_low' %}active{% endif %}">
-                        Price ↑
-                    </a>
-                    <a href="?{{ query_string }}&sort=price_high"
-                       class="sort-pill {% if current_filters.sort == 'price_high' %}active{% endif %}">
-                        Price ↓
-                    </a>
+            <!-- DISTRICT -->
+            <div class="fb" id="fb-district">
+                <div class="fb-header" onclick="toggleFb('fb-district')">
+                    <span class="fb-label"><i class="bi bi-pin-map"></i> District</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <select name="district" class="form-select" id="districtSelect">
+                        <option value="">All districts</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PROPERTY TYPE -->
+            <div class="fb" id="fb-type">
+                <div class="fb-header" onclick="toggleFb('fb-type')">
+                    <span class="fb-label"><i class="bi bi-house"></i> Property type</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <select name="property_type" class="form-select">
+                        <option value="">Any type</option>
+                        <option value="single_room" {% if current_filters.property_type == 'single_room' %}selected{% endif %}>Single room</option>
+                        <option value="two_rooms"   {% if current_filters.property_type == 'two_rooms'   %}selected{% endif %}>2 rooms</option>
+                        <option value="flat"        {% if current_filters.property_type == 'flat'        %}selected{% endif %}>Flat</option>
+                        <option value="apartment"   {% if current_filters.property_type == 'apartment'   %}selected{% endif %}>Apartment</option>
+                        <option value="house"       {% if current_filters.property_type == 'house'       %}selected{% endif %}>House</option>
+                        <option value="hostel"      {% if current_filters.property_type == 'hostel'      %}selected{% endif %}>Hostel</option>
+                        <option value="office"      {% if current_filters.property_type == 'office'      %}selected{% endif %}>Office space</option>
+                        <option value="shutter"     {% if current_filters.property_type == 'shutter'     %}selected{% endif %}>Shutter</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PRICE RANGE -->
+            <div class="fb" id="fb-price">
+                <div class="fb-header" onclick="toggleFb('fb-price')">
+                    <span class="fb-label"><i class="bi bi-cash-stack"></i> Price (NPR/month)</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <div class="price-row">
+                        <input type="number" name="min_price" class="form-control"
+                               placeholder="Min" value="{{ current_filters.min_price }}">
+                        <input type="number" name="max_price" class="form-control"
+                               placeholder="Max" value="{{ current_filters.max_price }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- FURNISHED -->
+            <div class="fb" id="fb-furnished">
+                <div class="fb-header" onclick="toggleFb('fb-furnished')">
+                    <span class="fb-label"><i class="bi bi-lamp"></i> Furnished</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <select name="furnished_status" class="form-select">
+                        <option value="">Any</option>
+                        <option value="furnished"      {% if current_filters.furnished_status == 'furnished'      %}selected{% endif %}>Furnished</option>
+                        <option value="semi_furnished" {% if current_filters.furnished_status == 'semi_furnished' %}selected{% endif %}>Semi-furnished</option>
+                        <option value="unfurnished"    {% if current_filters.furnished_status == 'unfurnished'    %}selected{% endif %}>Unfurnished</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- FACILITIES -->
+            <div class="fb" id="fb-facilities">
+                <div class="fb-header" onclick="toggleFb('fb-facilities')">
+                    <span class="fb-label"><i class="bi bi-stars"></i> Facilities</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <div class="fac-grid">
+                        <label class="fac-item">
+                            <input type="checkbox" name="wifi" {% if request.GET.wifi %}checked{% endif %}>
+                            <span><i class="bi bi-wifi"></i> WiFi</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="attached_bathroom" {% if request.GET.attached_bathroom %}checked{% endif %}>
+                            <span><i class="bi bi-droplet"></i> Bathroom</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="car_parking" {% if request.GET.car_parking %}checked{% endif %}>
+                            <span><i class="bi bi-car-front"></i> Parking</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="pet_allowed" {% if request.GET.pet_allowed %}checked{% endif %}>
+                            <span><i class="bi bi-heart"></i> Pets OK</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="kitchen" {% if request.GET.kitchen %}checked{% endif %}>
+                            <span><i class="bi bi-egg-fried"></i> Kitchen</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="water_24_7" {% if request.GET.water_24_7 %}checked{% endif %}>
+                            <span><i class="bi bi-clock"></i> 24/7 Water</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="balcony" {% if request.GET.balcony %}checked{% endif %}>
+                            <span><i class="bi bi-building"></i> Balcony</span>
+                        </label>
+                        <label class="fac-item">
+                            <input type="checkbox" name="cctv" {% if request.GET.cctv %}checked{% endif %}>
+                            <span><i class="bi bi-camera-video"></i> CCTV</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SORT -->
+            <div class="fb" id="fb-sort">
+                <div class="fb-header" onclick="toggleFb('fb-sort')">
+                    <span class="fb-label"><i class="bi bi-sort-down"></i> Sort by</span>
+                    <i class="bi bi-chevron-down fb-chevron"></i>
+                </div>
+                <div class="fb-body">
+                    <div class="sort-pills">
+                        <a href="?{{ query_string }}&sort=latest"
+                           class="sort-pill {% if current_filters.sort == 'latest' or not current_filters.sort %}active{% endif %}">Latest</a>
+                        <a href="?{{ query_string }}&sort=price_low"
+                           class="sort-pill {% if current_filters.sort == 'price_low' %}active{% endif %}">Price ↑</a>
+                        <a href="?{{ query_string }}&sort=price_high"
+                           class="sort-pill {% if current_filters.sort == 'price_high' %}active{% endif %}">Price ↓</a>
+                    </div>
                 </div>
             </div>
 
             <div class="apply-wrap">
+                <div class="apply-results-hint">
+                    <strong>{{ total_count }}</strong> listing{{ total_count|pluralize }} found
+                </div>
                 <button type="submit" class="btn btn-primary w-100 fw-semibold"
                         style="font-size:0.82rem;border-radius:8px;">
                     <i class="bi bi-search"></i> Apply filters
@@ -825,67 +837,124 @@
     <!-- ══════════ MAIN ══════════ -->
     <main class="rf-main">
 
+        <!-- ── HERO ── -->
         <div class="rf-hero">
-            <div>
-                <h1>Find your perfect room in Nepal</h1>
-                <p>
-                    <i class="bi bi-patch-check-fill" style="color:var(--gold);"></i>
-                    Verified listings &nbsp;·&nbsp; Trusted landlords &nbsp;·&nbsp; Easy search
-                </p>
-            </div>
-            <div class="hero-stats d-none d-md-flex">
-                <div><span class="sn">{{ total_count }}</span><span class="sl">Listings</span></div>
-                <div><span class="sn">7</span><span class="sl">Provinces</span></div>
-                <div><span class="sn">100%</span><span class="sl">Verified</span></div>
+            <div class="rf-hero-inner">
+                <div class="rf-hero-top">
+                    <div>
+                        <h1>Find your perfect room in Nepal</h1>
+                        <p>
+                            <i class="bi bi-patch-check-fill" style="color:var(--gold);"></i>
+                            Verified listings &nbsp;·&nbsp; Trusted landlords &nbsp;·&nbsp; Easy search
+                        </p>
+                    </div>
+                    <div class="hero-stats d-none d-md-flex">
+                        <div>
+                            <span class="sn" data-count-to="{{ total_count }}">{{ total_count }}</span>
+                            <span class="sl">Listings</span>
+                        </div>
+                        <div>
+                            <span class="sn" data-count-to="7">7</span>
+                            <span class="sl">Provinces</span>
+                        </div>
+                        <div>
+                            <span class="sn">100%</span>
+                            <span class="sl">Verified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Big hero search bar -->
+                <div class="hero-search">
+                    <form method="GET" action="{% url 'listings:homepage' %}">
+                        <div class="hero-search-wrap">
+                            <input type="text" name="q"
+                                   placeholder="Search by city, area, or listing title…"
+                                   value="{{ current_filters.q }}"
+                                   autocomplete="off">
+                            <button type="submit" class="hero-search-btn">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Popular area quick links -->
+                <div class="hero-areas">
+                    <span class="hero-areas-label">Popular:</span>
+                    <a href="?province=Bagmati&district=Kathmandu" class="hero-area-chip">Kathmandu</a>
+                    <a href="?province=Gandaki&district=Kaski" class="hero-area-chip">Pokhara</a>
+                    <a href="?province=Bagmati&district=Lalitpur" class="hero-area-chip">Lalitpur</a>
+                    <a href="?province=Bagmati&district=Bhaktapur" class="hero-area-chip">Bhaktapur</a>
+                    <a href="?province=Lumbini&district=Rupandehi" class="hero-area-chip">Butwal</a>
+                    <a href="?province=Koshi&district=Jhapa" class="hero-area-chip">Jhapa</a>
+                </div>
             </div>
         </div>
 
-        <!-- Quick category row -->
+        <!-- Quick category row with counts -->
         <div class="cat-row">
             <a href="{% url 'listings:homepage' %}"
                class="cat-item {% if not current_filters.property_type %}active{% endif %}">
-                <i class="bi bi-grid-3x3-gap-fill"></i><span>All</span>
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span class="cat-name">All</span>
+                <span class="cat-count">{{ type_counts.all|default:total_count }}</span>
             </a>
             <a href="?property_type=single_room"
                class="cat-item {% if current_filters.property_type == 'single_room' %}active{% endif %}">
-                <i class="bi bi-door-closed"></i><span>Room</span>
+                <i class="bi bi-door-closed"></i>
+                <span class="cat-name">Room</span>
+                <span class="cat-count">{{ type_counts.single_room|default:"0" }}</span>
             </a>
             <a href="?property_type=two_rooms"
                class="cat-item {% if current_filters.property_type == 'two_rooms' %}active{% endif %}">
-                <i class="bi bi-grid-1x2"></i><span>2 Rooms</span>
+                <i class="bi bi-grid-1x2"></i>
+                <span class="cat-name">2 Rooms</span>
+                <span class="cat-count">{{ type_counts.two_rooms|default:"0" }}</span>
             </a>
             <a href="?property_type=flat"
                class="cat-item {% if current_filters.property_type == 'flat' %}active{% endif %}">
-                <i class="bi bi-buildings"></i><span>Flat</span>
+                <i class="bi bi-buildings"></i>
+                <span class="cat-name">Flat</span>
+                <span class="cat-count">{{ type_counts.flat|default:"0" }}</span>
             </a>
             <a href="?property_type=apartment"
                class="cat-item {% if current_filters.property_type == 'apartment' %}active{% endif %}">
-                <i class="bi bi-building"></i><span>Apartment</span>
+                <i class="bi bi-building"></i>
+                <span class="cat-name">Apartment</span>
+                <span class="cat-count">{{ type_counts.apartment|default:"0" }}</span>
             </a>
             <a href="?property_type=house"
                class="cat-item {% if current_filters.property_type == 'house' %}active{% endif %}">
-                <i class="bi bi-house-door"></i><span>House</span>
+                <i class="bi bi-house-door"></i>
+                <span class="cat-name">House</span>
+                <span class="cat-count">{{ type_counts.house|default:"0" }}</span>
             </a>
             <a href="?property_type=hostel"
                class="cat-item {% if current_filters.property_type == 'hostel' %}active{% endif %}">
-                <i class="bi bi-people-fill"></i><span>Hostel</span>
+                <i class="bi bi-people-fill"></i>
+                <span class="cat-name">Hostel</span>
+                <span class="cat-count">{{ type_counts.hostel|default:"0" }}</span>
             </a>
             <a href="?property_type=office"
                class="cat-item {% if current_filters.property_type == 'office' %}active{% endif %}">
-                <i class="bi bi-briefcase-fill"></i><span>Office</span>
+                <i class="bi bi-briefcase-fill"></i>
+                <span class="cat-name">Office</span>
+                <span class="cat-count">{{ type_counts.office|default:"0" }}</span>
             </a>
             <a href="?property_type=shutter"
                class="cat-item {% if current_filters.property_type == 'shutter' %}active{% endif %}">
-                <i class="bi bi-shop"></i><span>Shutter</span>
+                <i class="bi bi-shop"></i>
+                <span class="cat-name">Shutter</span>
+                <span class="cat-count">{{ type_counts.shutter|default:"0" }}</span>
             </a>
         </div>
 
-        <!-- Mobile: show filter button -->
+        <!-- Mobile: filter toggle -->
         <button class="mobile-filter-btn" onclick="openSidebar()">
             <i class="bi bi-sliders2"></i> Filters
             {% if active_filter_count > 0 %}
-                <span class="badge ms-1"
-                      style="background:var(--coral);color:#fff;font-size:0.65rem;">
+                <span class="badge ms-1" style="background:var(--coral);color:#fff;font-size:0.65rem;">
                     {{ active_filter_count }}
                 </span>
             {% endif %}
@@ -900,10 +969,7 @@
             </span>
             <div class="active-tags">
                 {% if current_filters.property_type %}
-                    <span class="atag">
-                        {{ current_filters.property_type|title }}
-                        <a href="?{{ query_string }}">×</a>
-                    </span>
+                    <span class="atag">{{ current_filters.property_type|title }} <a href="?{{ query_string }}">×</a></span>
                 {% endif %}
                 {% if request.GET.wifi %}
                     <span class="atag">WiFi <a href="?{{ query_string }}">×</a></span>
@@ -920,17 +986,29 @@
             </div>
         </div>
 
+        <!-- Skeleton loader (shown while filters submit) -->
+        <div class="listing-grid" id="skeletonGrid" style="display:none;">
+            {% for i in "123456" %}
+            <div class="skeleton-card">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton-line medium"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+                <div class="skeleton-btn"></div>
+            </div>
+            {% endfor %}
+        </div>
+
         <!-- Listing grid -->
-        <div class="listing-grid">
+        <div class="listing-grid" id="listingGrid">
             {% for item in listings %}
                 {% if item.type == 'ad' %}
                     <div class="ad-slot-between">
                         {% if between_ad %}
                             <span class="rf-ad-label-inline">Sponsored</span>
                             <a href="{{ between_ad.link_url }}" target="_blank" rel="noopener">
-                                <img src="{{ between_ad.image.url }}"
-                                     alt="{{ between_ad.title }}"
-                                     class="between-ad-img">
+                                <img src="{{ between_ad.image.url }}" alt="{{ between_ad.title }}" class="between-ad-img">
                             </a>
                         {% else %}
                             <div class="ad-slot-placeholder">
@@ -945,16 +1023,44 @@
                         <div class="lc-img">
                             {% with listing.primary_image as img %}
                                 {% if img %}
-                                    <img src="{{ img.image.url }}" alt="{{ listing.title }}">
+                                    <img src="{{ img.image.url }}" alt="{{ listing.title }}" loading="lazy">
                                 {% else %}
-                                    <div class="lc-img-placeholder">
-                                        <i class="bi bi-image"></i>
-                                    </div>
+                                    <div class="lc-img-placeholder"><i class="bi bi-image"></i></div>
                                 {% endif %}
                             {% endwith %}
+
+                            <!-- Always-on gradient for price legibility -->
+                            <div class="lc-img-gradient"></div>
+
+                            <!-- Save/heart button (hover-revealed) -->
+                            {% if user.is_authenticated and user.role == 'tenant' %}
+                            <a href="{% url 'listings:save_listing' listing.pk %}"
+                               class="lc-save-btn {% if listing.pk in saved_listing_ids %}saved{% endif %}"
+                               title="{% if listing.pk in saved_listing_ids %}Unsave{% else %}Save{% endif %}">
+                                <i class="bi bi-heart{% if listing.pk in saved_listing_ids %}-fill{% endif %}"></i>
+                            </a>
+                            {% endif %}
+
                             <div class="lc-verified">
                                 <i class="bi bi-patch-check-fill"></i> Verified
                             </div>
+
+                            <!-- New / days-ago badge -->
+                            {% if listing.created_at %}
+                                {% with listing.created_at|timesince as age %}
+                                    {% if "day" in age and age|first == "1" or age|first == "0" %}
+                                        <span class="lc-age-badge">New</span>
+                                    {% elif "days" in age %}
+                                        {# Only show if ≤7 days #}
+                                        {% with age|slice:":2"|add:"" as daynum %}
+                                            {% if daynum|add:"0" <= 7 %}
+                                                <span class="lc-age-badge">{{ age|slice:":6" }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+
                             <div class="lc-price-overlay">
                                 NPR {{ listing.monthly_rent|floatformat:0 }}/mo
                             </div>
@@ -992,8 +1098,7 @@
                     <i class="bi bi-house-slash"></i>
                     <h5>No listings found</h5>
                     <p>Try adjusting your filters or search terms.</p>
-                    <a href="{% url 'listings:homepage' %}"
-                       class="btn btn-outline-primary btn-sm mt-2">
+                    <a href="{% url 'listings:homepage' %}" class="btn btn-outline-primary btn-sm mt-2">
                         Clear all filters
                     </a>
                 </div>
@@ -1004,69 +1109,56 @@
         {% if page_obj.paginator.num_pages > 1 %}
         <div class="d-flex justify-content-between align-items-center mt-4">
             <small class="text-muted">
-                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
-                of {{ total_count }} listings
+                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ total_count }} listings
             </small>
             <nav>
                 <ul class="pagination pagination-sm mb-0">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link"
-                               href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ page_obj.previous_page_number }}">
+                            <a class="page-link" href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ page_obj.previous_page_number }}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link"><i class="bi bi-chevron-left"></i></span>
-                        </li>
+                        <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
                     {% endif %}
 
                     {% for num in page_obj.paginator.page_range %}
                         {% if page_obj.number == num %}
                             <li class="page-item active">
-                                <span class="page-link"
-                                      style="background:var(--navy);border-color:var(--navy);">
-                                    {{ num }}
-                                </span>
+                                <span class="page-link" style="background:var(--navy);border-color:var(--navy);">{{ num }}</span>
                             </li>
                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link"
-                                   href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ num }}">
-                                    {{ num }}
-                                </a>
+                                <a class="page-link" href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ num }}">{{ num }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link"
-                               href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ page_obj.next_page_number }}">
+                            <a class="page-link" href="?{{ query_string }}&sort={{ current_filters.sort }}&page={{ page_obj.next_page_number }}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link"><i class="bi bi-chevron-right"></i></span>
-                        </li>
+                        <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
                     {% endif %}
                 </ul>
             </nav>
         </div>
         {% endif %}
 
+
         <!-- Recently Viewed -->
         {% if recently_viewed %}
-        <div class="mt-5">
+        <div class="mt-4">
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <h6 class="fw-bold mb-0" style="font-size:0.82rem;color:var(--navy);">
                     <i class="bi bi-clock-history"></i> Recently viewed
                 </h6>
                 <button class="btn btn-sm btn-outline-secondary py-0 px-2"
-                        style="font-size:0.7rem;"
-                        onclick="clearRecentlyViewed()">
+                        style="font-size:0.7rem;" onclick="clearRecentlyViewed()">
                     Clear
                 </button>
             </div>
@@ -1074,10 +1166,8 @@
                 {% for listing in recently_viewed %}
                 <a class="rv-card" href="{% url 'listings:detail' listing.pk %}">
                     {% with listing.primary_image as img %}
-                        {% if img %}
-                            <img src="{{ img.image.url }}" alt="{{ listing.title }}">
-                        {% else %}
-                            <div class="rv-thumb"><i class="bi bi-image"></i></div>
+                        {% if img %}<img src="{{ img.image.url }}" alt="{{ listing.title }}">
+                        {% else %}<div class="rv-thumb"><i class="bi bi-image"></i></div>
                         {% endif %}
                     {% endwith %}
                     <div class="rv-info">
@@ -1099,7 +1189,7 @@
 {{ districts|json_script:"districts-data" }}
 <script>
 /* ── District loader ── */
-const districtsData = JSON.parse(document.getElementById('districts-data').textContent);
+const districtsData   = JSON.parse(document.getElementById('districts-data').textContent);
 const provinceSelect  = document.getElementById('provinceSelect');
 const districtSelect  = document.getElementById('districtSelect');
 const currentDistrict = "{{ current_filters.district }}";
@@ -1114,8 +1204,11 @@ function loadDistricts(province) {
     });
 }
 if (provinceSelect && provinceSelect.value) loadDistricts(provinceSelect.value);
-if (provinceSelect) {
-    provinceSelect.addEventListener('change', () => loadDistricts(provinceSelect.value));
+if (provinceSelect) provinceSelect.addEventListener('change', () => loadDistricts(provinceSelect.value));
+
+/* ── Sidebar accordion ── */
+function toggleFb(id) {
+    document.getElementById(id).classList.toggle('collapsed');
 }
 
 /* ── Sidebar (mobile) ── */
@@ -1130,6 +1223,38 @@ function closeSidebar() {
     document.body.style.overflow = '';
 }
 
+/* ── Skeleton loader on filter submit ── */
+document.getElementById('filterForm').addEventListener('submit', function () {
+    document.getElementById('listingGrid').style.display = 'none';
+    document.getElementById('skeletonGrid').style.display = 'grid';
+});
+
+/* ── Stat counter animation ── */
+function animateCount(el) {
+    const target = parseInt(el.dataset.countTo, 10);
+    if (isNaN(target) || target === 0) return;
+    const duration = 900;
+    const step = Math.ceil(duration / target);
+    let current = 0;
+    const timer = setInterval(() => {
+        current += Math.max(1, Math.ceil(target / 60));
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = current;
+    }, duration / 60);
+}
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            document.querySelectorAll('[data-count-to]').forEach(animateCount);
+            observer.disconnect();
+        }
+    });
+}, { threshold: 0.2 });
+
+const heroEl = document.querySelector('.rf-hero');
+if (heroEl) observer.observe(heroEl);
+
 /* ── Recently viewed ── */
 function clearRecentlyViewed() {
     fetch("{% url 'listings:clear_recently_viewed' %}", {
@@ -1141,48 +1266,27 @@ function clearRecentlyViewed() {
     }).then(() => location.reload());
 }
 
-/* ── Slim ad bar + modal ── */
+/* ── Ad bar + modal ── */
 (function () {
-    const bar         = document.getElementById('rfAdBar');
-    const backdrop    = document.getElementById('rfAdModalBackdrop');
-    const learnMore   = document.getElementById('rfAdLearnMore');
-    const barClose    = document.getElementById('rfAdBarClose');
-    const modalClose  = document.getElementById('rfAdModalClose');
+    const bar          = document.getElementById('rfAdBar');
+    const backdrop     = document.getElementById('rfAdModalBackdrop');
+    const learnMore    = document.getElementById('rfAdLearnMore');
+    const barClose     = document.getElementById('rfAdBarClose');
+    const modalClose   = document.getElementById('rfAdModalClose');
     const modalDismiss = document.getElementById('rfAdModalDismiss');
 
     if (!bar) return;
 
-    function openModal() {
-        backdrop.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-        backdrop.classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    function dismissBar() {
-        bar.classList.add('dismissed');
-        closeModal();
-    }
+    function openModal()   { backdrop.classList.add('open');    document.body.style.overflow = 'hidden'; }
+    function closeModal()  { backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+    function dismissBar()  { bar.classList.add('dismissed');    closeModal(); }
 
     if (learnMore)    learnMore.addEventListener('click', openModal);
     if (barClose)     barClose.addEventListener('click', dismissBar);
     if (modalClose)   modalClose.addEventListener('click', closeModal);
     if (modalDismiss) modalDismiss.addEventListener('click', dismissBar);
-
-    /* Close on backdrop click (outside modal box) */
-    if (backdrop) {
-        backdrop.addEventListener('click', function (e) {
-            if (e.target === backdrop) closeModal();
-        });
-    }
-
-    /* Close on Escape key */
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeModal();
-    });
+    if (backdrop)     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 })();
 </script>
 {% endblock %}
