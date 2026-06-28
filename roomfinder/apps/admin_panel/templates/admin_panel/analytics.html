@@ -11,37 +11,132 @@
     overflow:hidden;
     transition:.3s ease;
 }
-
 .analytics-card:hover{
     transform:translateY(-4px);
 }
 
 .stat-card{
     border:none;
-    border-radius:24px;
+    border-radius:20px;
     background:#fff;
     box-shadow:0 10px 30px rgba(0,0,0,.06);
+    position:relative;
+    overflow:hidden;
 }
+.stat-card::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:5px; height:100%;
+    background:var(--accent-color, var(--navy));
+}
+.stat-card .icon-wrap{
+    width:56px; height:56px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--icon-bg, rgba(15,27,45,.08));
+    color:var(--accent-color, var(--navy));
+    font-size:1.5rem;
+    flex-shrink:0;
+}
+.trend-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:.78rem;
+    font-weight:600;
+    padding:3px 10px;
+    border-radius:20px;
+}
+.trend-up{ background:rgba(25,135,84,.12); color:#198754; }
+.trend-flat{ background:rgba(108,117,125,.12); color:#6c757d; }
 
 .chart-card{
     border:none;
-    border-radius:24px;
+    border-radius:20px;
     background:#fff;
     box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+.chart-card .card-header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.5rem;
+}
+.chart-empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:260px;
+    color:#adb5bd;
+    text-align:center;
+}
+.chart-empty i{ font-size:2.75rem; opacity:.4; margin-bottom:.75rem; }
+
+.chart-wrap{ position:relative; }
+.donut-center{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    pointer-events:none;
+}
+.donut-center .num{
+    font-size:1.9rem;
+    font-weight:800;
+    color:var(--navy);
+    line-height:1;
+}
+.donut-center .lbl{
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:#9aa3af;
+    margin-top:2px;
+}
+
+.legend-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem 1.2rem;
+    margin-top:1rem;
+    justify-content:center;
+}
+.legend-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:.82rem;
+    color:#495057;
+}
+.legend-dot{
+    width:10px; height:10px;
+    border-radius:50%;
+    flex-shrink:0;
 }
 
 .table-card{
     border:none;
-    border-radius:24px;
+    border-radius:20px;
     overflow:hidden;
     box-shadow:0 10px 30px rgba(0,0,0,.06);
 }
 
-.analytics-icon{
-    font-size:3rem;
-    opacity:.15;
+.rank-badge{
+    width:28px; height:28px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:.8rem;
+    background:rgba(15,27,45,.07);
     color:var(--navy);
 }
+.rank-badge.gold{ background:rgba(201,168,76,.18); color:#a3812e; }
 
 .section-title{
     color:var(--navy);
@@ -54,279 +149,196 @@
 <div class="container-fluid py-5">
 
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-
+    <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
         <div>
-
-            <span class="text-uppercase fw-bold small"
-                  style="color:var(--coral);letter-spacing:.15em;">
+            <span class="text-uppercase fw-bold small" style="color:var(--coral);letter-spacing:.15em;">
                 Platform Insights
             </span>
-
-            <h1 class="display-5 fw-bold mt-2 mb-2 section-title">
-                Revenue Analytics
-            </h1>
-
-            <p class="text-muted mb-0">
-                Real-time platform performance and growth overview.
-            </p>
-
+            <h1 class="display-5 fw-bold mt-2 mb-2 section-title">Revenue Analytics</h1>
+            <p class="text-muted mb-0">Real-time platform performance and growth overview.</p>
         </div>
-
-        <a href="{% url 'admin_panel:dashboard' %}"
-           class="btn btn-outline-secondary">
-            ← Dashboard
-        </a>
-
+        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary">← Dashboard</a>
     </div>
 
     <!-- Stats -->
-
     <div class="row g-4 mb-5">
 
         <div class="col-lg-3 col-md-6">
-
-            <div class="stat-card p-4 h-100">
-
-                <div class="d-flex justify-content-between align-items-center">
-
+            <div class="stat-card p-4 h-100" style="--accent-color:#0F1B2D; --icon-bg:rgba(15,27,45,.08);">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-
-                        <small class="text-muted">
-                            Total Phone Reveals
-                        </small>
-
-                        <div class="display-6 fw-bold mt-2"
-                             style="color:var(--navy);">
-                            {{ total_reveals }}
-                        </div>
-
-                        <small class="text-success">
-                            +{{ reveals_this_month }} this month
-                        </small>
-
+                        <small class="text-muted fw-semibold text-uppercase" style="font-size:.72rem;letter-spacing:.05em;">Total Phone Reveals</small>
+                        <div class="display-6 fw-bold mt-2 mb-2" style="color:var(--navy);">{{ total_reveals }}</div>
+                        {% if reveals_this_month > 0 %}
+                            <span class="trend-pill trend-up"><i class="bi bi-arrow-up-short"></i>+{{ reveals_this_month }} this month</span>
+                        {% else %}
+                            <span class="trend-pill trend-flat">No new reveals this month</span>
+                        {% endif %}
                     </div>
-
-                    <i class="bi bi-telephone-fill analytics-icon"></i>
-
+                    <div class="icon-wrap"><i class="bi bi-telephone-fill"></i></div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-lg-3 col-md-6">
-
-            <div class="stat-card p-4 h-100">
-
-                <div class="d-flex justify-content-between align-items-center">
-
+            <div class="stat-card p-4 h-100" style="--accent-color:#198754; --icon-bg:rgba(25,135,84,.10);">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-
-                        <small class="text-muted">
-                            Total Users
-                        </small>
-
-                        <div class="display-6 fw-bold mt-2"
-                             style="color:var(--navy);">
-                            {{ total_users }}
-                        </div>
-
-                        <small class="text-success">
-                            +{{ new_users_month }} this month
-                        </small>
-
+                        <small class="text-muted fw-semibold text-uppercase" style="font-size:.72rem;letter-spacing:.05em;">Total Users</small>
+                        <div class="display-6 fw-bold mt-2 mb-2" style="color:var(--navy);">{{ total_users }}</div>
+                        {% if new_users_month > 0 %}
+                            <span class="trend-pill trend-up"><i class="bi bi-arrow-up-short"></i>+{{ new_users_month }} this month</span>
+                        {% else %}
+                            <span class="trend-pill trend-flat">No new signups this month</span>
+                        {% endif %}
                     </div>
-
-                    <i class="bi bi-people-fill analytics-icon"></i>
-
+                    <div class="icon-wrap"><i class="bi bi-people-fill"></i></div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-lg-3 col-md-6">
-
-            <div class="stat-card p-4 h-100">
-
-                <div class="d-flex justify-content-between align-items-center">
-
+            <div class="stat-card p-4 h-100" style="--accent-color:#C9A84C; --icon-bg:rgba(201,168,76,.15);">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-
-                        <small class="text-muted">
-                            Active Listings
-                        </small>
-
-                        <div class="display-6 fw-bold mt-2"
-                             style="color:var(--navy);">
-                            {{ approved_listings }}
-                        </div>
-
-                        <small class="text-muted">
-                            {{ pending_listings }} pending review
-                        </small>
-
+                        <small class="text-muted fw-semibold text-uppercase" style="font-size:.72rem;letter-spacing:.05em;">Active Listings</small>
+                        <div class="display-6 fw-bold mt-2 mb-2" style="color:var(--navy);">{{ approved_listings }}</div>
+                        {% if pending_listings > 0 %}
+                            <span class="trend-pill" style="background:rgba(201,168,76,.18);color:#a3812e;"><i class="bi bi-hourglass-split"></i>{{ pending_listings }} pending review</span>
+                        {% else %}
+                            <span class="trend-pill trend-flat">No pending reviews</span>
+                        {% endif %}
                     </div>
-
-                    <i class="bi bi-house-fill analytics-icon"></i>
-
+                    <div class="icon-wrap"><i class="bi bi-house-fill"></i></div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-lg-3 col-md-6">
-
-            <div class="stat-card p-4 h-100">
-
-                <div class="d-flex justify-content-between align-items-center">
-
+            <div class="stat-card p-4 h-100" style="--accent-color:var(--coral); --icon-bg:rgba(255,99,71,.12);">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-
-                        <small class="text-muted">
-                            Active Ads
-                        </small>
-
-                        <div class="display-6 fw-bold mt-2"
-                             style="color:var(--navy);">
-                            {{ active_ads }}
-                        </div>
-
-                        <small class="text-muted">
-                            {{ inactive_ads }} inactive
-                        </small>
-
+                        <small class="text-muted fw-semibold text-uppercase" style="font-size:.72rem;letter-spacing:.05em;">Active Ads</small>
+                        <div class="display-6 fw-bold mt-2 mb-2" style="color:var(--navy);">{{ active_ads }}</div>
+                        <span class="trend-pill trend-flat">{{ inactive_ads }} inactive</span>
                     </div>
-
-                    <i class="bi bi-megaphone-fill analytics-icon"></i>
-
+                    <div class="icon-wrap"><i class="bi bi-megaphone-fill"></i></div>
                 </div>
-
             </div>
-
         </div>
 
     </div>
 
-    <!-- Charts Row -->
-
+    <!-- Charts Row 1 -->
     <div class="row g-4 mb-4">
 
         <div class="col-lg-8">
-
             <div class="chart-card p-4 h-100">
-
-                <h5 class="fw-bold mb-4 section-title">
-                    <i class="bi bi-graph-up-arrow me-2"></i>
-                    Phone Reveals — Last 30 Days
-                </h5>
-
+                <div class="card-header-row">
+                    <h5 class="fw-bold mb-0 section-title">
+                        <i class="bi bi-graph-up-arrow me-2" style="color:var(--coral);"></i>
+                        Phone Reveals — Last 30 Days
+                    </h5>
+                    {% if daily_reveals_labels %}
+                    <span class="badge rounded-pill" style="background:rgba(15,27,45,.08);color:var(--navy);">Total: {{ total_reveals }}</span>
+                    {% endif %}
+                </div>
                 {% if daily_reveals_labels %}
-                    <canvas id="revealsChart" height="100"></canvas>
+                    <div class="chart-wrap"><canvas id="revealsChart" height="110"></canvas></div>
                 {% else %}
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-graph-up" style="font-size:4rem;"></i>
-                        <p class="mt-3">
-                            No reveal data yet.
-                        </p>
+                    <div class="chart-empty">
+                        <i class="bi bi-graph-up"></i>
+                        <p class="mb-0">No reveal data yet. Activity will appear here once tenants start revealing landlord numbers.</p>
                     </div>
                 {% endif %}
-
             </div>
-
         </div>
 
         <div class="col-lg-4">
-
             <div class="chart-card p-4 h-100">
-
-                <h5 class="fw-bold mb-4 section-title">
-                    <i class="bi bi-pie-chart-fill me-2"></i>
-                    Listings by Province
-                </h5>
-
+                <div class="card-header-row">
+                    <h5 class="fw-bold mb-0 section-title">
+                        <i class="bi bi-pie-chart-fill me-2" style="color:var(--coral);"></i>
+                        Listings by Province
+                    </h5>
+                </div>
                 {% if province_labels %}
-                    <canvas id="provinceChart"></canvas>
+                    <div class="chart-wrap" style="max-width:260px;margin:0 auto;">
+                        <canvas id="provinceChart"></canvas>
+                        <div class="donut-center">
+                            <div class="num">{{ approved_listings }}</div>
+                            <div class="lbl">Listings</div>
+                        </div>
+                    </div>
+                    <div id="provinceLegend" class="legend-row"></div>
                 {% else %}
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-pie-chart" style="font-size:4rem;"></i>
-                        <p class="mt-3">
-                            No approved listings yet.
-                        </p>
+                    <div class="chart-empty">
+                        <i class="bi bi-pie-chart"></i>
+                        <p class="mb-0">No approved listings yet.</p>
                     </div>
                 {% endif %}
-
             </div>
-
         </div>
 
     </div>
-        <!-- Second Charts Row -->
 
+    <!-- Charts Row 2 -->
     <div class="row g-4 mb-5">
 
         <div class="col-lg-6">
-
             <div class="chart-card p-4 h-100">
-
-                <h5 class="fw-bold mb-4 section-title">
-                    <i class="bi bi-person-plus-fill me-2"></i>
-                    New User Registrations
-                </h5>
-
+                <div class="card-header-row">
+                    <h5 class="fw-bold mb-0 section-title">
+                        <i class="bi bi-person-plus-fill me-2" style="color:var(--coral);"></i>
+                        New User Registrations
+                    </h5>
+                    {% if new_users_labels %}
+                    <span class="badge rounded-pill" style="background:rgba(25,135,84,.1);color:#198754;">+{{ new_users_month }} this month</span>
+                    {% endif %}
+                </div>
                 {% if new_users_labels %}
-                    <canvas id="usersChart" height="120"></canvas>
+                    <div class="chart-wrap"><canvas id="usersChart" height="130"></canvas></div>
                 {% else %}
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-people" style="font-size:4rem;"></i>
-                        <p class="mt-3">
-                            No new user data available.
-                        </p>
+                    <div class="chart-empty">
+                        <i class="bi bi-people"></i>
+                        <p class="mb-0">No new user data available.</p>
                     </div>
                 {% endif %}
-
             </div>
-
         </div>
 
         <div class="col-lg-6">
-
             <div class="chart-card p-4 h-100">
-
-                <h5 class="fw-bold mb-4 section-title">
-                    <i class="bi bi-house-check-fill me-2"></i>
-                    Listing Status Breakdown
-                </h5>
-
-                <canvas id="statusChart" height="120"></canvas>
-
+                <div class="card-header-row">
+                    <h5 class="fw-bold mb-0 section-title">
+                        <i class="bi bi-house-check-fill me-2" style="color:var(--coral);"></i>
+                        Listing Status Breakdown
+                    </h5>
+                </div>
+                <div class="chart-wrap" style="max-width:260px;margin:0 auto;">
+                    <canvas id="statusChart" height="130"></canvas>
+                    <div class="donut-center">
+                        <div class="num">{{ approved_listings|add:pending_listings|add:rejected_listings }}</div>
+                        <div class="lbl">Total</div>
+                    </div>
+                </div>
+                <div id="statusLegend" class="legend-row"></div>
             </div>
-
         </div>
 
     </div>
 
     <!-- Top Listings -->
-
     <div class="table-card">
-
         <div class="bg-white p-4 border-bottom">
-
             <h5 class="fw-bold mb-0 section-title">
                 <i class="bi bi-trophy-fill text-warning me-2"></i>
                 Top Listings by Phone Reveals
             </h5>
-
         </div>
-
         <div class="table-responsive">
-
             <table class="table table-hover align-middle mb-0">
-
                 <thead class="table-light">
-
                     <tr>
                         <th>#</th>
                         <th>Listing</th>
@@ -334,69 +346,24 @@
                         <th>Phone Reveals</th>
                         <th>Action</th>
                     </tr>
-
                 </thead>
-
                 <tbody>
-
                     {% for item in top_listings %}
-
                     <tr>
-
-                        <td class="text-muted">
-                            {{ forloop.counter }}
-                        </td>
-
-                        <td>
-                            <strong>
-                                {{ item.listing__title|truncatechars:40 }}
-                            </strong>
-                        </td>
-
-                        <td>
-                            {{ item.listing__district }}
-                        </td>
-
-                        <td>
-
-                            <span class="badge bg-primary px-3 py-2">
-                                {{ item.reveal_count }} reveals
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <a href="{% url 'admin_panel:review_listing' item.listing__pk %}"
-                               class="btn btn-sm btn-outline-primary">
-                                View
-                            </a>
-
-                        </td>
-
+                        <td><span class="rank-badge {% if forloop.counter == 1 %}gold{% endif %}">{{ forloop.counter }}</span></td>
+                        <td><strong>{{ item.listing__title|truncatechars:40 }}</strong></td>
+                        <td>{{ item.listing__district }}</td>
+                        <td><span class="badge bg-primary px-3 py-2">{{ item.reveal_count }} reveals</span></td>
+                        <td><a href="{% url 'admin_panel:review_listing' item.listing__pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-
                     {% empty %}
-
                     <tr>
-
-                        <td colspan="5"
-                            class="text-center py-5 text-muted">
-
-                            No reveal data available.
-
-                        </td>
-
+                        <td colspan="5" class="text-center py-5 text-muted">No reveal data available.</td>
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
 
 </div>
@@ -405,233 +372,210 @@
 {% block extra_js %}
 <script>
 
-const primaryColor = '#0F1B2D';
-const successColor = '#198754';
-const warningColor = '#C9A84C';
-const dangerColor  = '#dc3545';
+const navy    = '#0F1B2D';
+const coral   = '#FF6347';
+const gold    = '#C9A84C';
+const success = '#198754';
+const danger  = '#dc3545';
+const info    = '#0dcaf0';
 
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.color = '#6c757d';
+
+function withAlpha(hex, alpha){
+    const c = hex.replace('#','');
+    const r = parseInt(c.substring(0,2),16);
+    const g = parseInt(c.substring(2,4),16);
+    const b = parseInt(c.substring(4,6),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
 
 // ---------------- REVEALS CHART ----------------
-
 {% if daily_reveals_labels %}
-new Chart(document.getElementById('revealsChart'), {
+(function(){
+    const ctx = document.getElementById('revealsChart');
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, withAlpha(coral, 0.25));
+    gradient.addColorStop(1, withAlpha(coral, 0.0));
 
-    type: 'line',
-
-    data: {
-
-        labels: {{ daily_reveals_labels|safe }},
-
-        datasets: [{
-
-            label: 'Phone Reveals',
-
-            data: {{ daily_reveals_data|safe }},
-
-            borderColor: primaryColor,
-
-            backgroundColor: 'rgba(15,27,45,.08)',
-
-            borderWidth: 3,
-
-            fill: true,
-
-            tension: .4,
-
-            pointRadius: 4,
-
-            pointBackgroundColor: primaryColor
-
-        }]
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-            legend: {
-                display: false
-            }
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ daily_reveals_labels|safe }},
+            datasets: [{
+                label: 'Phone Reveals',
+                data: {{ daily_reveals_data|safe }},
+                borderColor: coral,
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: .35,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: coral,
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 2
+            }]
         },
-
-        scales: {
-
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: navy,
+                    padding: 12,
+                    cornerRadius: 10,
+                    titleFont: { weight: '600' },
+                    displayColors: false
+                }
             },
-
-            x: {
-                grid: {
-                    display: false
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, precision: 0 },
+                    grid: { color: 'rgba(0,0,0,.05)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }
                 }
             }
         }
-    }
-});
+    });
+})();
 {% endif %}
-
 
 // ---------------- PROVINCE CHART ----------------
-
 {% if province_labels %}
-new Chart(document.getElementById('provinceChart'), {
+(function(){
+    const labels = {{ province_labels|safe }};
+    const data = {{ province_data|safe }};
+    const palette = [navy, gold, success, info, coral, '#6f42c1', danger];
 
-    type: 'doughnut',
-
-    data: {
-
-        labels: {{ province_labels|safe }},
-
-        datasets: [{
-
-            data: {{ province_data|safe }},
-
-            backgroundColor: [
-
-                '#0F1B2D',
-                '#C9A84C',
-                '#198754',
-                '#0dcaf0',
-                '#fd7e14',
-                '#6f42c1',
-                '#dc3545'
-
-            ],
-
-            borderWidth: 2,
-            borderColor: '#fff'
-
-        }]
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-
-            legend: {
-
-                position: 'bottom',
-
-                labels: {
-                    padding: 15
+    new Chart(document.getElementById('provinceChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: palette,
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: navy,
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: (c) => `${c.label}: ${c.raw} listing${c.raw === 1 ? '' : 's'}`
+                    }
                 }
             }
         }
-    }
-});
-{% endif %}
+    });
 
+    const legendEl = document.getElementById('provinceLegend');
+    labels.forEach((label, i) => {
+        legendEl.innerHTML += `<div class="legend-item"><span class="legend-dot" style="background:${palette[i % palette.length]}"></span>${label} (${data[i]})</div>`;
+    });
+})();
+{% endif %}
 
 // ---------------- USER GROWTH CHART ----------------
-
 {% if new_users_labels %}
-new Chart(document.getElementById('usersChart'), {
+(function(){
+    const ctx = document.getElementById('usersChart');
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, navy);
+    gradient.addColorStop(1, withAlpha(navy, 0.6));
 
-    type: 'bar',
-
-    data: {
-
-        labels: {{ new_users_labels|safe }},
-
-        datasets: [{
-
-            label: 'Users',
-
-            data: {{ new_users_data|safe }},
-
-            backgroundColor: 'rgba(15,27,45,.85)',
-
-            borderRadius: 8
-
-        }]
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-
-            legend: {
-                display: false
-            }
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ new_users_labels|safe }},
+            datasets: [{
+                label: 'Users',
+                data: {{ new_users_data|safe }},
+                backgroundColor: gradient,
+                borderRadius: 6,
+                maxBarThickness: 34
+            }]
         },
-
-        scales: {
-
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: navy,
+                    padding: 10,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
             },
-
-            x: {
-                grid: { display: false }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, precision: 0 },
+                    grid: { color: 'rgba(0,0,0,.05)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }
+                }
             }
         }
-    }
-});
+    });
+})();
 {% endif %}
 
-
 // ---------------- STATUS CHART ----------------
+(function(){
+    const labels = ['Approved', 'Pending', 'Rejected'];
+    const data = [{{ approved_listings }}, {{ pending_listings }}, {{ rejected_listings }}];
+    const palette = [success, gold, danger];
 
-new Chart(document.getElementById('statusChart'), {
-
-    type: 'doughnut',
-
-    data: {
-
-        labels: ['Approved','Pending','Rejected'],
-
-        datasets: [{
-
-            data: [
-
-                {{ approved_listings }},
-                {{ pending_listings }},
-                {{ rejected_listings }}
-
-            ],
-
-            backgroundColor: [
-
-                successColor,
-                warningColor,
-                dangerColor
-
-            ],
-
-            borderWidth: 2,
-            borderColor: '#fff'
-
-        }]
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-
-            legend: {
-
-                position: 'bottom',
-
-                labels: {
-                    padding: 15
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: palette,
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: navy,
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: (c) => `${c.label}: ${c.raw}`
+                    }
                 }
-
             }
-
         }
+    });
 
-    }
-
-});
+    const legendEl = document.getElementById('statusLegend');
+    labels.forEach((label, i) => {
+        legendEl.innerHTML += `<div class="legend-item"><span class="legend-dot" style="background:${palette[i]}"></span>${label} (${data[i]})</div>`;
+    });
+})();
 
 </script>
 {% endblock %}
